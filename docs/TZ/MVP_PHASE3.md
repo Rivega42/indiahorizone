@@ -65,11 +65,33 @@
 ### M4: Operations & Onboarding
 Чек-листы гида, регламенты онбординга клиента, договор с гидом, остальные согласия. См. карту в [#89](https://github.com/Rivega42/indiahorizone/issues/89).
 
-### M5: «Кружок» Production
-Запись/сжатие/очередь/доставка/воспроизведение видео-фидбэка. UX дашборда — ядро + кружок. Базовая архитектура микросервисов.
+### M5: «Кружок» Production + архитектура
+Архитектура и backlog зафиксированы:
+- [x] `docs/ARCH/README.md`, `MICROSERVICES.md`, `OFFLINE.md`, `EVENTS.md`, `VIDEO_CIRCLE/README.md`
+- [x] `docs/BACKLOG/M5/` — 11 slices (A–K), ~118 атомарных issues, ~586 часов
+- [ ] Утверждение founders → массовое создание issues в GitHub
+- [ ] Реализация по slice'ам (начиная с A → MVP-1)
 
 ### M6: Growth & Optional
-Программа лояльности, GDPR (если нужно), OpenAPI, traces, расширения дашборда (гайды/утилиты/соц/сервис).
+Программа лояльности (см. [`docs/LOYALTY/`](../LOYALTY/)), GDPR (если нужно), OpenAPI, traces, расширения дашборда (гайды/утилиты/соц/сервис).
+
+### Закрытые в этой итерации каркасы
+
+- [x] `docs/JTBD.md` — JTBD клиентов и команды (EPIC 1)
+- [x] `docs/USER_STORIES.md` — INVEST-истории по ролям с приоритетами (EPIC 1)
+- [x] `docs/LOYALTY/README.md`, `REFERRAL.md`, `REPEAT.md`, `UGC.md` — программа лояльности фазы 3 (EPIC 8, [#86](https://github.com/Rivega42/indiahorizone/issues/86))
+- [x] `docs/BUSINESS_MODEL/UNIT_ECONOMICS.md` — каркас юнит-экономики ([#9](https://github.com/Rivega42/indiahorizone/issues/9))
+- [x] `CLAUDE.md § 5, § 6` — принципы «документы — часть фичи» и «проактивные рекомендации»
+- [x] `CONTRIBUTING.md` — PR-чеклист и шаблон с обязательным разделом зависимых документов
+
+### M4 — Operations & Onboarding (закрыто в этой итерации)
+
+- [x] `docs/OPS/GUIDE_ONBOARDING.md` — воронка найма, скрининг, интервью, тест-выезд, стажировка, аттестация, категории, расторжение
+- [x] `docs/OPS/GUIDE_CHECKLISTS.md` — ежедневные SOP (pre-trip, аэропорт, утро, день, debrief, конец поездки, внештатные, аптечка)
+- [x] `docs/LEGAL/CONTRACTS/GUIDE_CONTRACT.md` — договор IH IN PVT LTD ↔ гид (service contract, TDS, NDA, non-solicit)
+- [x] `docs/LEGAL/CONSENTS/PHOTO_VIDEO.md` ([#53](https://github.com/Rivega42/indiahorizone/issues/53)) — granular 4 уровня
+- [x] `docs/LEGAL/CONSENTS/GEO.md` ([#54](https://github.com/Rivega42/indiahorizone/issues/54)) — granular SOS / live / геофенс / аналитика
+- [x] `docs/LEGAL/CONSENTS/EMERGENCY_CONTACTS.md` ([#55](https://github.com/Rivega42/indiahorizone/issues/55)) — двойное согласие, регламент звонка
 
 ## Метрики успеха фазы 3 → фазы 4
 

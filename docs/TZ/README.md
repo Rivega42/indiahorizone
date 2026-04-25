@@ -20,14 +20,14 @@
 
 | Эпик | Issue | Статус | Документ |
 |---|---|---|---|
-| 1. Документация продукта | [#1](https://github.com/Rivega42/indiahorizone/issues/1) | open | `docs/JTBD.md`, `docs/USER_STORIES.md`, `docs/BUSINESS_MODEL.md` |
+| 1. Документация продукта | [#1](https://github.com/Rivega42/indiahorizone/issues/1) | in progress | `docs/JTBD.md`, `docs/USER_STORIES.md`, `docs/BUSINESS_MODEL.md`, `docs/BUSINESS_MODEL/UNIT_ECONOMICS.md` |
 | 2. Платежи и финансы | [#11](https://github.com/Rivega42/indiahorizone/issues/11) | open | `docs/FINANCE/` |
 | 3. SOS | [#19](https://github.com/Rivega42/indiahorizone/issues/19) | open | `docs/SOS/` |
 | 4. Операции | [#31](https://github.com/Rivega42/indiahorizone/issues/31) | open | `docs/OPS/` |
 | 5. Юридика и compliance | [#47](https://github.com/Rivega42/indiahorizone/issues/47) | open | `docs/LEGAL/` |
 | 6. Архитектура (микросервисы) | [#57](https://github.com/Rivega42/indiahorizone/issues/57) | open | `docs/ARCH/` |
 | 7. UX и фичи | [#77](https://github.com/Rivega42/indiahorizone/issues/77) | open | `docs/UX/` |
-| 8. Программа лояльности | [#86](https://github.com/Rivega42/indiahorizone/issues/86) | open | `docs/LOYALTY/` |
+| 8. Программа лояльности | [#86](https://github.com/Rivega42/indiahorizone/issues/86) | in progress | `docs/LOYALTY/` |
 | 9. ТЗ v1.0 (этот документ) | [#89](https://github.com/Rivega42/indiahorizone/issues/89) | in progress | `docs/TZ/` |
 | 10. Гигиена репозитория | [#93](https://github.com/Rivega42/indiahorizone/issues/93) | open | корень репо |
 
@@ -57,6 +57,13 @@
 - Что НЕ продаём в фазе 3: авиабилеты, страховку — только рекомендуем.
 - Платежи: РФ юрлицо → IN юрлицо. См. [`docs/FINANCE/`](../FINANCE/).
 
+Юнит-экономика — [`docs/BUSINESS_MODEL/UNIT_ECONOMICS.md`](../BUSINESS_MODEL/UNIT_ECONOMICS.md) (#9).
+
+## JTBD и user stories
+
+- [`docs/JTBD.md`](../JTBD.md) — клиентские и внутренние JTBD.
+- [`docs/USER_STORIES.md`](../USER_STORIES.md) — INVEST-истории по ролям с приоритетами P0/P1/P2.
+
 ## Границы продукта
 
 См. [`docs/BUSINESS_MODEL.md` § Граница ответственности](../BUSINESS_MODEL.md) (issue [#10](https://github.com/Rivega42/indiahorizone/issues/10)).
@@ -69,6 +76,9 @@
 - [`docs/OPS/STRUCTURE.md`](../OPS/STRUCTURE.md) — RACI, смены 24/7
 - [`docs/OPS/SLA.md`](../OPS/SLA.md) — SLA по каналам
 - [`docs/OPS/ESCALATION.md`](../OPS/ESCALATION.md) — матрица эскалации
+- [`docs/OPS/CLIENT_ONBOARDING.md`](../OPS/CLIENT_ONBOARDING.md) — онбординг клиента
+- [`docs/OPS/GUIDE_ONBOARDING.md`](../OPS/GUIDE_ONBOARDING.md) — наём, проверка, обучение, аттестация гидов
+- [`docs/OPS/GUIDE_CHECKLISTS.md`](../OPS/GUIDE_CHECKLISTS.md) — ежедневные SOP гида
 
 ## SOS
 
@@ -84,6 +94,8 @@
 - [`docs/LEGAL/TOUR_OPERATOR.md`](../LEGAL/TOUR_OPERATOR.md) — статус: туроператор vs турагент
 - [`docs/LEGAL/PDN.md`](../LEGAL/PDN.md) — 152-ФЗ
 - [`docs/LEGAL/CONTRACTS/CLIENT_OFFER.md`](../LEGAL/CONTRACTS/CLIENT_OFFER.md) — оферта клиенту
+- [`docs/LEGAL/CONTRACTS/GUIDE_CONTRACT.md`](../LEGAL/CONTRACTS/GUIDE_CONTRACT.md) — договор IH IN PVT LTD ↔ гид
+- Согласия: [`PDN`](../LEGAL/CONSENTS/PDN.md), [`PHOTO_VIDEO`](../LEGAL/CONSENTS/PHOTO_VIDEO.md), [`GEO`](../LEGAL/CONSENTS/GEO.md), [`EMERGENCY_CONTACTS`](../LEGAL/CONSENTS/EMERGENCY_CONTACTS.md)
 
 ## Финансы
 
@@ -93,9 +105,26 @@
 
 См. [`docs/ARCH/`](../ARCH/) (EPIC 6 — issue [#57](https://github.com/Rivega42/indiahorizone/issues/57)).
 
+Стартовые точки:
+- [`docs/ARCH/README.md`](../ARCH/README.md) — индекс, принципы, стек
+- [`docs/ARCH/MICROSERVICES.md`](../ARCH/MICROSERVICES.md) — карта 10 модулей
+- [`docs/ARCH/OFFLINE.md`](../ARCH/OFFLINE.md) — offline-first
+- [`docs/ARCH/EVENTS.md`](../ARCH/EVENTS.md) — domain events на Redis Streams
+- [`docs/ARCH/VIDEO_CIRCLE/README.md`](../ARCH/VIDEO_CIRCLE/README.md) — кружок production
+
+## Backlog разработки
+
+См. [`docs/BACKLOG/M5/README.md`](../BACKLOG/M5/README.md) — атомарные issues по slice'ам (A–K), готовые к выгрузке в GitHub Issues.
+
 ## UX
 
 См. [`docs/UX/`](../UX/) (EPIC 7 — issue [#77](https://github.com/Rivega42/indiahorizone/issues/77)).
+
+## Программа лояльности
+
+См. [`docs/LOYALTY/`](../LOYALTY/) (EPIC 8 — issue [#86](https://github.com/Rivega42/indiahorizone/issues/86)).
+
+Принцип: не делаем накопительные баллы, делаем три простых механики — реферал, repeat-привилегии, UGC через дневник поездки.
 
 ## Глоссарий
 
