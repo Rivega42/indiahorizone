@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 
 import { EventsBusService } from './events-bus.service';
+import { IdempotencyService } from './idempotency.service';
 
 /**
  * Global EventsBus module — обёртка над Redis Streams.
@@ -11,17 +12,20 @@ import { EventsBusService } from './events-bus.service';
  * Принципы:
  * - publish() из bizz-логики НЕ вызывается напрямую. Используется outbox-pattern (#119).
  * - Subscribers регистрируются через bus.subscribe() в onModuleInit() конкретного модуля.
+ * - Идемпотентность handler'а гарантирована автоматически через
+ *   IdempotencyService (#120) — на основе таблицы processed_events.
  *
  * См. docs/ARCH/EVENTS.md.
  */
 @Global()
 @Module({
-  providers: [EventsBusService],
-  exports: [EventsBusService],
+  providers: [EventsBusService, IdempotencyService],
+  exports: [EventsBusService, IdempotencyService],
 })
 export class EventsBusModule {}
 
 export { EventsBusService } from './events-bus.service';
+export { IdempotencyService } from './idempotency.service';
 export type {
   DomainEvent,
   EventActor,
