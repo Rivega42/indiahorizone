@@ -1,0 +1,12 @@
+# CODEOWNERS — кто ревьюит что
+
+# По умолчанию — Roman ревьюит всё
+* @Rivega42
+
+# Документация — можно без ревью
+docs/ @Rivega42
+*.md @Rivega42
+
+# Инфраструктура
+docker-compose.yml @Rivega42
+.github/ @Rivega42

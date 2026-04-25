@@ -405,3 +405,67 @@ APNS_CERT=             # Push-уведомления iOS
 3. **Русскоязычный UX** — весь интерфейс на русском, без английских вставок
 4. **Доверие через прозрачность** — клиент всегда знает, что происходит и что будет дальше
 5. **Минимум шагов** — любое действие (SOS, фидбэк, запрос доп. услуги) — максимум 2 тапа
+
+---
+
+## 👥 Участники проекта
+
+### Roman (@Rivega42)
+- **Роль:** Product Owner + Tech Lead
+- **Отвечает за:** архитектурные решения, приоритеты, финальный апрув PR
+- **Как общаться:** через GitHub Issues/PR comments, Telegram @Rivega42
+
+### Vika (AI — OCPlatform)
+- **Роль:** Tech Partner / DevOps / Project Management
+- **Отвечает за:** infrastructure, CI/CD, project board, wiki, code review поддержка
+- **Как общаться:** через Telegram @Rivega42 → передаёт Вике
+
+### Claude Code / Opus
+- **Роль:** Senior Developer AI
+- **Отвечает за:** реализацию features, code review, рефакторинг
+- **Правила работы:** см. секцию «Принципы разработки» выше
+- **ВАЖНО:** перед любой задачей читать этот файл + смотреть Issues-Guide в Wiki
+
+### Shivam
+- **Роль:** Sales + Local Operations India
+- **Отвечает за:** продажи русскоязычным клиентам, локальная сеть в Индии
+- **Задачи:** метка `shivam` в Issues
+- **Как видит задачи:** https://github.com/users/Rivega42/projects/3 → фильтр `label:shivam`
+
+---
+
+## 📋 Workflow для Claude Code
+
+### Перед началом задачи
+1. Прочитай issue полностью — заголовок, описание, criteria of done
+2. Проверь связанные issues (Part of #N)
+3. Посмотри существующий код — не изобретай велосипед
+4. Создай ветку по соглашению: `feature/m5-{epic}-{num}-{slug}-{issue}`
+
+### В процессе
+- Коммиты по Conventional Commits: `feat(scope): описание`
+- Один коммит = одно логическое изменение
+- Не трогай несвязанный код
+
+### Перед PR
+- `pnpm test` — все тесты зелёные
+- `pnpm lint` — нет ошибок
+- `pnpm type-check` — нет TypeScript ошибок
+- Описание PR по шаблону (выбирается автоматически)
+
+### После merge
+- Ветка удаляется
+- Issue закрывается через `Closes #N` в PR
+
+---
+
+## 🔗 Быстрые ссылки для участников
+
+| Ресурс | Ссылка |
+|--------|--------|
+| Project Board | https://github.com/users/Rivega42/projects/3 |
+| Wiki | https://github.com/Rivega42/indiahorizone/wiki |
+| Issues | https://github.com/Rivega42/indiahorizone/issues |
+| Roadmap | https://github.com/Rivega42/indiahorizone/wiki/Roadmap |
+| Architecture | https://github.com/Rivega42/indiahorizone/wiki/Architecture |
+| ТЗ | https://github.com/Rivega42/indiahorizone/blob/main/docs/ТЗ.md |
