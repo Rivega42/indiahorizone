@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📋 Project Board
+    url: https://github.com/users/Rivega42/projects/3
+    about: Посмотреть статус всех задач
+  - name: 📖 Wiki
+    url: https://github.com/Rivega42/indiahorizone/wiki
+    about: Документация и руководства

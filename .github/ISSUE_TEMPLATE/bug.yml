@@ -1,0 +1,37 @@
+name: 🐛 Bug
+description: Что-то сломано
+title: "[P?] fix(?): "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Приоритет
+      options: ["P0 Critical", "P1 High", "P2 Medium", "P3 Low"]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемое поведение
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Фактическое поведение
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Платформа
+      multiple: true
+      options: ["iOS", "Android", "Web", "API"]
