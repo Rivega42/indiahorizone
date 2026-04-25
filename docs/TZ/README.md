@@ -105,6 +105,17 @@
 
 См. [`docs/ARCH/`](../ARCH/) (EPIC 6 — issue [#57](https://github.com/Rivega42/indiahorizone/issues/57)).
 
+Стартовые точки:
+- [`docs/ARCH/README.md`](../ARCH/README.md) — индекс, принципы, стек
+- [`docs/ARCH/MICROSERVICES.md`](../ARCH/MICROSERVICES.md) — карта 10 модулей
+- [`docs/ARCH/OFFLINE.md`](../ARCH/OFFLINE.md) — offline-first
+- [`docs/ARCH/EVENTS.md`](../ARCH/EVENTS.md) — domain events на Redis Streams
+- [`docs/ARCH/VIDEO_CIRCLE/README.md`](../ARCH/VIDEO_CIRCLE/README.md) — кружок production
+
+## Backlog разработки
+
+См. [`docs/BACKLOG/M5/README.md`](../BACKLOG/M5/README.md) — атомарные issues по slice'ам (A–K), готовые к выгрузке в GitHub Issues.
+
 ## UX
 
 См. [`docs/UX/`](../UX/) (EPIC 7 — issue [#77](https://github.com/Rivega42/indiahorizone/issues/77)).

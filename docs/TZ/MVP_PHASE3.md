@@ -65,8 +65,12 @@
 ### M4: Operations & Onboarding
 Чек-листы гида, регламенты онбординга клиента, договор с гидом, остальные согласия. См. карту в [#89](https://github.com/Rivega42/indiahorizone/issues/89).
 
-### M5: «Кружок» Production
-Запись/сжатие/очередь/доставка/воспроизведение видео-фидбэка. UX дашборда — ядро + кружок. Базовая архитектура микросервисов.
+### M5: «Кружок» Production + архитектура
+Архитектура и backlog зафиксированы:
+- [x] `docs/ARCH/README.md`, `MICROSERVICES.md`, `OFFLINE.md`, `EVENTS.md`, `VIDEO_CIRCLE/README.md`
+- [x] `docs/BACKLOG/M5/` — 11 slices (A–K), ~118 атомарных issues, ~586 часов
+- [ ] Утверждение founders → массовое создание issues в GitHub
+- [ ] Реализация по slice'ам (начиная с A → MVP-1)
 
 ### M6: Growth & Optional
 Программа лояльности (см. [`docs/LOYALTY/`](../LOYALTY/)), GDPR (если нужно), OpenAPI, traces, расширения дашборда (гайды/утилиты/соц/сервис).
