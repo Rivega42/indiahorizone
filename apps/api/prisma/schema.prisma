@@ -60,3 +60,26 @@ model OutboxEntry {
   @@index([publishedAt, createdAt], map: "idx_outbox_unpublished")
   @@map("outbox_entries")
 }
+
+/// Идемпотентность подписчиков. Каждый subscriber записывает (event_id, consumer)
+/// после успешной обработки. Перед обработкой проверяется существование пары —
+/// если есть, обработка пропускается.
+///
+/// Это защита от at-least-once delivery: события могут прийти дважды при
+/// retry / reconnect / consumer-restart. Без processed_events двойная
+/// обработка приводит к двойным side-effects (двойной push, двойной AML-flag).
+///
+/// TTL: 30 дней через scheduled job (см. IdempotencyService.cleanup()).
+/// Достаточно — Redis Streams сохраняет события 14 дней; за 30 дней любой
+/// retry-цикл должен закрыться.
+model ProcessedEvent {
+  /// DomainEvent.id, унаследованный из OutboxEntry.eventId.
+  eventId     String   @map("event_id") @db.Uuid
+  /// Имя consumer (group). Один event может быть processed разными consumers.
+  consumer    String
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@id([eventId, consumer])
+  @@index([processedAt], map: "idx_processed_events_ttl")
+  @@map("processed_events")
+}

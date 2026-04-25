@@ -4,6 +4,7 @@ import { Injectable, Logger, type OnModuleDestroy } from '@nestjs/common';
 
 import { RedisService } from '../redis/redis.service';
 
+import { IdempotencyService } from './idempotency.service';
 import {
   type DomainEvent,
   type EventHandler,
@@ -36,7 +37,10 @@ export class EventsBusService implements OnModuleDestroy {
   private readonly logger = new Logger(EventsBusService.name);
   private readonly subscriptions = new Set<{ stop: () => void }>();
 
-  constructor(private readonly redis: RedisService) {}
+  constructor(
+    private readonly redis: RedisService,
+    private readonly idempotency: IdempotencyService,
+  ) {}
 
   async onModuleDestroy(): Promise<void> {
     for (const sub of this.subscriptions) {
@@ -213,8 +217,20 @@ export class EventsBusService implements OnModuleDestroy {
       return;
     }
 
+    // Idempotency-check: если consumer уже обработал это event.id — пропускаем,
+    // только ack'аем (чтобы убрать из pending). Защита от at-least-once duplicates.
+    if (await this.idempotency.isProcessed(event.id, group)) {
+      await this.redis.getClient().xack(stream, group, messageId);
+      this.logger.debug(
+        { eventId: event.id, type: event.type, group },
+        'event.skipped.already-processed',
+      );
+      return;
+    }
+
     try {
       await handler(event);
+      await this.idempotency.markProcessed(event.id, group);
       await this.redis.getClient().xack(stream, group, messageId);
       this.logger.debug({ eventId: event.id, type: event.type, group }, 'event.handled');
     } catch (error) {
@@ -222,8 +238,8 @@ export class EventsBusService implements OnModuleDestroy {
         { err: error, eventId: event.id, type: event.type, group },
         'event.handler.failed',
       );
-      // Не ack'аем — событие останется в pending list, будет переобработано
-      // (или попадёт в DLQ при > 5 попытках — реализуется в #120 / #218 audit).
+      // Не ack'аем — событие останется в pending list, будет переобработано.
+      // markProcessed НЕ вызываем — иначе при retry handler пропустится с ошибкой ниже.
     }
   }
 
