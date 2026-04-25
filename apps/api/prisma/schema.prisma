@@ -29,3 +29,34 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// === Cross-cutting infrastructure (модуль common) ===
+//
+// Эти таблицы — не часть бизнес-модуля, а инфра.
+// outbox_entries — Transactional Outbox Pattern (#119)
+// processed_events — Idempotency для подписчиков (#120)
+
+/// Outbox для событий: запись в той же транзакции, что и бизнес-операция.
+/// Outbox-relay воркер периодически забирает unpublished и публикует в Redis Streams.
+/// Это гарантия, что события не потеряются при rollback'нутой транзакции, и не
+/// появятся при failed publish'е — основная гигиена event-driven систем.
+model OutboxEntry {
+  id            String    @id @default(uuid()) @db.Uuid
+  /// Тип события: <service>.<entity>.<verb>, например "auth.user.registered"
+  eventType     String    @map("event_type")
+  /// Версия схемы payload (DomainEvent.schemaVersion)
+  schemaVersion Int       @map("schema_version") @default(1)
+  /// JSON payload + envelope-метаданные (correlationId, actor)
+  payload       Json
+  /// UUIDv4 для DomainEvent.id — генерируется на этапе записи, гарантирует
+  /// идемпотентность при повторной публикации в Redis Streams.
+  eventId       String    @unique @map("event_id") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at")
+  /// NULL пока не опубликовано. После успешного XADD — proставляется.
+  publishedAt   DateTime? @map("published_at")
+  /// Счётчик попыток публикации (для DLQ при > N попытках)
+  attempts      Int       @default(0)
+
+  @@index([publishedAt, createdAt], map: "idx_outbox_unpublished")
+  @@map("outbox_entries")
+}
