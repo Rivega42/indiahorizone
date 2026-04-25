@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+.next/
+coverage/
+*.tsbuildinfo
+pnpm-lock.yaml
+*.md
+docs/
+LICENSE

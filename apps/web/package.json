@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "echo 'TODO: next dev (см. issue #121)'",
     "build": "echo 'TODO: next build (см. issue #121)'",
-    "lint": "echo 'TODO: eslint (см. issue #113)'",
+    "lint": "eslint .",
     "test": "echo 'TODO: vitest (см. issue #121)'",
     "type-check": "tsc -b"
   }
