@@ -25,7 +25,7 @@
 | 3. SOS | [#19](https://github.com/Rivega42/indiahorizone/issues/19) | open | `docs/SOS/` |
 | 4. Операции | [#31](https://github.com/Rivega42/indiahorizone/issues/31) | open | `docs/OPS/` |
 | 5. Юридика и compliance | [#47](https://github.com/Rivega42/indiahorizone/issues/47) | open | `docs/LEGAL/` |
-| 6. Архитектура (микросервисы) | [#57](https://github.com/Rivega42/indiahorizone/issues/57) | open | `docs/ARCH/` |
+| 6. Архитектура (modular monolith → микросервисы) | [#57](https://github.com/Rivega42/indiahorizone/issues/57) | in progress | `docs/ARCH/`, `docs/BACKLOG/M5/` |
 | 7. UX и фичи | [#77](https://github.com/Rivega42/indiahorizone/issues/77) | open | `docs/UX/` |
 | 8. Программа лояльности | [#86](https://github.com/Rivega42/indiahorizone/issues/86) | in progress | `docs/LOYALTY/` |
 | 9. ТЗ v1.0 (этот документ) | [#89](https://github.com/Rivega42/indiahorizone/issues/89) | in progress | `docs/TZ/` |
@@ -136,7 +136,7 @@
 | Гид | Локальный оператор в Индии — встречает, ведёт, сопровождает |
 | Менеджер | Sales — продаёт поездки и собирает маршрут |
 | Управляющий / admin | Founder, видит метрики и делает стратегические решения |
-| SOS | Экстренная связь клиента в ЧП — отдельный микросервис с гарантированной доставкой |
+| SOS | Экстренная связь клиента в ЧП — модуль с гарантированной доставкой; первый кандидат на extraction в отдельный сервис при росте |
 | RACI | Матрица распределения ролей (Responsible, Accountable, Consulted, Informed) |
 | SLA | Service Level Agreement — контракт о времени реакции |
 | ПДн | Персональные данные (152-ФЗ) |
