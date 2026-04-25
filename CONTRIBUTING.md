@@ -18,7 +18,13 @@
 
 ## Как начать
 
-### Требования
+> ⚠️ **WIP (фаза 3).** Скелет кода ещё не создан — соответствующие команды
+> ниже не работают «as is». Они станут актуальными после issues эпика 6
+> (архитектура) и эпика 10 (`package.json`, `docker-compose.yml`).
+> Сейчас репозиторий — документация. См. [`docs/TZ/README.md`](docs/TZ/README.md)
+> для точки входа.
+
+### Требования (целевые)
 
 - Node.js 20+
 - PostgreSQL 15+
@@ -26,7 +32,7 @@
 - Docker + Docker Compose
 - Git
 
-### Настройка окружения
+### Настройка окружения (целевая, после M3 / EPIC 10)
 
 ```bash
 # 1. Клонировать репозиторий
@@ -82,11 +88,14 @@ indiahorizone/
 ### 2. Создание ветки
 
 ```bash
-# Формат: type/краткое-описание-номер-issue
-git checkout -b feature/клиент-оффлайн-режим-12
-git checkout -b fix/sos-кнопка-ios-34
-git checkout -b docs/tz-ежедневный-фидбэк-56
+# Формат: type/short-description-issue-number (только латиница)
+git checkout -b feature/client-offline-12
+git checkout -b fix/sos-button-ios-34
+git checkout -b docs/tz-daily-feedback-56
 ```
+
+> Кириллица в именах веток ломает CI-инструменты, URL-шеринг и часть
+> git-хостингов. Используем латинский kebab-case.
 
 Типы веток:
 | Тип | Когда использовать |
