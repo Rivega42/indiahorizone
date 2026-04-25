@@ -77,6 +77,17 @@
 - [x] `docs/USER_STORIES.md` — INVEST-истории по ролям с приоритетами (EPIC 1)
 - [x] `docs/LOYALTY/README.md`, `REFERRAL.md`, `REPEAT.md`, `UGC.md` — программа лояльности фазы 3 (EPIC 8, [#86](https://github.com/Rivega42/indiahorizone/issues/86))
 - [x] `docs/BUSINESS_MODEL/UNIT_ECONOMICS.md` — каркас юнит-экономики ([#9](https://github.com/Rivega42/indiahorizone/issues/9))
+- [x] `CLAUDE.md § 5, § 6` — принципы «документы — часть фичи» и «проактивные рекомендации»
+- [x] `CONTRIBUTING.md` — PR-чеклист и шаблон с обязательным разделом зависимых документов
+
+### M4 — Operations & Onboarding (закрыто в этой итерации)
+
+- [x] `docs/OPS/GUIDE_ONBOARDING.md` — воронка найма, скрининг, интервью, тест-выезд, стажировка, аттестация, категории, расторжение
+- [x] `docs/OPS/GUIDE_CHECKLISTS.md` — ежедневные SOP (pre-trip, аэропорт, утро, день, debrief, конец поездки, внештатные, аптечка)
+- [x] `docs/LEGAL/CONTRACTS/GUIDE_CONTRACT.md` — договор IH IN PVT LTD ↔ гид (service contract, TDS, NDA, non-solicit)
+- [x] `docs/LEGAL/CONSENTS/PHOTO_VIDEO.md` ([#53](https://github.com/Rivega42/indiahorizone/issues/53)) — granular 4 уровня
+- [x] `docs/LEGAL/CONSENTS/GEO.md` ([#54](https://github.com/Rivega42/indiahorizone/issues/54)) — granular SOS / live / геофенс / аналитика
+- [x] `docs/LEGAL/CONSENTS/EMERGENCY_CONTACTS.md` ([#55](https://github.com/Rivega42/indiahorizone/issues/55)) — двойное согласие, регламент звонка
 
 ## Метрики успеха фазы 3 → фазы 4
 

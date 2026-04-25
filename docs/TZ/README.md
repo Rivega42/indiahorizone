@@ -76,6 +76,9 @@
 - [`docs/OPS/STRUCTURE.md`](../OPS/STRUCTURE.md) — RACI, смены 24/7
 - [`docs/OPS/SLA.md`](../OPS/SLA.md) — SLA по каналам
 - [`docs/OPS/ESCALATION.md`](../OPS/ESCALATION.md) — матрица эскалации
+- [`docs/OPS/CLIENT_ONBOARDING.md`](../OPS/CLIENT_ONBOARDING.md) — онбординг клиента
+- [`docs/OPS/GUIDE_ONBOARDING.md`](../OPS/GUIDE_ONBOARDING.md) — наём, проверка, обучение, аттестация гидов
+- [`docs/OPS/GUIDE_CHECKLISTS.md`](../OPS/GUIDE_CHECKLISTS.md) — ежедневные SOP гида
 
 ## SOS
 
@@ -91,6 +94,8 @@
 - [`docs/LEGAL/TOUR_OPERATOR.md`](../LEGAL/TOUR_OPERATOR.md) — статус: туроператор vs турагент
 - [`docs/LEGAL/PDN.md`](../LEGAL/PDN.md) — 152-ФЗ
 - [`docs/LEGAL/CONTRACTS/CLIENT_OFFER.md`](../LEGAL/CONTRACTS/CLIENT_OFFER.md) — оферта клиенту
+- [`docs/LEGAL/CONTRACTS/GUIDE_CONTRACT.md`](../LEGAL/CONTRACTS/GUIDE_CONTRACT.md) — договор IH IN PVT LTD ↔ гид
+- Согласия: [`PDN`](../LEGAL/CONSENTS/PDN.md), [`PHOTO_VIDEO`](../LEGAL/CONSENTS/PHOTO_VIDEO.md), [`GEO`](../LEGAL/CONSENTS/GEO.md), [`EMERGENCY_CONTACTS`](../LEGAL/CONSENTS/EMERGENCY_CONTACTS.md)
 
 ## Финансы
 
