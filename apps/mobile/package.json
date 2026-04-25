@@ -7,6 +7,7 @@
     "dev": "echo 'TODO: expo start (фаза 4)'",
     "build": "echo 'TODO: eas build (фаза 4)'",
     "lint": "echo 'TODO: eslint (см. issue #113)'",
-    "test": "echo 'TODO: jest (фаза 4)'"
+    "test": "echo 'TODO: jest (фаза 4)'",
+    "type-check": "tsc -b"
   }
 }

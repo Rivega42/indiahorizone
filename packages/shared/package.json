@@ -6,8 +6,9 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "build": "echo 'TODO: tsc -b (см. issue #112)'",
+    "build": "tsc -b",
     "lint": "echo 'TODO: eslint (см. issue #113)'",
-    "test": "echo 'TODO: vitest'"
+    "test": "echo 'TODO: vitest'",
+    "type-check": "tsc -b"
   }
 }

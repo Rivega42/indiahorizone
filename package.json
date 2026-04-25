@@ -13,6 +13,10 @@
     "dev": "pnpm --parallel --filter='./apps/*' run dev",
     "build": "pnpm --recursive --filter='./apps/*' --filter='./packages/*' run build",
     "lint": "pnpm --recursive --filter='./apps/*' --filter='./packages/*' run lint",
-    "test": "pnpm --recursive --filter='./apps/*' --filter='./packages/*' run test"
+    "test": "pnpm --recursive --filter='./apps/*' --filter='./packages/*' run test",
+    "type-check": "tsc -b"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
   }
 }
