@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { RedisService } from '../../common/redis/redis.service';
 
 interface HealthStatus {
   status: 'ok';
@@ -13,13 +14,16 @@ interface ReadinessStatus {
   status: 'ready' | 'degraded';
   checks: {
     postgres: 'up' | 'down';
-    redis: 'up' | 'down' | 'pending';
+    redis: 'up' | 'down';
   };
 }
 
 @Controller()
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+  ) {}
 
   @Get('health')
   health(): HealthStatus {
@@ -33,16 +37,16 @@ export class HealthController {
 
   @Get('readiness')
   async readiness(): Promise<ReadinessStatus> {
-    const postgresUp = await this.prisma.healthcheck();
-
-    // TODO: Redis check появится после #118 (events-bus подключение).
-    const redis: 'pending' = 'pending';
+    const [postgresUp, redisUp] = await Promise.all([
+      this.prisma.healthcheck(),
+      this.redis.healthcheck(),
+    ]);
 
     return {
-      status: postgresUp ? 'ready' : 'degraded',
+      status: postgresUp && redisUp ? 'ready' : 'degraded',
       checks: {
         postgres: postgresUp ? 'up' : 'down',
-        redis,
+        redis: redisUp ? 'up' : 'down',
       },
     };
   }
