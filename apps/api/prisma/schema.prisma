@@ -83,3 +83,48 @@ model ProcessedEvent {
   @@index([processedAt], map: "idx_processed_events_ttl")
   @@map("processed_events")
 }
+
+// === auth модуль (#126–#137) ===
+//
+// Источник: docs/BACKLOG/M5/B_AUTH.md, docs/ARCH/MICROSERVICES.md § auth-svc.
+// auth — security-критичный модуль, в фазе 4 — первый кандидат на extraction.
+// Правила: cross-module FK запрещены. Profile (модуль clients) ссылается на
+// User по userId через soft-reference, не FK.
+
+enum UserRole {
+  client
+  guide
+  manager
+  concierge
+  finance
+  admin
+
+  @@map("user_role")
+}
+
+enum UserStatus {
+  active
+  suspended
+  pending
+
+  @@map("user_status")
+}
+
+/// Пользователь системы. Любой actor с возможностью авторизации (клиент,
+/// гид, менеджер, concierge, финансы, admin) — User. Профиль клиента
+/// (имя, паспорт, preferences) — отдельная сущность Client в модуле clients
+/// (#138), привязка через userId без FK.
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  /// Email lowercased (приведение в коде на уровне приложения).
+  /// Unique с case-insensitive collation в Postgres (citext или lower-index).
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  role         UserRole   @default(client)
+  status       UserStatus @default(active)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  @@index([email], map: "idx_users_email")
+  @@map("users")
+}
