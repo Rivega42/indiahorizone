@@ -72,6 +72,64 @@
 
 ---
 
+## Локальная разработка
+
+### Требования
+
+- Node.js ≥ 20
+- pnpm ≥ 9 (`corepack enable && corepack prepare pnpm@9 --activate`)
+- Docker + Docker Compose
+- Make (опционально, для шорткатов)
+
+### Быстрый старт
+
+```bash
+# 1. Установить зависимости
+pnpm install
+
+# 2. Скопировать конфиг
+cp .env.example .env
+
+# 3. Поднять локальную инфраструктуру (Postgres + Redis + MinIO)
+make up
+# или: docker compose up -d
+
+# 4. Проверить статус
+make ps
+```
+
+Сервисы будут доступны:
+
+| Сервис | Хост | Порт |
+|---|---|---|
+| Postgres 15 | localhost | 5432 |
+| Redis 7 | localhost | 6379 |
+| MinIO (S3) | localhost | 9000 (API), 9001 (UI) |
+
+### Команды Makefile
+
+```bash
+make help              # Список команд
+make up                # Поднять контейнеры в фоне
+make down              # Остановить контейнеры (volumes сохраняются)
+make logs              # Хвост логов
+make ps                # Статус
+make restart           # Перезапустить
+make reset             # ⚠️  Снести вместе с volumes (потеря данных)
+make shell-postgres    # psql внутри контейнера
+make shell-redis       # redis-cli внутри контейнера
+```
+
+### Запуск приложений
+
+> ⚠️ Сейчас (Slice A) `pnpm dev` падает с TODO-сообщением — реальные приложения появятся в issues #116 (NestJS api), #121 (Next.js web).
+
+```bash
+pnpm dev               # Все приложения параллельно (когда они появятся)
+```
+
+---
+
 ## Команда
 
 | Роль | Кто |
