@@ -1,0 +1,31 @@
+// IndiaHorizone — Prisma schema
+//
+// Подход: modular monolith. ВСЕ модули (auth, clients, trips, sos, ...)
+// делят одну БД, но владение таблицами строго по модулям.
+//
+// Правила:
+// - Таблицы одного модуля имеют префикс: User → auth, Client → clients, и т.д.
+// - Cross-module foreign keys ЗАПРЕЩЕНЫ — только soft-references по ID.
+//   Это позволяет в фазе 4–5 механически вынести модуль в отдельную БД.
+// - Каждый модуль добавляет свои модели через issue из M5 backlog:
+//   - User (#126) — модуль auth
+//   - Client + ClientProfile (#138) — модуль clients
+//   - Consent (#142), EmergencyContact (#144) — модуль clients
+//   - Trip + Itinerary + DayPlan + Booking (#149) — модуль trips
+//   - SosEvent + SosAck + SosEscalation (#192) — модуль sos
+//   - ChatThread + ChatMessage (#167) — модуль comm
+//   - MediaAsset (#173) — модуль media
+//   - и т.д. (см. docs/ARCH/MICROSERVICES.md)
+//
+// Сейчас (после issue #117) — пустая schema, только datasource + generator.
+// Первая миграция будет 0_init без таблиц — это OK для bootstrap.
+
+generator client {
+  provider = "prisma-client-js"
+  // Output ~ default node_modules/.prisma/client
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
