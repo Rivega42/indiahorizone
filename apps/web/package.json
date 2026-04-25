@@ -1,0 +1,12 @@
+{
+  "name": "@indiahorizone/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Клиентский портал — Trip Dashboard (Next.js 14 PWA)",
+  "scripts": {
+    "dev": "echo 'TODO: next dev (см. issue #121)'",
+    "build": "echo 'TODO: next build (см. issue #121)'",
+    "lint": "echo 'TODO: eslint (см. issue #113)'",
+    "test": "echo 'TODO: vitest (см. issue #121)'"
+  }
+}
