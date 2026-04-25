@@ -35,7 +35,7 @@ jobs:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           item-id: ${{ steps.add.outputs.itemId }}
           field-keys: Status
-          field-values: "🔄 In Progress"
+          field-values: '🔄 In Progress'
 
   set-status-in-review:
     name: PR ready for review → In Review
@@ -53,7 +53,7 @@ jobs:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           item-id: ${{ steps.add.outputs.itemId }}
           field-keys: Status
-          field-values: "👀 In Review"
+          field-values: '👀 In Review'
 
   set-status-done:
     name: Issue/PR closed → Done
@@ -73,7 +73,7 @@ jobs:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           item-id: ${{ steps.add.outputs.itemId }}
           field-keys: Status
-          field-values: "✅ Done"
+          field-values: '✅ Done'
 
   set-priority-from-label:
     name: Set Priority from label
@@ -93,7 +93,7 @@ jobs:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           item-id: ${{ steps.add.outputs.itemId }}
           field-keys: Priority
-          field-values: "🔴 P0 Critical"
+          field-values: '🔴 P0 Critical'
       - name: Set P1
         if: github.event.label.name == 'P1'
         uses: titoportas/update-project-fields@v0.1.0
@@ -102,4 +102,4 @@ jobs:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           item-id: ${{ steps.add.outputs.itemId }}
           field-keys: Priority
-          field-values: "🟠 P1 High"
+          field-values: '🟠 P1 High'

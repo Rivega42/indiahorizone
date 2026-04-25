@@ -6,7 +6,6 @@ import { PasswordService } from './password.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 
-
 import type { LoginDto, LoginResponse } from '../dto/login.dto';
 
 const GENERIC_INVALID_CREDS = 'Неверный email или пароль';
@@ -37,10 +36,7 @@ export class LoginService {
     private readonly jwt: JwtTokenService,
   ) {}
 
-  async login(
-    dto: LoginDto,
-    context: { ip?: string; userAgent?: string },
-  ): Promise<LoginResponse> {
+  async login(dto: LoginDto, context: { ip?: string; userAgent?: string }): Promise<LoginResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
       select: { id: true, email: true, role: true, status: true, passwordHash: true },
@@ -48,8 +44,7 @@ export class LoginService {
 
     // Anti-enumeration: даже если user не найден, выполняем dummy-verify, чтобы
     // timing-side-channel не выдал существование email.
-    const dummyHash =
-      '$argon2id$v=19$m=19456,t=2,p=1$ZHVtbXltb2NraGFzaGRvbnRsb2dpbg$ZHVtbXk';
+    const dummyHash = '$argon2id$v=19$m=19456,t=2,p=1$ZHVtbXltb2NraGFzaGRvbnRsb2dpbg$ZHVtbXk';
     const verifyTarget = user?.passwordHash ?? dummyHash;
     const { valid, needsRehash } = await this.password.verify(verifyTarget, dto.password);
 

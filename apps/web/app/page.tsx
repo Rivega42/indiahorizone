@@ -9,12 +9,12 @@ export default function HomePage(): React.ReactElement {
           IndiaHorizone — Trip Dashboard
         </h1>
         <p className="text-base text-muted-foreground sm:text-lg">
-          Клиентский кабинет: маршрут, документы, кружок-фидбэк, SOS — всё под рукой
-          даже без интернета.
+          Клиентский кабинет: маршрут, документы, кружок-фидбэк, SOS — всё под рукой даже без
+          интернета.
         </p>
         <p className="text-xs text-muted-foreground">
-          Это пустой scaffold. Реальные экраны появятся в следующих slice&apos;ах backlog M5
-          (см. issues #154, #155, #156, #170, #198 и др.). Design system —{' '}
+          Это пустой scaffold. Реальные экраны появятся в следующих slice&apos;ах backlog M5 (см.
+          issues #154, #155, #156, #170, #198 и др.). Design system —{' '}
           <code className="font-mono text-xs">docs/UX/DESIGN_SYSTEM.md</code>.
         </p>
       </div>

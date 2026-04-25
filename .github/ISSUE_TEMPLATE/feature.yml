@@ -1,13 +1,13 @@
 name: ✨ Feature
 description: Новая функциональность
-title: "[M?.?.?] [P?] feat(?): "
-labels: ["enhancement"]
+title: '[M?.?.?] [P?] feat(?): '
+labels: ['enhancement']
 body:
   - type: dropdown
     id: priority
     attributes:
       label: Приоритет
-      options: ["P0 Critical", "P1 High", "P2 Medium", "P3 Low"]
+      options: ['P0 Critical', 'P1 High', 'P2 Medium', 'P3 Low']
     validations:
       required: true
   - type: dropdown
@@ -15,7 +15,7 @@ body:
     attributes:
       label: Для кого
       multiple: true
-      options: ["Клиент", "Гид", "Менеджер", "Concierge", "Управляющий"]
+      options: ['Клиент', 'Гид', 'Менеджер', 'Concierge', 'Управляющий']
   - type: textarea
     id: what
     attributes:
@@ -32,4 +32,4 @@ body:
     id: acceptance
     attributes:
       label: Критерии приёмки (Definition of Done)
-      placeholder: "- [ ] ..."
+      placeholder: '- [ ] ...'

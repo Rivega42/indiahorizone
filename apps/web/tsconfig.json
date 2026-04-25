@@ -10,22 +10,12 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "incremental": true,
-    "plugins": [
-      { "name": "next" }
-    ],
+    "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./*"]
     }
   },
-  "references": [
-    { "path": "../../packages/shared" },
-    { "path": "../../packages/ui" }
-  ],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
+  "references": [{ "path": "../../packages/shared" }, { "path": "../../packages/ui" }],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules", "dist", ".next"]
 }

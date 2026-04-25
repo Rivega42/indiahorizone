@@ -7,8 +7,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import type { DomainEvent } from '../events-bus/types';
 import type { Prisma, PrismaClient } from '@prisma/client';
 
-
-
 /**
  * OutboxService — запись событий в outbox в той же транзакции, что и
  * бизнес-операция. После commit'а транзакции outbox-relay воркер

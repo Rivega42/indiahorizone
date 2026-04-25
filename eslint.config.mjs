@@ -59,15 +59,9 @@ export default tseslint.config(
       'import/order': [
         'error',
         {
-          'groups': [
-            'builtin',
-            'external',
-            'internal',
-            ['parent', 'sibling', 'index'],
-            'type',
-          ],
+          groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'type'],
           'newlines-between': 'always',
-          'alphabetize': { order: 'asc', caseInsensitive: true },
+          alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
       'import/no-duplicates': 'error',
@@ -75,8 +69,8 @@ export default tseslint.config(
 
       // Style
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'eqeqeq': ['error', 'smart'],
-      'curly': ['error', 'multi-line'],
+      eqeqeq: ['error', 'smart'],
+      curly: ['error', 'multi-line'],
     },
   },
 
