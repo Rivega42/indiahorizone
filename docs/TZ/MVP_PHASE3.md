@@ -69,7 +69,14 @@
 Запись/сжатие/очередь/доставка/воспроизведение видео-фидбэка. UX дашборда — ядро + кружок. Базовая архитектура микросервисов.
 
 ### M6: Growth & Optional
-Программа лояльности, GDPR (если нужно), OpenAPI, traces, расширения дашборда (гайды/утилиты/соц/сервис).
+Программа лояльности (см. [`docs/LOYALTY/`](../LOYALTY/)), GDPR (если нужно), OpenAPI, traces, расширения дашборда (гайды/утилиты/соц/сервис).
+
+### Закрытые в этой итерации каркасы
+
+- [x] `docs/JTBD.md` — JTBD клиентов и команды (EPIC 1)
+- [x] `docs/USER_STORIES.md` — INVEST-истории по ролям с приоритетами (EPIC 1)
+- [x] `docs/LOYALTY/README.md`, `REFERRAL.md`, `REPEAT.md`, `UGC.md` — программа лояльности фазы 3 (EPIC 8, [#86](https://github.com/Rivega42/indiahorizone/issues/86))
+- [x] `docs/BUSINESS_MODEL/UNIT_ECONOMICS.md` — каркас юнит-экономики ([#9](https://github.com/Rivega42/indiahorizone/issues/9))
 
 ## Метрики успеха фазы 3 → фазы 4
 
