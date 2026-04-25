@@ -5,6 +5,7 @@ import { EventsBusModule } from './common/events-bus/events-bus.module';
 import { OutboxModule } from './common/outbox/outbox.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { RedisModule } from './common/redis/redis.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 
 @Module({
@@ -18,6 +19,7 @@ import { HealthModule } from './modules/health/health.module';
     EventsBusModule,
     OutboxModule,
     HealthModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
