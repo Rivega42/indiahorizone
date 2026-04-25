@@ -7,6 +7,7 @@
     "dev": "echo 'TODO: nest start --watch (см. issue #116)'",
     "build": "echo 'TODO: nest build (см. issue #116)'",
     "lint": "echo 'TODO: eslint (см. issue #113)'",
-    "test": "echo 'TODO: jest (см. issue #116)'"
+    "test": "echo 'TODO: jest (см. issue #116)'",
+    "type-check": "tsc -b"
   }
 }
