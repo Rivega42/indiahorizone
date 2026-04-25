@@ -66,8 +66,8 @@ export class EventsBusService implements OnModuleDestroy {
       occurredAt: event.occurredAt ?? new Date().toISOString(),
       type: event.type,
       schemaVersion: event.schemaVersion,
-      correlationId: event.correlationId,
-      causationId: event.causationId,
+      ...(event.correlationId !== undefined && { correlationId: event.correlationId }),
+      ...(event.causationId !== undefined && { causationId: event.causationId }),
       actor: event.actor,
       payload: event.payload,
     };

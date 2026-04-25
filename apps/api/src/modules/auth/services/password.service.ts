@@ -39,7 +39,7 @@ export class PasswordService {
     return {
       ok: result.score >= MIN_ZXCVBN_SCORE,
       score: result.score,
-      warning: result.feedback.warning || undefined,
+      ...(result.feedback.warning ? { warning: result.feedback.warning } : {}),
       suggestions: result.feedback.suggestions ?? [],
     };
   }

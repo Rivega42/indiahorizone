@@ -55,6 +55,9 @@ export class AuthController {
     @Headers('x-forwarded-for') xForwardedFor?: string,
   ): Promise<LoginResponse> {
     const realIp = (xForwardedFor?.split(',')[0]?.trim() ?? ip) || undefined;
-    return this.loginService.login(dto, { ip: realIp, userAgent });
+    return this.loginService.login(dto, {
+      ...(realIp !== undefined && { ip: realIp }),
+      ...(userAgent !== undefined && { userAgent }),
+    });
   }
 }

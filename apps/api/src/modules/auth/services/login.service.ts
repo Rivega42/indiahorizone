@@ -78,8 +78,8 @@ export class LoginService {
         data: {
           userId: user.id,
           refreshTokenHash: refreshHash,
-          ip: context.ip,
-          userAgent: context.userAgent,
+          ip: context.ip ?? null,
+          userAgent: context.userAgent ?? null,
           expiresAt: refresh.expiresAt,
         },
       });
@@ -90,8 +90,8 @@ export class LoginService {
         actor: { type: 'user', id: user.id },
         payload: {
           userId: user.id,
-          ip: context.ip,
-          userAgent: context.userAgent,
+          ip: context.ip ?? null,
+          userAgent: context.userAgent ?? null,
         },
       });
     });
