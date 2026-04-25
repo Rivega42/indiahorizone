@@ -2,34 +2,136 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design System v0 — IndiaHorizone
+ * Source of truth: docs/UX/DESIGN_SYSTEM.md
+ * Все цвета — HSL, для удобства dark-mode и тонкой настройки яркости.
+ */
+
 @layer base {
   :root {
+    /* === Neutrals === */
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --primary: 24 95% 53%;
-    --primary-foreground: 0 0% 100%;
+    --foreground: 0 0% 9%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+
+    /* === Brand: saffron-orange (единственный indian-color акцент) === */
+    --primary: 24 95% 53%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 24 95% 53%;
+
+    /* === Secondary (subtle, not saffron) === */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+
+    /* === Semantic === */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 7%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    /* === Radius === */
     --radius: 0.625rem;
   }
 
   .dark {
     --background: 0 0% 7%;
     --foreground: 0 0% 96%;
-    --primary: 24 95% 53%;
-    --primary-foreground: 0 0% 7%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 64%;
     --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 96%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 24 95% 53%;
+    --primary-foreground: 0 0% 7%;
+    --ring: 24 95% 53%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 96%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 7%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 7%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 96%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 7%;
+  }
+
+  /* Системное переключение темы. Явный toggle — на фазу 4. */
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      --background: 0 0% 7%;
+      --foreground: 0 0% 96%;
+      --muted: 0 0% 15%;
+      --muted-foreground: 0 0% 64%;
+      --border: 0 0% 20%;
+      --input: 0 0% 20%;
+      --accent: 0 0% 15%;
+      --accent-foreground: 0 0% 96%;
+      --card: 0 0% 9%;
+      --card-foreground: 0 0% 96%;
+      --popover: 0 0% 9%;
+      --popover-foreground: 0 0% 96%;
+
+      --primary-foreground: 0 0% 7%;
+      --secondary: 0 0% 15%;
+      --secondary-foreground: 0 0% 96%;
+
+      --success-foreground: 0 0% 7%;
+      --destructive: 0 72% 51%;
+      --destructive-foreground: 0 0% 96%;
+      --info-foreground: 0 0% 7%;
+    }
   }
 
   * {
     @apply border-border;
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   html,
   body {
     @apply bg-background text-foreground antialiased;
+  }
+
+  /* Mono-font для tabular цифр (цены, даты, счётчики) */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Reduced motion — уважаем системное предпочтение */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
