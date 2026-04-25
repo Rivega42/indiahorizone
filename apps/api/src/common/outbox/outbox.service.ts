@@ -1,11 +1,13 @@
 import { randomUUID } from 'node:crypto';
 
 import { Injectable, Logger } from '@nestjs/common';
-import type { Prisma, PrismaClient } from '@prisma/client';
-
-import type { DomainEvent } from '../events-bus/types';
 
 import { PrismaService } from '../prisma/prisma.service';
+
+import type { DomainEvent } from '../events-bus/types';
+import type { Prisma, PrismaClient } from '@prisma/client';
+
+
 
 /**
  * OutboxService — запись событий в outbox в той же транзакции, что и

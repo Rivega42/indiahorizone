@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 
 import { Injectable, Logger, type OnModuleDestroy } from '@nestjs/common';
 
-import { RedisService } from '../redis/redis.service';
 
 import { IdempotencyService } from './idempotency.service';
 import {
@@ -13,6 +12,7 @@ import {
   type SubscribeOptions,
   streamForEventType,
 } from './types';
+import { RedisService } from '../redis/redis.service';
 
 /**
  * EventsBusService — обёртка над Redis Streams для domain events.
@@ -42,7 +42,7 @@ export class EventsBusService implements OnModuleDestroy {
     private readonly idempotency: IdempotencyService,
   ) {}
 
-  async onModuleDestroy(): Promise<void> {
+  onModuleDestroy(): void {
     for (const sub of this.subscriptions) {
       sub.stop();
     }
@@ -118,7 +118,7 @@ export class EventsBusService implements OnModuleDestroy {
         try {
           const result = (await this.redis
             .getSubscriber()
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+             
             .xreadgroup(
               'GROUP',
               options.consumerGroup,
@@ -200,7 +200,7 @@ export class EventsBusService implements OnModuleDestroy {
       return;
     }
 
-    const raw = fields[dataIndex + 1] as string;
+    const raw = fields[dataIndex + 1]!;
     let event: DomainEvent<T>;
     try {
       event = JSON.parse(raw) as DomainEvent<T>;
