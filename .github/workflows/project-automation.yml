@@ -1,0 +1,105 @@
+name: Project Automation — IndiaHorizone
+
+on:
+  issues:
+    types: [opened, closed, reopened, labeled, assigned]
+  pull_request:
+    types: [opened, closed, reopened, ready_for_review, converted_to_draft]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  add-to-project:
+    name: Add issue/PR to project
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+
+  set-status-in-progress:
+    name: PR opened → In Progress
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        id: add
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+      - uses: titoportas/update-project-fields@v0.1.0
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          item-id: ${{ steps.add.outputs.itemId }}
+          field-keys: Status
+          field-values: "🔄 In Progress"
+
+  set-status-in-review:
+    name: PR ready for review → In Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'ready_for_review'
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        id: add
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+      - uses: titoportas/update-project-fields@v0.1.0
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          item-id: ${{ steps.add.outputs.itemId }}
+          field-keys: Status
+          field-values: "👀 In Review"
+
+  set-status-done:
+    name: Issue/PR closed → Done
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'issues' && github.event.action == 'closed') ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        id: add
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+      - uses: titoportas/update-project-fields@v0.1.0
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          item-id: ${{ steps.add.outputs.itemId }}
+          field-keys: Status
+          field-values: "✅ Done"
+
+  set-priority-from-label:
+    name: Set Priority from label
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'labeled'
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        id: add
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+      - name: Set P0
+        if: github.event.label.name == 'P0'
+        uses: titoportas/update-project-fields@v0.1.0
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          item-id: ${{ steps.add.outputs.itemId }}
+          field-keys: Priority
+          field-values: "🔴 P0 Critical"
+      - name: Set P1
+        if: github.event.label.name == 'P1'
+        uses: titoportas/update-project-fields@v0.1.0
+        with:
+          project-url: https://github.com/users/Rivega42/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          item-id: ${{ steps.add.outputs.itemId }}
+          field-keys: Priority
+          field-values: "🟠 P1 High"
