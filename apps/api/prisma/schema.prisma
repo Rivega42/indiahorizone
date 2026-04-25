@@ -125,6 +125,44 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
+  /// Backref для CASCADE на logout-all и trip-history.
+  sessions     Session[]
+
   @@index([email], map: "idx_users_email")
   @@map("users")
+}
+
+/// Сессия пользователя (refresh-token instance). Один user может иметь
+/// несколько активных сессий — один на устройство.
+///
+/// refreshTokenHash — argon2id-хеш refresh-токена. Сам токен НИКОГДА не
+/// хранится в БД (только клиенту в cookie/storage). При login генерируется
+/// random + хешируется → используется для verify при /auth/refresh.
+///
+/// Refresh-rotation реализуется в #129: при использовании refresh-токена
+/// — старая Session помечается revokedAt, создаётся новая. Detection-reuse:
+/// если revokedAt уже стоит, и снова приходит запрос → атака → invalidate
+/// все сессии user'а.
+model Session {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  /// argon2id-хеш refresh-токена. По нему verify при /auth/refresh.
+  refreshTokenHash  String    @map("refresh_token_hash")
+  /// IP при создании. Используется для suspicious-detection (#136).
+  ip                String?
+  /// User-Agent при создании.
+  userAgent         String?   @map("user_agent")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  /// Когда refresh истечёт (createdAt + 30 дней).
+  expiresAt         DateTime  @map("expires_at")
+  /// Установлено при logout / refresh-rotation. NULL = активна.
+  revokedAt         DateTime? @map("revoked_at")
+  /// Заполняется при revoke — для трейсинга и detection-reuse.
+  revokeReason      String?   @map("revoke_reason")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt], map: "idx_sessions_user_active")
+  @@index([expiresAt], map: "idx_sessions_expires_ttl")
+  @@map("sessions")
 }
