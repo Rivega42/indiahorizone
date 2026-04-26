@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Quick actions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: hsl(0 0% 98%); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 480px; }
+  .qa { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--radius-xl); padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: all 150ms ease-out; }
+  .qa:hover { background: hsl(var(--accent)); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .qa-icon { width: 40px; height: 40px; border-radius: 10px; background: hsl(24 95% 53% / 0.10); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .qa-label { font: 500 13px/1.2 var(--font-sans); color: hsl(var(--foreground)); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <button class="qa"><div class="qa-icon">📂</div><div class="qa-label">Документы</div></button>
+    <button class="qa"><div class="qa-icon">🗺️</div><div class="qa-label">Маршрут</div></button>
+    <button class="qa"><div class="qa-icon">💬</div><div class="qa-label">Concierge</div></button>
+    <button class="qa"><div class="qa-icon">📞</div><div class="qa-label">Гид</div></button>
+  </div>
+</body>
+</html>

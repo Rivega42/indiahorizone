@@ -55,19 +55,21 @@ https://api.anthropic.com/v1/design/h/<hash>?open_file=ui_kits/<theme>/<screen>.
 
 ## Индекс экранов
 
-| Тема | Файл | Code-issue(s) | MVP | Status |
+> Все prototype-файлы в `from-claude-design/project/ui_kits/trip_dashboard/`. JSX-версии (для React) и HTML-версии (для browser preview) идут парами.
+
+| Тема | Файлы | Code-issue(s) | MVP | Status |
 |---|---|---|---|---|
-| Auth (login + register + 2FA + reset + suspicious) | [`auth.html`](./auth.html) (API: [link](https://api.anthropic.com/v1/design/h/pHs57PS-D8ELYurHBp6PGA?open_file=ui_kits%2Ftrip_dashboard%2Fauth.html)) | #134, #135, #136 | MVP-1 | 🟡 prototype done, ждёт code |
-| Профиль + согласия | _ждёт_ | #147 | MVP-1 | ⚪ |
-| Trip Dashboard главный | _ждёт_ | #154 | MVP-1 | ⚪ |
-| Маршрут (день за днём) | _ждёт_ | #156 | MVP-1 | ⚪ |
-| Чат клиент↔concierge | _ждёт_ | #170 | MVP-2 | ⚪ |
-| Кружок recorder | _ждёт_ | #179 | MVP-2 | ⚪ |
-| Дневник поездки | _ждёт_ | #184 | MVP-2 | ⚪ |
-| Экран фидбэка | _ждёт_ | #190 | MVP-2 | ⚪ |
-| SOS hold-to-trigger | _ждёт_ | #198 | MVP-2 | ⚪ |
-| SOS active screen | _ждёт_ | #199 | MVP-2 | ⚪ |
-| Concierge SOS dashboard | _ждёт_ | #200 | MVP-2 | ⚪ |
+| Auth (login + register + 2FA + reset + suspicious) | [`auth.html`](./from-claude-design/project/ui_kits/trip_dashboard/auth.html) · [`AuthScreens.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/AuthScreens.jsx) | #134, #135, #136 | MVP-1 | 🟡 prototype done, ревью passed |
+| Профиль + согласия | [`profile.html`](./from-claude-design/project/ui_kits/trip_dashboard/profile.html) · [`ProfileScreen.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/ProfileScreen.jsx) | #147 | MVP-1 | 🟡 prototype done |
+| Trip Dashboard главный | [`index.html`](./from-claude-design/project/ui_kits/trip_dashboard/index.html) · [`TripDashboard.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/TripDashboard.jsx) | #154 | MVP-1 | 🟡 prototype done |
+| Маршрут (день за днём) | [`itinerary.html`](./from-claude-design/project/ui_kits/trip_dashboard/itinerary.html) · [`ItineraryScreen.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/ItineraryScreen.jsx) | #156 | MVP-1 | 🟡 prototype done |
+| Чат клиент↔concierge | [`chat.html`](./from-claude-design/project/ui_kits/trip_dashboard/chat.html) · [`ChatScreen.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/ChatScreen.jsx) | #170 | MVP-2 | 🟡 prototype done |
+| Кружок recorder | [`recorder.html`](./from-claude-design/project/ui_kits/trip_dashboard/recorder.html) · [`RecorderScreen.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/RecorderScreen.jsx) | #179 | MVP-2 | 🟡 prototype done |
+| Дневник поездки | [`journal.html`](./from-claude-design/project/ui_kits/trip_dashboard/journal.html) · [`JournalScreen.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/JournalScreen.jsx) | #184 | MVP-2 | 🟡 prototype done |
+| Экран фидбэка | [`feedback.html`](./from-claude-design/project/ui_kits/trip_dashboard/feedback.html) · [`FeedbackScreen.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/FeedbackScreen.jsx) | #190 | MVP-2 | 🟡 prototype done |
+| SOS (trigger + active + concierge dashboard) | [`sos.html`](./from-claude-design/project/ui_kits/trip_dashboard/sos.html) · [`SOSScreens.jsx`](./from-claude-design/project/ui_kits/trip_dashboard/SOSScreens.jsx) | #198, #199, #200 | MVP-2 | 🟡 prototype done |
+| Design system tokens (preview cards) | [`from-claude-design/project/preview/`](./from-claude-design/project/preview/) | DESIGN_SYSTEM.md | — | 🟢 reference |
+| Source CSS (saffron + semantic + Inter) | [`colors_and_type.css`](./from-claude-design/project/colors_and_type.css) | DESIGN_SYSTEM.md | — | 🟢 reference |
 
 **Легенда статусов:**
 - ⚪ — экран не прототипирован

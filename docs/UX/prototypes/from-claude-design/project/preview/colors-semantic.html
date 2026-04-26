@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Colors — Semantic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: hsl(var(--background)); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .sw { border-radius: 10px; border: 1px solid hsl(var(--border)); overflow: hidden; }
+  .chip { height: 72px; display:flex; align-items:center; justify-content:center; color:#fff; font:600 12px/1 var(--font-sans); }
+  .meta { padding: 8px 10px; }
+  .name { font: 600 12px/1.2 var(--font-sans); }
+  .tok { font: 500 10px/1.3 var(--font-mono); color: hsl(var(--muted-foreground)); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:hsl(142 71% 45%)">✓</div><div class="meta"><div class="name">Success</div><div class="tok">142 71% 45%</div></div></div>
+    <div class="sw"><div class="chip" style="background:hsl(38 92% 50%); color:#1a1a1a">!</div><div class="meta"><div class="name">Warning</div><div class="tok">38 92% 50%</div></div></div>
+    <div class="sw"><div class="chip" style="background:hsl(0 84% 60%)">SOS</div><div class="meta"><div class="name">Destructive · SOS</div><div class="tok">0 84% 60%</div></div></div>
+    <div class="sw"><div class="chip" style="background:hsl(217 91% 60%)">i</div><div class="meta"><div class="name">Info</div><div class="tok">217 91% 60%</div></div></div>
+  </div>
+</body>
+</html>

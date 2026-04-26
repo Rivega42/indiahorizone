@@ -1,0 +1,243 @@
+/*
+ * IndiaHorizone Design System — Colors & Type
+ * Source of truth: docs/UX/DESIGN_SYSTEM.md (in github repo Rivega42/indiahorizone)
+ * All colors in HSL for easy dark-mode + brightness tuning.
+ *
+ * Use:
+ *   <link rel="stylesheet" href="colors_and_type.css">
+ *   <link rel="preconnect" href="https://fonts.googleapis.com">
+ *   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+ */
+
+:root {
+  /* ============================================================
+   * NEUTRALS (true-grayscale, hsl(0 0% ...))
+   * ============================================================ */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+
+  /* ============================================================
+   * BRAND — saffron-orange (единственный indian-color акцент)
+   * Не добавлять зелёный/фиолетовый/золотой Mughal-палитры.
+   * ============================================================ */
+  --primary: 24 95% 53%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 24 95% 53%;
+
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+
+  /* ============================================================
+   * SEMANTIC
+   * ============================================================ */
+  --success: 142 71% 45%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 7%;
+  /* destructive = SOS-критично; красный read как «опасность» */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --info: 217 91% 60%;
+  --info-foreground: 0 0% 100%;
+
+  /* ============================================================
+   * RADIUS
+   * ============================================================ */
+  --radius: 0.625rem;          /* 10px — default */
+  --radius-sm: 0.25rem;        /* 4px — inline tags */
+  --radius-md: 0.375rem;       /* 6px — inputs, small buttons */
+  --radius-lg: 0.625rem;       /* 10px — buttons, cards (default) */
+  --radius-xl: 1rem;           /* 16px — large cards, modals */
+  --radius-full: 9999px;       /* pills, avatars, FAB */
+
+  /* ============================================================
+   * SHADOWS
+   * ============================================================ */
+  --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.05);
+  --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
+
+  /* ============================================================
+   * MOTION
+   * ============================================================ */
+  --duration-fast: 100ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --duration-lazy: 500ms;
+  --ease-spring: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================================
+   * TYPE
+   * ============================================================ */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 96%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 64%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 96%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary-foreground: 0 0% 7%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 96%;
+
+    --success-foreground: 0 0% 7%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 96%;
+    --info-foreground: 0 0% 7%;
+  }
+}
+
+/* ================================================================
+ * BASE
+ * ================================================================ */
+html {
+  -webkit-tap-highlight-color: transparent;
+  font-family: var(--font-sans);
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11"; /* Inter alts */
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ================================================================
+ * TYPE — semantic classes
+ * Mirror DESIGN_SYSTEM.md spec: display / h1..h4 / body-lg / body / body-sm / caption
+ * ================================================================ */
+
+.t-display {
+  font-size: 48px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.t-h1 {
+  font-size: 36px;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.t-h2 {
+  font-size: 24px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.t-h3 {
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.t-h4 {
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.t-body-lg {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.t-body {
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.t-body-sm {
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.t-caption {
+  font-size: 12px;
+  line-height: 1.3;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Default heading map (use semantic .t-* if you need exact fidelity) */
+h1 { font: 600 36px/1.15 var(--font-sans); letter-spacing: -0.015em; }
+h2 { font: 600 24px/1.25 var(--font-sans); letter-spacing: -0.01em; }
+h3 { font: 600 20px/1.3 var(--font-sans); }
+h4 { font: 500 18px/1.35 var(--font-sans); }
+p  { font: 400 14px/1.5 var(--font-sans); }
+
+/* ================================================================
+ * COLOR UTILITY (for preview cards, lightweight; full system uses Tailwind)
+ * ================================================================ */
+.bg-background { background: hsl(var(--background)); }
+.bg-card { background: hsl(var(--card)); }
+.bg-muted { background: hsl(var(--muted)); }
+.bg-primary { background: hsl(var(--primary)); }
+.bg-success { background: hsl(var(--success)); }
+.bg-warning { background: hsl(var(--warning)); }
+.bg-destructive { background: hsl(var(--destructive)); }
+.bg-info { background: hsl(var(--info)); }
+
+.text-foreground { color: hsl(var(--foreground)); }
+.text-muted-foreground { color: hsl(var(--muted-foreground)); }
+.text-primary { color: hsl(var(--primary)); }
+.text-destructive { color: hsl(var(--destructive)); }
+.text-success { color: hsl(var(--success)); }
+.text-warning { color: hsl(var(--warning)); }
+
+.border-default { border: 1px solid hsl(var(--border)); }

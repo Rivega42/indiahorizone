@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Toast & alerts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: hsl(0 0% 98%); display: flex; flex-direction: column; gap: 10px; }
+  .alert { display: flex; gap: 12px; padding: 12px 14px; border-radius: var(--radius-lg); border: 1px solid; align-items: flex-start; font: 400 13px/1.5 var(--font-sans); }
+  .alert .ico { font-size: 18px; line-height: 1; }
+  .alert .ttl { font-weight: 600; margin-bottom: 2px; }
+  .a-success { background: hsl(142 71% 45% / 0.08); border-color: hsl(142 71% 45% / 0.3); color: hsl(142 71% 22%); }
+  .a-warning { background: hsl(38 92% 50% / 0.08); border-color: hsl(38 92% 50% / 0.3); color: hsl(38 92% 25%); }
+  .a-info    { background: hsl(217 91% 60% / 0.08); border-color: hsl(217 91% 60% / 0.3); color: hsl(217 70% 35%); }
+  .a-error   { background: hsl(0 84% 60% / 0.08); border-color: hsl(0 84% 60% / 0.3); color: hsl(0 70% 35%); }
+  .toast { background: hsl(0 0% 9%); color: #fff; border-radius: var(--radius-lg); padding: 12px 14px; box-shadow: var(--shadow-lg); font: 400 13px/1.4 var(--font-sans); display: flex; gap: 10px; align-items: center; max-width: 360px; }
+</style>
+</head>
+<body>
+  <div class="alert a-success"><span class="ico">✓</span><div><div class="ttl">Кружок отправлен</div>Concierge получил ваш кружок 💚</div></div>
+  <div class="alert a-warning"><span class="ico">⚠</span><div><div class="ttl">Виза истекает через 5 дней</div>Подайте заявление в посольство, чтобы продлить пребывание.</div></div>
+  <div class="alert a-info"><span class="ico">📡</span><div><div class="ttl">Нет сети — использую кеш</div>Все документы доступны оффлайн.</div></div>
+  <div class="toast"><span>✓</span>Сохранено</div>
+</body>
+</html>
