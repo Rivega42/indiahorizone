@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Logo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 24px; background: hsl(var(--background)); display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: center; }
+  .panel { padding: 20px; border-radius: var(--radius-xl); border: 1px solid hsl(var(--border)); display: flex; align-items: center; gap: 12px; }
+  .panel.dark { background: hsl(0 0% 7%); border-color: hsl(0 0% 16%); }
+  .mark { width: 36px; height: 36px; border-radius: 10px; background: hsl(24 95% 53%); display: flex; align-items: center; justify-content: center; color: #fff; font: 700 18px/1 var(--font-sans); letter-spacing: -0.04em; }
+  .word { font: 600 22px/1 var(--font-sans); letter-spacing: -0.02em; color: hsl(var(--foreground)); }
+  .word .h { color: hsl(24 95% 53%); }
+  .panel.dark .word { color: #fff; }
+  .meta { font: 500 11px/1 var(--font-mono); color: hsl(var(--muted-foreground)); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="panel"><div class="mark">IH</div><div class="word">India<span class="h">Horizone</span></div></div>
+    <div class="meta">Light surface</div>
+  </div>
+  <div>
+    <div class="panel dark"><div class="mark">IH</div><div class="word">India<span class="h">Horizone</span></div></div>
+    <div class="meta">Dark surface</div>
+  </div>
+</body>
+</html>

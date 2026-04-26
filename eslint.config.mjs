@@ -15,6 +15,8 @@ export default tseslint.config(
       '**/.next/**',
       '**/coverage/**',
       '**/*.tsbuildinfo',
+      // AI-generated prototypes from Claude Design — не для lint'а, только для визуального референса
+      'docs/UX/prototypes/from-claude-design/**',
     ],
   },
 

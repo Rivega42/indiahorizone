@@ -8,3 +8,5 @@ pnpm-lock.yaml
 *.md
 docs/
 LICENSE
+# AI-generated prototypes from Claude Design — не правим руками (см. docs/UX/prototypes/README.md)
+docs/UX/prototypes/from-claude-design/

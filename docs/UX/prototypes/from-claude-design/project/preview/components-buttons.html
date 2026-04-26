@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Buttons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: hsl(var(--background)); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .btn { font: 500 14px/1 var(--font-sans); padding: 10px 16px; border-radius: var(--radius-lg); border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 100ms ease-out; }
+  .btn-primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+  .btn-primary:hover { filter: brightness(0.95); }
+  .btn-outline { background: transparent; color: hsl(var(--foreground)); border-color: hsl(var(--border)); }
+  .btn-outline:hover { background: hsl(var(--accent)); }
+  .btn-ghost { background: transparent; color: hsl(var(--foreground)); }
+  .btn-ghost:hover { background: hsl(var(--accent)); }
+  .btn-destructive { background: hsl(var(--destructive)); color: #fff; }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .btn-lg { padding: 14px 22px; font-size: 16px; }
+  .btn-icon { padding: 8px; width: 36px; height: 36px; justify-content: center; }
+  .label { font: 500 10px/1 var(--font-mono); color: hsl(var(--muted-foreground)); text-transform: uppercase; letter-spacing: 0.08em; min-width: 70px; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="label">primary</span>
+    <button class="btn btn-primary">Открыть документы</button>
+    <button class="btn btn-primary btn-sm">Записать кружок</button>
+    <button class="btn btn-primary btn-lg">Отправить код</button>
+  </div>
+  <div class="row"><span class="label">outline</span>
+    <button class="btn btn-outline">Я лучше текстом</button>
+    <button class="btn btn-outline btn-sm">Переснять</button>
+  </div>
+  <div class="row"><span class="label">ghost · icon</span>
+    <button class="btn btn-ghost">Отмена</button>
+    <button class="btn btn-ghost btn-icon" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="row"><span class="label">destructive</span>
+    <button class="btn btn-destructive">🆘 SOS · нажмите и держите</button>
+  </div>
+</body>
+</html>
