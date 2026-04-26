@@ -94,10 +94,6 @@ export class RefreshService {
     }
 
     // ✓ Все проверки пройдены — rotate
-    const newAccess = this.jwt.signAccess({
-      userId: session.userId,
-      role: session.user.role,
-    });
     const newRefresh = this.jwt.generateRefresh();
     const newRefreshHash = await this.password.hash(newRefresh.random);
 
@@ -136,6 +132,13 @@ export class RefreshService {
       });
 
       return fresh.id;
+    });
+
+    // newSessionId известен после INSERT'а — теперь подписываем JWT
+    const newAccess = this.jwt.signAccess({
+      userId: session.userId,
+      sessionId: newSessionId,
+      role: session.user.role,
     });
 
     this.logger.log(

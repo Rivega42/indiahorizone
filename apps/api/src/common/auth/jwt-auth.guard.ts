@@ -63,7 +63,11 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Невалидный или истёкший токен');
     }
 
-    const user: AuthenticatedUser = { id: payload.sub, role: payload.role };
+    const user: AuthenticatedUser = {
+      id: payload.sub,
+      sessionId: payload.sid,
+      role: payload.role,
+    };
     req.user = user;
 
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [

@@ -10,6 +10,7 @@ const REFRESH_TOKEN_BYTES = 64; // 64 байта = 128 hex-символов = 51
 
 export interface AccessTokenPayload {
   sub: string; // userId
+  sid: string; // sessionId — нужен для /auth/logout (revoke текущую) и audit
   role: UserRole;
   type: 'access';
 }
@@ -56,10 +57,13 @@ export class JwtTokenService {
 
   /**
    * Выпустить access-токен (JWT) для user'а.
+   * sessionId нужен для /auth/logout (revoke текущей session по claim'у),
+   * /auth/me (показать текущую session), audit-events.
    */
-  signAccess(payload: { userId: string; role: UserRole }): string {
+  signAccess(payload: { userId: string; sessionId: string; role: UserRole }): string {
     const claims: AccessTokenPayload = {
       sub: payload.userId,
+      sid: payload.sessionId,
       role: payload.role,
       type: 'access',
     };

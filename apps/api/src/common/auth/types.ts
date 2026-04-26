@@ -7,6 +7,8 @@ import type { UserRole } from '@prisma/client';
  */
 export interface AuthenticatedUser {
   id: string;
+  /** sessionId из JWT-claim. Используется для /auth/logout и audit. */
+  sessionId: string;
   role: UserRole;
 }
 
