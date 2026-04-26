@@ -75,11 +75,11 @@ export class LoginService {
 
     const access = this.jwt.signAccess({ userId: user.id, role: user.role });
     const refresh = this.jwt.generateRefresh();
-    const refreshHash = await this.password.hash(refresh.token);
+    const refreshHash = await this.password.hash(refresh.random);
 
     // Транзакция: создаём Session + публикуем auth.user.logged_in
-    await this.prisma.$transaction(async (tx) => {
-      await tx.session.create({
+    const sessionId = await this.prisma.$transaction(async (tx) => {
+      const session = await tx.session.create({
         data: {
           userId: user.id,
           refreshTokenHash: refreshHash,
@@ -87,6 +87,7 @@ export class LoginService {
           userAgent: context.userAgent,
           expiresAt: refresh.expiresAt,
         },
+        select: { id: true },
       });
 
       await this.outbox.add(tx, {
@@ -95,17 +96,20 @@ export class LoginService {
         actor: { type: 'user', id: user.id },
         payload: {
           userId: user.id,
+          sessionId: session.id,
           ip: context.ip,
           userAgent: context.userAgent,
         },
       });
+
+      return session.id;
     });
 
-    this.logger.log({ userId: user.id }, 'auth.user.logged_in');
+    this.logger.log({ userId: user.id, sessionId }, 'auth.user.logged_in');
 
     return {
       accessToken: access,
-      refreshToken: refresh.token,
+      refreshToken: this.jwt.composeRefresh(sessionId, refresh.random),
       user: {
         id: user.id,
         email: user.email,

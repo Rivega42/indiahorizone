@@ -89,13 +89,41 @@ export class JwtTokenService {
   }
 
   /**
-   * Сгенерировать random refresh-токен. Возвращает plain токен (для клиента)
-   * и его длительность. Хеширование делается caller'ом через PasswordService.
+   * Сгенерировать random refresh-токен. Возвращает random-часть (для хеша)
+   * и expiresAt. Caller потом composeRefresh(sessionId, random) → клиенту.
    */
-  generateRefresh(): { token: string; expiresAt: Date } {
-    const token = randomBytes(REFRESH_TOKEN_BYTES).toString('hex');
+  generateRefresh(): { random: string; expiresAt: Date } {
+    const random = randomBytes(REFRESH_TOKEN_BYTES).toString('hex');
     const expiresAt = new Date(Date.now() + this.refreshTtlSec * 1000);
-    return { token, expiresAt };
+    return { random, expiresAt };
+  }
+
+  /**
+   * Собирает refresh-token, который видит клиент: `<sessionId>.<random>`.
+   *
+   * sessionId в payload нужен, чтобы при /auth/refresh найти Session
+   * за O(1) (lookup by PK), а не перебирать все сессии × argon2.verify
+   * (DoS-уязвимо). sessionId не секретен — UUID, угадать невозможно.
+   * Хеш в БД argon2(random), не argon2(`${sessionId}.${random}`) — проще.
+   */
+  composeRefresh(sessionId: string, random: string): string {
+    return `${sessionId}.${random}`;
+  }
+
+  /**
+   * Парсит refresh-токен от клиента. Возвращает null если формат неверный.
+   * Не делает verify — только разделяет.
+   */
+  parseRefresh(token: string): { sessionId: string; random: string } | null {
+    const dot = token.indexOf('.');
+    if (dot < 0) return null;
+    const sessionId = token.slice(0, dot);
+    const random = token.slice(dot + 1);
+    // Базовая валидация UUID v4 (8-4-4-4-12 hex) и random (hex 128 chars)
+    if (!/^[0-9a-f-]{36}$/i.test(sessionId) || !/^[0-9a-f]+$/i.test(random)) {
+      return null;
+    }
+    return { sessionId, random };
   }
 
   getRefreshTtlMs(): number {
