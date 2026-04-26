@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 
+import { Providers } from '../lib/providers';
+
 import './globals.css';
 
 const inter = Inter({
@@ -41,7 +43,9 @@ export default function RootLayout({
 }): React.ReactElement {
   return (
     <html lang="ru" className={inter.variable}>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
