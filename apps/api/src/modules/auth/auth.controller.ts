@@ -9,11 +9,14 @@ import {
 } from '@nestjs/common';
 
 import { LoginDto } from './dto/login.dto';
+import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './services/auth.service';
 import { LoginService } from './services/login.service';
+import { RefreshService } from './services/refresh.service';
 
 import type { LoginResponse } from './dto/login.dto';
+import type { RefreshResponse } from './dto/refresh.dto';
 import type { RegisterResponse } from './dto/register.dto';
 
 @Controller('auth')
@@ -21,6 +24,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly loginService: LoginService,
+    private readonly refreshService: RefreshService,
   ) {}
 
   /**
@@ -64,5 +68,28 @@ export class AuthController {
   ): Promise<LoginResponse> {
     const realIp = (xForwardedFor?.split(',')[0]?.trim() ?? ip) || undefined;
     return this.loginService.login(dto, { ip: realIp, userAgent });
+  }
+
+  /**
+   * POST /auth/refresh
+   *
+   * Body: { refreshToken: "<sessionId>.<random>" }
+   * Returns 200 + { accessToken, refreshToken } (новая пара) или 401 generic.
+   *
+   * Refresh-rotation: старая Session помечается revokedAt='rotated',
+   * создаётся новая Session с тем же userId. Reuse-detection: если
+   * приходит уже-revoked refresh-token — invalidate ВСЕ сессии user'а
+   * (защита от утечки токена).
+   */
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Body() dto: RefreshDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+    @Headers('x-forwarded-for') xForwardedFor?: string,
+  ): Promise<RefreshResponse> {
+    const realIp = (xForwardedFor?.split(',')[0]?.trim() ?? ip) || undefined;
+    return this.refreshService.refresh(dto, { ip: realIp, userAgent });
   }
 }
