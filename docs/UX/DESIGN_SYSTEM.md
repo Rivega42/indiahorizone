@@ -233,6 +233,7 @@ Tailwind defaults (mobile-first):
 - [`apps/web/tailwind.config.ts`](../../apps/web/tailwind.config.ts) — Tailwind extend (потребляет CSS-переменные)
 - [`apps/web/components.json`](../../apps/web/components.json) — shadcn config
 - **Claude Design** ([claude.ai/design](https://claude.ai/design)) — auto-pull tokens из репо для прототипирования. См. issue #257.
+- [`docs/UX/prototypes/`](./prototypes/) — экспортированные HTML-прототипы из Claude Design + API-ссылки. Workflow приёма новых экранов — в README этой папки.
 
 ## Acceptance
 
