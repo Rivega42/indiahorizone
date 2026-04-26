@@ -8,6 +8,8 @@ import {
   Post,
 } from '@nestjs/common';
 
+import { Public } from '../../common/auth/decorators';
+
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -35,6 +37,7 @@ export class AuthController {
    *
    * Rate-limit: 5 попыток / 15 мин на IP — через throttler (#221).
    */
+  @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(
@@ -58,6 +61,7 @@ export class AuthController {
    *
    * Rate-limit: 10 попыток / 15 мин на email — через throttler (#221).
    */
+  @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -81,6 +85,7 @@ export class AuthController {
    * приходит уже-revoked refresh-token — invalidate ВСЕ сессии user'а
    * (защита от утечки токена).
    */
+  @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
