@@ -8,15 +8,17 @@ import {
   Post,
 } from '@nestjs/common';
 
-import { Public } from '../../common/auth/decorators';
+import { CurrentUser, Public } from '../../common/auth/decorators';
 
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './services/auth.service';
 import { LoginService } from './services/login.service';
+import { LogoutService } from './services/logout.service';
 import { RefreshService } from './services/refresh.service';
 
+import type { AuthenticatedUser } from '../../common/auth/types';
 import type { LoginResponse } from './dto/login.dto';
 import type { RefreshResponse } from './dto/refresh.dto';
 import type { RegisterResponse } from './dto/register.dto';
@@ -27,6 +29,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly loginService: LoginService,
     private readonly refreshService: RefreshService,
+    private readonly logoutService: LogoutService,
   ) {}
 
   /**
@@ -55,10 +58,6 @@ export class AuthController {
    * Body: { email, password }
    * Returns 200 + { accessToken, refreshToken, user } или 401 (generic).
    *
-   * 2FA flow (#133) добавится в LoginService позже: при включённой 2FA
-   * вернётся { challengeId } вместо токенов; токены выдаются после
-   * POST /auth/2fa/verify.
-   *
    * Rate-limit: 10 попыток / 15 мин на email — через throttler (#221).
    */
   @Public()
@@ -79,11 +78,6 @@ export class AuthController {
    *
    * Body: { refreshToken: "<sessionId>.<random>" }
    * Returns 200 + { accessToken, refreshToken } (новая пара) или 401 generic.
-   *
-   * Refresh-rotation: старая Session помечается revokedAt='rotated',
-   * создаётся новая Session с тем же userId. Reuse-detection: если
-   * приходит уже-revoked refresh-token — invalidate ВСЕ сессии user'а
-   * (защита от утечки токена).
    */
   @Public()
   @Post('refresh')
@@ -96,5 +90,51 @@ export class AuthController {
   ): Promise<RefreshResponse> {
     const realIp = (xForwardedFor?.split(',')[0]?.trim() ?? ip) || undefined;
     return this.refreshService.refresh(dto, { ip: realIp, userAgent });
+  }
+
+  /**
+   * POST /auth/logout
+   *
+   * Header: Authorization: Bearer <accessToken>
+   * Returns 204 No Content.
+   *
+   * Инвалидирует ТЕКУЩУЮ сессию (sessionId из JWT-claim). Идемпотентен —
+   * повторный вызов не ошибка. Клиент должен сам удалить токены из storage.
+   */
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(
+    @CurrentUser() user: AuthenticatedUser,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+    @Headers('x-forwarded-for') xForwardedFor?: string,
+  ): Promise<void> {
+    const realIp = (xForwardedFor?.split(',')[0]?.trim() ?? ip) || undefined;
+    await this.logoutService.logout(user.id, user.sessionId, {
+      ip: realIp,
+      userAgent,
+    });
+  }
+
+  /**
+   * POST /auth/logout-all
+   *
+   * Header: Authorization: Bearer <accessToken>
+   * Returns 200 + { revokedCount }.
+   *
+   * Инвалидирует ВСЕ active сессии user'а (включая текущую). Используется
+   * при reset password, suspicious «не я», или явно из UI «выйти со всех
+   * устройств».
+   */
+  @Post('logout-all')
+  @HttpCode(HttpStatus.OK)
+  async logoutAll(
+    @CurrentUser() user: AuthenticatedUser,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+    @Headers('x-forwarded-for') xForwardedFor?: string,
+  ): Promise<{ revokedCount: number }> {
+    const realIp = (xForwardedFor?.split(',')[0]?.trim() ?? ip) || undefined;
+    return this.logoutService.logoutAll(user.id, { ip: realIp, userAgent });
   }
 }

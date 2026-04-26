@@ -73,7 +73,6 @@ export class LoginService {
         .catch((err: unknown) => this.logger.warn({ err, userId: user.id }, 'rehash.failed'));
     }
 
-    const access = this.jwt.signAccess({ userId: user.id, role: user.role });
     const refresh = this.jwt.generateRefresh();
     const refreshHash = await this.password.hash(refresh.random);
 
@@ -104,6 +103,9 @@ export class LoginService {
 
       return session.id;
     });
+
+    // sessionId известен после INSERT'а — теперь подписываем JWT с ним
+    const access = this.jwt.signAccess({ userId: user.id, sessionId, role: user.role });
 
     this.logger.log({ userId: user.id, sessionId }, 'auth.user.logged_in');
 

@@ -5,6 +5,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './services/auth.service';
 import { JwtTokenService } from './services/jwt.service';
 import { LoginService } from './services/login.service';
+import { LogoutService } from './services/logout.service';
 import { PasswordService } from './services/password.service';
 import { RefreshService } from './services/refresh.service';
 
@@ -27,7 +28,21 @@ import { RefreshService } from './services/refresh.service';
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LoginService, RefreshService, PasswordService, JwtTokenService],
-  exports: [AuthService, LoginService, RefreshService, PasswordService, JwtTokenService],
+  providers: [
+    AuthService,
+    LoginService,
+    RefreshService,
+    LogoutService,
+    PasswordService,
+    JwtTokenService,
+  ],
+  exports: [
+    AuthService,
+    LoginService,
+    RefreshService,
+    LogoutService,
+    PasswordService,
+    JwtTokenService,
+  ],
 })
 export class AuthModule {}
