@@ -11,6 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { HealthModule } from './modules/health/health.module';
+import { LeadsModule } from './modules/leads/leads.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { HealthModule } from './modules/health/health.module';
     AuthModule,
     ClientsModule,
     CatalogModule,
+    LeadsModule,
     CommonAuthModule, // глобальный JwtAuthGuard, требует AuthModule (JwtTokenService)
     HealthModule,
   ],

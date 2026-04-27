@@ -330,3 +330,60 @@ model TourMedia {
   @@index([tourId, kind], map: "idx_tour_media_tour_kind")
   @@map("tour_media")
 }
+
+// === leads модуль (#297 [12.4]) ===
+//
+// Источник: issue #297, EPIC #293.
+// leads — заявки с tour landing pages (форма «Хочу этот тур»).
+// ПДн поля (name, contact, comment) шифруются через CryptoService (#139).
+// Cross-module rule: НЕТ FK на User / Tour. Lead — самостоятельная сущность,
+// привязка к туру — через soft-string `source`.
+//
+// В фазе 4 переносится в CRM-модуль (sales-svc) вместе с таблицами
+// клиентов и сделок.
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  REJECTED
+
+  @@map("lead_status")
+}
+
+/// Заявка на тур / общая. ПДн (name, contact, comment) — зашифрованы через
+/// CryptoService. ipHash — sha256(ip), для антифрод-аналитики (без хранения
+/// сырого IP).
+///
+/// status workflow: NEW → CONTACTED → CONVERTED|REJECTED. Переходы делает
+/// менеджер через будущую CRM (EPIC 14). До этого — все Lead'ы NEW.
+model Lead {
+  id          String     @id @default(uuid()) @db.Uuid
+  /// Источник заявки. Свободный slug:
+  /// - "tour-tury-kerala-oktyabr-2026" — кнопка с tour landing page
+  /// - "general" — общая форма с главной (когда будет)
+  source      String
+  /// Зашифровано (#139). plaintext: имя клиента (2–100 символов).
+  name        String
+  /// Тип контакта: 'phone' | 'telegram' | 'email'. Не шифруется (enum-like).
+  contactType String     @map("contact_type")
+  /// Зашифровано (#139). plaintext: телефон / @username / email.
+  contact     String
+  /// Зашифровано (#139). plaintext: свободный комментарий клиента (опционально).
+  comment     String?
+  /// Версия текста consent на момент согласия. При обновлении Политики
+  /// конфиденциальности версия меняется → новый клиент подписывает новую,
+  /// старый Lead.consentTextVersion сохраняет старую (для аудита 152-ФЗ).
+  /// Формат: 'YYYY-MM-DD-vN'.
+  consentTextVersion String @map("consent_text_version")
+  /// sha256(ip) — для rate-limit и антифрод-аналитики, не raw IP (privacy).
+  ipHash      String?    @map("ip_hash")
+  userAgent   String?    @map("user_agent")
+  status      LeadStatus @default(NEW)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@index([status, createdAt], map: "idx_leads_status_created")
+  @@index([source], map: "idx_leads_source")
+  @@map("leads")
+}
