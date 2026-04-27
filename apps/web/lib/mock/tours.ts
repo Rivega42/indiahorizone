@@ -1,0 +1,287 @@
+/**
+ * Mock-данные туров. До готовности catalog API ([12.3]) страница тура
+ * читает отсюда. Когда #296 будет смерджен — заменим на fetch + ISR.
+ *
+ * ВАЖНО: цены — placeholder, ждём подтверждения юнит-экономики от Шивама
+ * (см. P0-блокер в EPIC 13).
+ */
+
+export type ActivityKind =
+  | 'culture'
+  | 'nature'
+  | 'food'
+  | 'water'
+  | 'adventure'
+  | 'wellness';
+
+export type Activity = {
+  kind: ActivityKind;
+  label: string;
+};
+
+export type TourDay = {
+  dayNumber: number;
+  location: string;
+  title: string;
+  description: string;
+  activities: Activity[];
+  imageUrl: string;
+  isOptional?: boolean;
+};
+
+export type TourReview = {
+  authorName: string;
+  city: string;
+  tripDate: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  quote: string;
+};
+
+export type TourFAQ = {
+  q: string;
+  a: string;
+};
+
+export type Tour = {
+  slug: string;
+  title: string;
+  region: string;
+  durationDays: number;
+  durationLabel: string;
+  groupSize: string;
+  season: string;
+  priceFromRub: number;
+  priceToRub?: number;
+  heroPosterUrl: string;
+  heroVideoUrl?: string;
+  emotionalHook: string;
+  trustBadges: string[];
+  facts: { iconKind: string; label: string; value: string }[];
+  days: TourDay[];
+  inclusions: { included: string[]; notIncluded: string[] };
+  reviews: TourReview[];
+  faq: TourFAQ[];
+};
+
+export const KERALA_TOUR: Tour = {
+  slug: 'tury-kerala-oktyabr-2026',
+  title: 'Керала. 10 дней без хаоса.',
+  region: 'Тривандрум · Варкала · Джатаю',
+  durationDays: 10,
+  durationLabel: '10 дней / 9 ночей',
+  groupSize: 'до 6 человек или индивидуально',
+  season: 'Октябрь 2026',
+  priceFromRub: 250_000,
+  priceToRub: 320_000,
+  heroPosterUrl:
+    'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1920&q=85',
+  emotionalHook:
+    'Тропики, океан и тишина — без давки, без разводов, без сюрпризов на ресепшене. Команда на земле, которая знает Кералу как свой двор.',
+  trustBadges: [
+    'SOS 24/7',
+    'Русскоязычный concierge',
+    'Билеты подбираем под вашу гибкость',
+  ],
+  facts: [
+    { iconKind: 'clock', label: 'Длительность', value: '10 дней / 9 ночей' },
+    { iconKind: 'users', label: 'Размер группы', value: 'до 6 человек' },
+    { iconKind: 'calendar', label: 'Сезон', value: 'Октябрь 2026' },
+    { iconKind: 'bed', label: 'Отели', value: '3–4★ под маршрут' },
+    { iconKind: 'car', label: 'Трансферы', value: 'все включены' },
+    { iconKind: 'headset', label: 'Concierge', value: '24/7 на русском' },
+  ],
+  days: [
+    {
+      dayNumber: 1,
+      location: 'Тривандрум',
+      title: 'Прибытие и первые впечатления',
+      description:
+        'Встреча в аэропорту с табличкой на русском, трансфер в отель. После отдыха — храм Падманабхасвами на закате (внешний осмотр) и шоу Катхакали с грим-сессией перед спектаклем.',
+      activities: [
+        { kind: 'culture', label: 'Храм' },
+        { kind: 'culture', label: 'Шоу Катхакали' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=1200&q=80',
+    },
+    {
+      dayNumber: 2,
+      location: 'Тривандрум · Ковалам',
+      title: 'Город и пляж',
+      description:
+        'Музей Напье, дворец Кутхирамалика, обед в локальном ресторане. После обеда — пляж Ковалам, маяк, прогулка по променаду на закате.',
+      activities: [
+        { kind: 'culture', label: 'Музеи' },
+        { kind: 'water', label: 'Пляж' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1582719471137-c3967ffb1c42?w=1200&q=80',
+    },
+    {
+      dayNumber: 3,
+      location: 'Остров Пувар',
+      title: 'Backwaters и мангровые заросли',
+      description:
+        'Лодочная прогулка по реке Нейяр, мангровые заросли, утренняя рыбалка с локальными рыбаками. Обед на лодке.',
+      activities: [
+        { kind: 'water', label: 'Лодка' },
+        { kind: 'nature', label: 'Мангры' },
+        { kind: 'food', label: 'Локальная кухня' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80',
+    },
+    {
+      dayNumber: 4,
+      location: 'Варкала',
+      title: 'Утёс над океаном',
+      description:
+        'Переезд в Варкалу (1.5 ч). Заселение в отель на утёсе. Прогулка по cliff-walk, ужин в кафе с видом на закат над Аравийским морем.',
+      activities: [
+        { kind: 'nature', label: 'Утёс' },
+        { kind: 'food', label: 'Закат-ужин' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=1200&q=80',
+    },
+    {
+      dayNumber: 5,
+      location: 'Варкала',
+      title: 'Йога, сёрфинг или массаж',
+      description:
+        'Утренняя йога на пляже (опционально). После — выбор: урок сёрфинга для начинающих, или классический аюрведический массаж в проверенной клинике.',
+      activities: [
+        { kind: 'wellness', label: 'Йога' },
+        { kind: 'water', label: 'Сёрф' },
+        { kind: 'wellness', label: 'Аюрведа' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200&q=80',
+      isOptional: true,
+    },
+    {
+      dayNumber: 6,
+      location: 'Джатаю',
+      title: 'Парк скульптур и зиплайн',
+      description:
+        'Самая большая статуя птицы в мире, канатная дорога с панорамой на джунгли, зиплайн или скалолазание для желающих. Возвращение в Варкалу к ужину.',
+      activities: [
+        { kind: 'culture', label: 'Скульптурный парк' },
+        { kind: 'adventure', label: 'Зиплайн' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80',
+    },
+    {
+      dayNumber: 7,
+      location: 'Каппил',
+      title: 'Храм и каякинг',
+      description:
+        'Храм Джанардана (древний, действующий). Каякинг по озеру Каппил — там, где backwaters встречаются с океаном. Свободное время на пляже Каппил.',
+      activities: [
+        { kind: 'culture', label: 'Храм' },
+        { kind: 'water', label: 'Каяк' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1609766975914-b10b7a537bc0?w=1200&q=80',
+    },
+    {
+      dayNumber: 8,
+      location: 'Понмуди',
+      title: 'Треккинг или СПА — на ваш выбор',
+      description:
+        'Опция А: треккинг в холмы Понмуди, виды на чайные плантации (5–6 ч). Опция Б: полный день в спа с массажами и хаммамом. Решение принимает группа за день до.',
+      activities: [
+        { kind: 'adventure', label: 'Треккинг' },
+        { kind: 'wellness', label: 'СПА' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1514222134-b57cbb8ce073?w=1200&q=80',
+      isOptional: true,
+    },
+    {
+      dayNumber: 9,
+      location: 'Тривандрум',
+      title: 'Дельфины, кулинарка и шопинг',
+      description:
+        'Раннее утро — выход в океан на лодке за дельфинами. После обеда — кулинарный мастер-класс по керальской кухне, вечером — спокойный шопинг на рынке специй.',
+      activities: [
+        { kind: 'water', label: 'Дельфины' },
+        { kind: 'food', label: 'Мастер-класс' },
+      ],
+      imageUrl:
+        'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200&q=80',
+    },
+    {
+      dayNumber: 10,
+      location: 'Тривандрум',
+      title: 'Возвращение домой',
+      description:
+        'Завтрак, неспешный чек-аут, трансфер в аэропорт. Вылет.',
+      activities: [{ kind: 'culture', label: 'Прощание' }],
+      imageUrl:
+        'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
+    },
+  ],
+  inclusions: {
+    included: [
+      'Все 9 ночей в проверенных отелях 3–4★',
+      'Все трансферы между локациями',
+      'Все активности из программы (кроме опциональных)',
+      'Русскоязычный гид-concierge',
+      'SOS-поддержка 24/7',
+      'Trip Dashboard: маршрут, документы, чат — оффлайн',
+    ],
+    notIncluded: [
+      'Авиабилеты — помогаем подобрать рейс под вашу гибкость',
+      'Страховка — рекомендуем конкретного брокера',
+      'Виза в Индию — помогаем советом и образцами',
+      'Личные расходы (шопинг, сувениры, чаевые)',
+    ],
+  },
+  reviews: [
+    /*
+     * Placeholder — выдуманные отзывы НЕ публикуем на проде. Перед запуском
+     * рекламы — заменить на реальные с consent от клиентов или скрыть блок.
+     * См. P0-блокер в EPIC 13.
+     */
+  ],
+  faq: [
+    {
+      q: 'Нужна ли виза?',
+      a: 'Да, для граждан РФ нужна электронная виза (e-Visa). Получается за 3–5 дней онлайн через официальный портал. Стоимость — около $25. Помогаем заполнять анкету.',
+    },
+    {
+      q: 'Безопасно ли в Индии?',
+      a: 'Керала — один из самых безопасных штатов Индии: высокий уровень грамотности, развитая медицина, низкий уровень преступности. Гид с группой 24/7, у нас есть SOS-канал в Telegram + резервный звонок.',
+    },
+    {
+      q: 'Что если что-то пойдёт не так?',
+      a: 'У вас в Trip Dashboard кнопка SOS — нажатие соединяет с дежурным concierge в течение 2 минут. Прямые контакты надёжных клиник, юристов, посольства РФ — заранее в офлайне.',
+    },
+    {
+      q: 'Можно изменить программу под себя?',
+      a: 'Да. Каждый тур мы стартуем с 40-минутного звонка, на котором собираем ваши предпочтения. Готовый маршрут — это 60% наша программа + 40% ваши пожелания.',
+    },
+    {
+      q: 'Когда и как платить?',
+      a: '30% — после согласования маршрута, остаток — за 14 дней до вылета. Оплата на счёт юр.лица, договор-оферта.',
+    },
+    {
+      q: 'Что включено в цену?',
+      a: 'Отели, трансферы, активности из программы, гид, SOS-поддержка. НЕ включены: авиабилеты, виза, страховка, личные расходы. Подробно — в блоке «Что включено» выше.',
+    },
+  ],
+};
+
+export const TOURS_BY_SLUG: Record<string, Tour> = {
+  [KERALA_TOUR.slug]: KERALA_TOUR,
+};
+
+export function getTourBySlug(slug: string): Tour | null {
+  return TOURS_BY_SLUG[slug] ?? null;
+}
+
+export function listToursSlugs(): string[] {
+  return Object.keys(TOURS_BY_SLUG);
+}

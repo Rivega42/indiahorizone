@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Radii</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: hsl(var(--background)); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .item { text-align: center; }
+  .box { height: 76px; background: hsl(0 0% 96%); border: 1px solid hsl(var(--border)); margin-bottom: 8px; }
+  .name { font: 600 11px/1.2 var(--font-sans); }
+  .px { font: 500 10px/1.3 var(--font-mono); color: hsl(var(--muted-foreground)); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="item"><div class="box" style="border-radius:4px"></div><div class="name">sm</div><div class="px">4px · tags</div></div>
+    <div class="item"><div class="box" style="border-radius:6px"></div><div class="name">md</div><div class="px">6px · inputs</div></div>
+    <div class="item"><div class="box" style="border-radius:10px"></div><div class="name">lg · default</div><div class="px">10px · cards</div></div>
+    <div class="item"><div class="box" style="border-radius:16px"></div><div class="name">xl</div><div class="px">16px · modals</div></div>
+    <div class="item"><div class="box" style="border-radius:9999px"></div><div class="name">full</div><div class="px">pill / FAB</div></div>
+  </div>
+</body>
+</html>
