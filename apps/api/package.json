@@ -15,6 +15,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
+    "db:seed:tours": "ts-node prisma/seed/tours.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
