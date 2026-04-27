@@ -17,6 +17,33 @@ type Interface = {
 
 const INTERFACES: Interface[] = [
   {
+    href: '/prototypes/tour-landing/MOODBOARD.html',
+    external: true,
+    title: 'Tour Landing — Moodboard (Claude Design [12.D1])',
+    status: 'prototype',
+    description:
+      '12 референсов luxury/adventure travel + 3 finalist (Black Tomato, Original Travel, Much Better Adventures). Палитра, tone of voice, anti-references.',
+    issue: '#312 — done',
+  },
+  {
+    href: '/prototypes/tour-landing/hero/Hero.html',
+    external: true,
+    title: 'Tour Landing — Hero «Керала», 3 варианта (Claude Design [12.D2])',
+    status: 'prototype',
+    description:
+      'Design canvas с тремя desktop-вариантами Hero: V1 full-bleed cinematic, V2 split editorial, V3 immersive saffron sunset (рекомендуем). + Mobile со sticky CTA.',
+    issue: '#313 — done',
+  },
+  {
+    href: '/prototypes/tour-landing/timeline/Kerala.html',
+    external: true,
+    title: 'Tour Landing — полная страница «Керала» (Claude Design [12.D3])',
+    status: 'prototype',
+    description:
+      'Hero V3 + DayTimeline композит — фактическая страница тура от дизайна. До интеграции в наш Next.js (предстоит замена /tours/[slug] под этот стиль).',
+    issue: '#314 — partial',
+  },
+  {
     href: '/prototypes/homepage.html',
     external: true,
     title: 'Главная страница (Claude Design прототип)',
@@ -27,10 +54,10 @@ const INTERFACES: Interface[] = [
   },
   {
     href: '/tours/tury-kerala-oktyabr-2026',
-    title: 'Страница тура — Керала 10 дней',
+    title: 'Страница тура — Керала 10 дней (Next.js, наш стек)',
     status: 'in-progress',
     description:
-      'Tour landing page по шаблону EPIC 12: Hero, Facts, DayTimeline, Inclusions, PriceBlock+LeadForm, FAQ. Mock-данные до готовности catalog API.',
+      'Tour landing на Tailwind + shadcn: Hero, Facts, DayTimeline, Inclusions, PriceBlock+LeadForm, FAQ. Mock-данные. Будет переработана под дизайн [12.D2-D5] после утверждения.',
     issue: '#293 (EPIC 12)',
   },
   {

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Type — Body & Caption</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: hsl(var(--background)); }
+  .row { display: grid; grid-template-columns: 110px 1fr 130px; gap: 14px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid hsl(var(--border)); }
+  .row:last-child { border: none; }
+  .label { font: 500 11px/1 var(--font-mono); color: hsl(var(--muted-foreground)); text-transform: uppercase; letter-spacing: 0.08em; }
+  .meta { font: 400 11px/1.3 var(--font-mono); color: hsl(var(--muted-foreground)); text-align: right; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="label">h4</span><span class="t-h4">Завтрак, отель Lazylagoon</span><span class="meta">18 / 1.35 / 500</span></div>
+  <div class="row"><span class="label">body-lg</span><span class="t-body-lg">Lead-параграф для премиум-секций — landing, оферта.</span><span class="meta">16 / 1.5 / 400</span></div>
+  <div class="row"><span class="label">body</span><span class="t-body">Основной текст в Trip Dashboard, формах и UI. Inter в кириллице читается чисто.</span><span class="meta">14 / 1.5 / 400</span></div>
+  <div class="row"><span class="label">body-sm</span><span class="t-body-sm">Captions, helper text, timestamps</span><span class="meta">12 / 1.4 / 400</span></div>
+  <div class="row"><span class="label">caption</span><span class="t-caption">Phase 3 · Bootstrap</span><span class="meta">12 / 0.15em / 500</span></div>
+  <div class="row"><span class="label">mono · nums</span><span class="t-mono" style="font-size:14px;">42&nbsp;000&nbsp;₽ · 25&nbsp;апр&nbsp;2026, 14:30</span><span class="meta">tabular-nums</span></div>
+</body>
+</html>

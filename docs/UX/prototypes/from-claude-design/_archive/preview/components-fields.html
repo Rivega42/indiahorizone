@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Form fields</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: hsl(var(--background)); display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .field label { display: block; font: 500 13px/1.2 var(--font-sans); margin-bottom: 6px; }
+  .req { color: hsl(var(--destructive)); }
+  input, textarea { width: 100%; box-sizing: border-box; font: 400 14px/1.5 var(--font-sans); padding: 10px 12px; border: 1px solid hsl(var(--border)); border-radius: var(--radius-md); background: hsl(var(--background)); color: hsl(var(--foreground)); outline: none; transition: border-color 100ms ease-out, box-shadow 100ms ease-out; }
+  input:focus, textarea:focus { border-color: hsl(var(--ring)); box-shadow: 0 0 0 3px hsl(24 95% 53% / 0.2); }
+  .helper { font: 400 12px/1.4 var(--font-sans); color: hsl(var(--muted-foreground)); margin-top: 4px; }
+  .err { font: 400 12px/1.4 var(--font-sans); color: hsl(var(--destructive)); margin-top: 4px; }
+  input.error { border-color: hsl(var(--destructive)); }
+</style>
+</head>
+<body>
+  <div class="field">
+    <label>Email <span class="req">*</span></label>
+    <input type="email" placeholder="вы@почта.рф" />
+    <div class="helper">Используется только для восстановления пароля.</div>
+  </div>
+  <div class="field">
+    <label>Номер паспорта</label>
+    <input type="text" value="75 0123456" class="error" />
+    <div class="err">Не получилось распознать — проверьте серию и номер.</div>
+  </div>
+  <div class="field" style="grid-column: span 2">
+    <label>Заметка для concierge</label>
+    <textarea rows="2" placeholder="Например: «прилетим раньше, можно ли в номер»"></textarea>
+  </div>
+</body>
+</html>

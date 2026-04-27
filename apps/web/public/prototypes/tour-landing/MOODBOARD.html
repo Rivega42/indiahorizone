@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>[12.D1] Moodboard — Tour Landing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--saffron:hsl(24 95% 53%);--ink:hsl(0 0% 9%);--mute:hsl(0 0% 45%);--line:hsl(0 0% 90%);--bg:hsl(0 0% 98%);}
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);font-family:Inter,system-ui,sans-serif;color:var(--ink);font-feature-settings:'cv11','ss01';}
+  .wrap{max-width:1280px;margin:0 auto;padding:48px 32px 80px;}
+  .eyebrow{font:500 12px/1 Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--saffron);margin-bottom:14px;}
+  h1{font:700 42px/1.1 Inter;letter-spacing:-0.02em;margin:0 0 14px;}
+  .lede{font:400 17px/1.55 Inter;color:var(--mute);max-width:720px;margin:0 0 8px;}
+  .meta{font:500 12px/1.6 Inter;color:var(--mute);margin-bottom:48px;}
+  .meta b{color:var(--ink);font-weight:600;}
+  h2{font:600 26px/1.2 Inter;letter-spacing:-0.015em;margin:56px 0 6px;}
+  h2 .num{font:500 13px/1 Inter;letter-spacing:.1em;color:var(--saffron);text-transform:uppercase;display:block;margin-bottom:8px;}
+  .h2sub{font:400 14px/1.5 Inter;color:var(--mute);margin:0 0 24px;max-width:640px;}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .grid.three{grid-template-columns:repeat(3,1fr);gap:24px;}
+  .ref{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
+  .ref .img{aspect-ratio:4/3;position:relative;overflow:hidden;}
+  .ref .body{padding:14px 14px 16px;}
+  .ref .brand{font:600 14px/1.2 Inter;margin-bottom:2px;display:flex;align-items:center;gap:8px;}
+  .ref .domain{font:500 11px/1.2 ui-monospace,'JetBrains Mono',monospace;color:var(--mute);}
+  .ref .takeaway{font:400 12px/1.5 Inter;color:hsl(0 0% 25%);margin-top:10px;}
+  .ref .verdict{display:inline-flex;align-items:center;gap:5px;font:500 11px/1 Inter;padding:4px 8px;border-radius:9999px;margin-top:10px;}
+  .v-yes{background:hsl(142 71% 45% / 0.1);color:hsl(142 71% 25%);}
+  .v-mix{background:hsl(38 92% 50% / 0.12);color:hsl(28 90% 35%);}
+  .v-no{background:hsl(0 84% 60% / 0.1);color:hsl(0 70% 35%);}
+  /* finalist */
+  .finalist{border:2px solid var(--saffron);position:relative;}
+  .finalist::before{content:'★ FINALIST';position:absolute;top:10px;right:10px;background:var(--saffron);color:#fff;font:600 10px/1 Inter;letter-spacing:.1em;padding:5px 8px;border-radius:6px;z-index:2;}
+  /* palette */
+  .palette{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);}
+  .sw{aspect-ratio:1.6/1;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;color:#fff;font:500 11px/1.3 Inter;}
+  .sw small{display:block;font:500 10px/1.2 ui-monospace,monospace;opacity:.85;margin-top:2px;}
+  .sw.lt{color:var(--ink);}
+  .pal-cap{font:400 13px/1.5 Inter;color:var(--mute);margin-top:14px;}
+  /* tone */
+  .tone-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .tone{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;}
+  .tone.no{border-left:3px solid hsl(0 84% 60%);}
+  .tone.yes{border-left:3px solid hsl(142 71% 45%);}
+  .tone-head{font:500 11px/1 Inter;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;}
+  .tone.yes .tone-head{color:hsl(142 71% 35%);}
+  .tone.no .tone-head{color:hsl(0 70% 40%);}
+  .tone-ex{padding:12px 0;border-bottom:1px solid var(--line);}
+  .tone-ex:last-child{border-bottom:none;}
+  .tone-ex .q{font:500 14px/1.45 Inter;color:var(--ink);margin-bottom:4px;}
+  .tone-ex .src{font:400 11px/1.4 Inter;color:var(--mute);}
+  /* rec block */
+  .rec{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px 30px;margin-top:48px;}
+  .rec h3{font:600 18px/1.3 Inter;margin:0 0 12px;}
+  .rec ul{margin:0;padding-left:20px;font:400 14px/1.7 Inter;color:hsl(0 0% 22%);}
+  .rec li::marker{color:var(--saffron);}
+  /* Image generators (CSS-only photographic refs) */
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">[12.D1] · Эпик #293 · Issue #312</div>
+  <h1>Moodboard — Tour Landing</h1>
+  <p class="lede">12 референсов luxury &amp; adventure travel landing pages, 3 finalist'а для основы IndiaHorizone, утверждение saffron-палитры на тропической фотографии, и tone of voice — что повторяем и что отвергаем.</p>
+  <p class="meta"><b>Цель:</b> зафиксировать визуальную референс-базу для [12.D2]–[12.D6]. <b>Аудитория:</b> русскоязычные 30–50, образованные. <b>Анти-стереотипы:</b> без махараджей, без золотых разводов, без Bollywood.</p>
+
+  <!-- ============ SECTION 1 — REFERENCES ============ -->
+  <h2><span class="num">01 — Референсы</span>12 tour landings, что брать и что отбрасывать</h2>
+  <p class="h2sub">Каждый референс — субъективный score после прохода главной + одного tour-page. Verdict: ✓ берём подход, ≈ берём частично, ✗ отвергаем.</p>
+
+  <div class="grid">
+
+    <!-- 1 Black Tomato -->
+    <div class="ref finalist">
+      <div class="img" style="background:
+        radial-gradient(ellipse at 30% 40%, hsl(28 60% 55%) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 70%, hsl(20 50% 30%) 0%, transparent 60%),
+        linear-gradient(180deg, hsl(28 35% 25%), hsl(0 0% 8%));">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:600 16px/1.2 Inter;letter-spacing:-0.01em;">Where the<br/>impossible begins.</div>
+      </div>
+      <div class="body">
+        <div class="brand">Black Tomato</div>
+        <div class="domain">blacktomato.com</div>
+        <div class="takeaway">Full-bleed cinematic video, маленькие надписи, огромное свободное пространство. CTA «Plan your trip» — без сильного CTA-цвета. Тон — литературный, эмоциональный.</div>
+        <div class="verdict v-yes">✓ Hero · тон · airy layout</div>
+      </div>
+    </div>
+
+    <!-- 2 Original Travel -->
+    <div class="ref finalist">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(195 50% 70%) 0%, hsl(28 70% 65%) 60%, hsl(20 60% 45%) 100%);">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.4));"></div>
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;">
+          <div style="font:500 11px/1 Inter;letter-spacing:.12em;text-transform:uppercase;opacity:.85;margin-bottom:6px;">South India · 12 days</div>
+          <div style="font:600 17px/1.2 Inter;">Tea estates &amp; backwaters</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="brand">Original Travel</div>
+        <div class="domain">originaltravel.co.uk</div>
+        <div class="takeaway">Чистая типографика serif+sans, day-by-day timeline в виде вертикали с фото слева, текст справа. «Why we love it» блок до программы — тёплый.</div>
+        <div class="verdict v-yes">✓ Day-by-day · structure</div>
+      </div>
+    </div>
+
+    <!-- 3 Scott Dunn -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(120deg, hsl(220 30% 25%) 0%, hsl(195 40% 50%) 50%, hsl(28 50% 55%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:600 15px/1.2 Inter;">Tailor-made<br/>journeys.</div>
+      </div>
+      <div class="body">
+        <div class="brand">Scott Dunn</div>
+        <div class="domain">scottdunn.com</div>
+        <div class="takeaway">Premium, но overdesigned: много карточек, плотная сетка, агрессивные CTA. Социальные доказательства — рейтинг Trustpilot вверху.</div>
+        <div class="verdict v-mix">≈ Concierge framing only</div>
+      </div>
+    </div>
+
+    <!-- 4 Abercrombie & Kent -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(38 35% 25%) 0%, hsl(28 50% 40%) 100%);
+        background-image:radial-gradient(ellipse at 50% 60%, hsl(45 70% 60%) 0%, transparent 50%),linear-gradient(180deg, hsl(38 35% 25%) 0%, hsl(28 50% 40%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:600 15px/1.2 Inter;">Travel,<br/>extraordinary.</div>
+      </div>
+      <div class="body">
+        <div class="brand">Abercrombie &amp; Kent</div>
+        <div class="domain">abercrombiekent.com</div>
+        <div class="takeaway">Старая школа luxury — золотой акцент, serif-headline. Слишком corporate для нашей ЦА, выглядит «для пенсионеров».</div>
+        <div class="verdict v-no">✗ Слишком boomer-luxe</div>
+      </div>
+    </div>
+
+    <!-- 5 Intrepid -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(48 90% 55%) 0%, hsl(20 80% 50%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:700 16px/1.05 Inter;letter-spacing:-0.01em;">REAL<br/>TRAVEL.<br/>REAL PEOPLE.</div>
+      </div>
+      <div class="body">
+        <div class="brand">Intrepid Travel</div>
+        <div class="domain">intrepidtravel.com</div>
+        <div class="takeaway">Массовый adventure, кричащие цвета, «small group» как УТП. Хороший price-block (per person/from), плохо для luxury-ЦА.</div>
+        <div class="verdict v-mix">≈ Price-block pattern</div>
+      </div>
+    </div>
+
+    <!-- 6 G Adventures -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(195 60% 45%) 0%, hsl(160 40% 35%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:700 14px/1.1 Inter;">CHANGE<br/>THE WAY YOU<br/>SEE THE WORLD</div>
+      </div>
+      <div class="body">
+        <div class="brand">G Adventures</div>
+        <div class="domain">gadventures.com</div>
+        <div class="takeaway">Sustainability-first, бейджи «G for Good». Много текста, много badges. Полезно для consent/CTM-блока.</div>
+        <div class="verdict v-mix">≈ Trust badges</div>
+      </div>
+    </div>
+
+    <!-- 7 Much Better Adventures -->
+    <div class="ref finalist">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 12%) 100%);
+        background-image:radial-gradient(ellipse at 60% 50%, hsl(28 90% 55%) 0%, transparent 40%),linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 12%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;">
+          <div style="font:500 11px/1 Inter;letter-spacing:.12em;text-transform:uppercase;color:hsl(28 90% 65%);margin-bottom:6px;">Hand-picked</div>
+          <div style="font:600 16px/1.2 Inter;">Small-group adventures</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="brand">Much Better Adventures</div>
+        <div class="domain">muchbetteradventures.com</div>
+        <div class="takeaway">Тёмная база + тёплый акцент = идеально для нашего saffron. Текстовые отзывы с фото-аватаром, нет видео-кружков. Mobile-first отлично.</div>
+        <div class="verdict v-yes">✓ Dark + accent · text reviews</div>
+      </div>
+    </div>
+
+    <!-- 8 Remote Lands -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(0 0% 96%) 0%, hsl(28 30% 80%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:hsl(0 0% 9%);">
+          <div style="font:600 16px/1.2 'Times New Roman',serif;letter-spacing:-0.01em;">Asia, defined.</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="brand">Remote Lands</div>
+        <div class="domain">remotelands.com</div>
+        <div class="takeaway">Editorial-журнальный подход, длинные long-reads, фото на всю ширину. Нет ярких CTA — лиды через «Inquire».</div>
+        <div class="verdict v-mix">≈ Editorial copy</div>
+      </div>
+    </div>
+
+    <!-- 9 Wilderness Safaris -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(38 60% 55%) 0%, hsl(20 70% 30%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:600 15px/1.2 Inter;">Nature with<br/>purpose.</div>
+      </div>
+      <div class="body">
+        <div class="brand">Wilderness Safaris</div>
+        <div class="domain">wilderness-safaris.com</div>
+        <div class="takeaway">Conservation-first сторителлинг. Хорошо: «impact metrics» в hero. Плохо: фото lions+sunsets — не наш кейс.</div>
+        <div class="verdict v-mix">≈ Impact framing</div>
+      </div>
+    </div>
+
+    <!-- 10 IndiaSomeday (anti) -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(48 90% 60%) 0%, hsl(0 80% 50%) 100%);
+        background-image:repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(255,255,255,.06) 6px, rgba(255,255,255,.06) 12px),linear-gradient(180deg, hsl(48 90% 60%) 0%, hsl(0 80% 50%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:700 16px/1.1 Inter;">INCREDIBLE<br/>INDIA!</div>
+      </div>
+      <div class="body">
+        <div class="brand">IndiaSomeday</div>
+        <div class="domain">indiasomeday.com</div>
+        <div class="takeaway">Стереотипный «Bollywood-стиль» — золото, орнаменты, изобилие. Именно то, от чего наша ЦА оттолкнётся.</div>
+        <div class="verdict v-no">✗ Anti-reference</div>
+      </div>
+    </div>
+
+    <!-- 11 Audley -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(28 25% 35%) 0%, hsl(20 35% 22%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;font:600 15px/1.2 Inter;">Specialists in<br/>tailor-made travel.</div>
+      </div>
+      <div class="body">
+        <div class="brand">Audley Travel</div>
+        <div class="domain">audleytravel.com</div>
+        <div class="takeaway">«Country specialist» framing — портрет менеджера + цитата. Концепт дельный для concierge-позиционирования.</div>
+        <div class="verdict v-mix">≈ Specialist quote</div>
+      </div>
+    </div>
+
+    <!-- 12 Pelorus -->
+    <div class="ref">
+      <div class="img" style="background:
+        linear-gradient(180deg, hsl(195 35% 12%) 0%, hsl(195 25% 8%) 100%);
+        background-image:radial-gradient(ellipse at 45% 55%, hsl(28 70% 50%) 0%, transparent 38%),linear-gradient(180deg, hsl(195 35% 12%) 0%, hsl(195 25% 8%) 100%);">
+        <div style="position:absolute;left:14px;bottom:14px;color:#fff;">
+          <div style="font:500 11px/1 Inter;letter-spacing:.12em;text-transform:uppercase;opacity:.7;margin-bottom:6px;">Expedition design</div>
+          <div style="font:600 16px/1.2 Inter;">Beyond the map.</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="brand">Pelorus</div>
+        <div class="domain">pelorusx.com</div>
+        <div class="takeaway">Тёмный editorial, тонкая типографика, минимум CTA. Очень premium, но для нас — слишком cold.</div>
+        <div class="verdict v-mix">≈ Restraint level</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ SECTION 2 — FINALISTS ============ -->
+  <h2><span class="num">02 — Три finalist'а</span>На чём строим IndiaHorizone tour landing</h2>
+  <p class="h2sub">Те, чей композит ближе всего к нашему позиционированию: literary tone (Black Tomato), structured day-by-day (Original Travel), dark+saffron-accent (Much Better Adventures).</p>
+
+  <div class="grid three">
+    <div class="ref finalist">
+      <div class="img" style="background:radial-gradient(ellipse at 30% 40%, hsl(28 60% 55%) 0%, transparent 55%),radial-gradient(ellipse at 75% 70%, hsl(20 50% 30%) 0%, transparent 60%),linear-gradient(180deg, hsl(28 35% 25%), hsl(0 0% 8%));">
+        <div style="position:absolute;left:18px;bottom:18px;color:#fff;font:600 20px/1.15 Inter;letter-spacing:-0.01em;">Where the<br/>impossible begins.</div>
+      </div>
+      <div class="body">
+        <div class="brand">Black Tomato <span style="font:500 11px/1 Inter;color:var(--saffron);">→ HERO</span></div>
+        <div class="takeaway"><b>Берём:</b> full-bleed image hero, очень тонкий headline, минимум визуального шума. CTA — текстовая ссылка с подчёркиванием, не кнопка-плашка.</div>
+      </div>
+    </div>
+
+    <div class="ref finalist">
+      <div class="img" style="background:linear-gradient(180deg, hsl(195 50% 70%) 0%, hsl(28 70% 65%) 60%, hsl(20 60% 45%) 100%);">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.4));"></div>
+        <div style="position:absolute;left:18px;bottom:18px;color:#fff;">
+          <div style="font:500 12px/1 Inter;letter-spacing:.12em;text-transform:uppercase;opacity:.85;margin-bottom:8px;">South India · 12 days</div>
+          <div style="font:600 20px/1.2 Inter;">Tea estates &amp; backwaters</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="brand">Original Travel <span style="font:500 11px/1 Inter;color:var(--saffron);">→ DAY-BY-DAY</span></div>
+        <div class="takeaway"><b>Берём:</b> вертикальный timeline с пронумерованными днями, фото слева 40%, описание справа 60%. Блок «Why we love it» сразу под hero.</div>
+      </div>
+    </div>
+
+    <div class="ref finalist">
+      <div class="img" style="background:radial-gradient(ellipse at 60% 50%, hsl(28 90% 55%) 0%, transparent 40%),linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 12%) 100%);">
+        <div style="position:absolute;left:18px;bottom:18px;color:#fff;">
+          <div style="font:500 12px/1 Inter;letter-spacing:.12em;text-transform:uppercase;color:hsl(28 90% 65%);margin-bottom:8px;">Hand-picked</div>
+          <div style="font:600 20px/1.2 Inter;">Small-group adventures</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="brand">Much Better Adventures <span style="font:500 11px/1 Inter;color:var(--saffron);">→ ACCENTS · REVIEWS</span></div>
+        <div class="takeaway"><b>Берём:</b> dark sections как контраст к light hero, saffron-акцент на CTAs и метках. Текстовые отзывы с фото-аватаром (без видео-кружков на лендинге).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 3 — PALETTE ============ -->
+  <h2><span class="num">03 — Палитра</span>Saffron работает с тропической Кералой?</h2>
+  <p class="h2sub">Проверка: основной saffron (#F97316) + neutrals + поверх типичной фотографии Кералы (зелень backwaters + закат над Аравийским морем).</p>
+
+  <div class="palette">
+    <div class="sw" style="background:hsl(24 95% 53%);"><span>Saffron / Primary</span><small>hsl(24 95% 53%)<br/>#F97316</small></div>
+    <div class="sw" style="background:hsl(24 95% 38%);"><span>Saffron Deep / Hover</span><small>hsl(24 95% 38%)</small></div>
+    <div class="sw" style="background:hsl(160 40% 30%);"><span>Tea Green / Accent</span><small>hsl(160 40% 30%)</small></div>
+    <div class="sw" style="background:hsl(195 35% 12%);"><span>Backwater Ink</span><small>hsl(195 35% 12%)</small></div>
+    <div class="sw lt" style="background:hsl(28 30% 94%);"><span>Sand / Warm BG</span><small>hsl(28 30% 94%)</small></div>
+    <div class="sw lt" style="background:#fff;"><span>White</span><small>#FFFFFF</small></div>
+  </div>
+  <p class="pal-cap"><b>Вывод:</b> saffron contrast-OK на тёмном backwater-ink (AA на текстовых элементах) и на sand-фоне. Tea-green — secondary для бейджей «sustainability» / «eco». Saffron <b>не</b> кладём на чисто-зелёное фото — теряет насыщенность; всегда подкладываем dark gradient overlay (см. finalist'ы).</p>
+
+  <!-- ============ SECTION 4 — TONE OF VOICE ============ -->
+  <h2><span class="num">04 — Tone of voice</span>3 примера повторяем · 3 отвергаем</h2>
+  <p class="h2sub">Все примеры русскоязычные — адаптация англоязычного тона под нашу ЦА. Headline + 1–2 строки supporting copy для tour-page hero.</p>
+
+  <div class="tone-grid">
+    <div class="tone yes">
+      <div class="tone-head">✓ Берём этот тон</div>
+      <div class="tone-ex">
+        <div class="q">«Двенадцать дней в Керале — без спешки, без туристических автобусов, без обязательных селфи у фонтана.»</div>
+        <div class="src">Black Tomato style — отрицанием, через «не как у всех»</div>
+      </div>
+      <div class="tone-ex">
+        <div class="q">«Мы знаем Кералу как свою — и подберём именно тот ритм, что нужен вам.»</div>
+        <div class="src">Audley specialist style — concierge-обещание, человеческое</div>
+      </div>
+      <div class="tone-ex">
+        <div class="q">«Чай с фермером в горах Муннара. Лодка по backwaters Аллеппи. Три ночи под звёздами в Текади.»</div>
+        <div class="src">Original Travel style — конкретные образы вместо прилагательных</div>
+      </div>
+    </div>
+
+    <div class="tone no">
+      <div class="tone-head">✗ Отвергаем</div>
+      <div class="tone-ex">
+        <div class="q">«Откройте магию Индии! Незабываемое путешествие в страну тысячи богов!»</div>
+        <div class="src">Восклицания, штампы, «магия»/«незабываемое»</div>
+      </div>
+      <div class="tone-ex">
+        <div class="q">«Эксклюзивный тур премиум-класса по программе VIP+ с личным гидом!»</div>
+        <div class="src">Маркетинговый сленг, «эксклюзивный/премиум/VIP» — пустые слова</div>
+      </div>
+      <div class="tone-ex">
+        <div class="q">«Прикоснитесь к древней мудрости Востока в стране махараджей и слонов 🐘🕌»</div>
+        <div class="src">Стереотипы + emoji — отталкивает 30–50 ЦА</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 5 — RECOMMENDATION ============ -->
+  <div class="rec">
+    <h3>Рекомендация для [12.D2]–[12.D6]</h3>
+    <ul>
+      <li><b>Hero ([12.D2]):</b> композит Black Tomato + Original Travel — full-bleed фото с тёмным gradient-overlay снизу, eyebrow «Южная Индия · 12 дней», headline в одну-две строки в стиле «отрицанием», CTA — текстовая ссылка с saffron-подчёркиванием, без plate-кнопки.</li>
+      <li><b>Day-by-day ([12.D3]):</b> вертикальный timeline по образцу Original Travel. Каждый день — нумерованный кружок saffron, фото 40%, описание 60%, под описанием «Facts» как chips (расстояние / часы в дороге / высота).</li>
+      <li><b>Reviews ([12.D4]):</b> текстовые карточки в стиле Much Better Adventures — фото-аватар + имя + город + 2–3 строки. Никаких видео-кружков на лендинге (это для post-trip Дневника).</li>
+      <li><b>Price + Lead ([12.D5]):</b> price-block в стиле Intrepid («от X / на чел.»), но без агрессии. LeadForm — 3 поля (имя, email, telegram/whatsapp) + consent-чекбокс с ссылкой на политику данных, без галочки по умолчанию.</li>
+      <li><b>Mobile ([12.D6]):</b> Much Better Adventures как референс — 100% mobile-first, sticky CTA внизу экрана с текстом «Узнать стоимость», hero сжимается до 70vh.</li>
+      <li><b>Photo brief ([12.D7]):</b> Шиваму — снимать тёмные/контрастные кадры (закаты, силуэты лодок, чайные плантации в облаках), <b>избегать</b> ярко-полуденных Bollywood-кадров. Aspect 3:2 + 1:1 для мобильных.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
