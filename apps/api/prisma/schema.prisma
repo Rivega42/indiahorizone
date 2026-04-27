@@ -45,7 +45,7 @@ model OutboxEntry {
   /// Тип события: <service>.<entity>.<verb>, например "auth.user.registered"
   eventType     String    @map("event_type")
   /// Версия схемы payload (DomainEvent.schemaVersion)
-  schemaVersion Int       @map("schema_version") @default(1)
+  schemaVersion Int       @default(1) @map("schema_version")
   /// JSON payload + envelope-метаданные (correlationId, actor)
   payload       Json
   /// UUIDv4 для DomainEvent.id — генерируется на этапе записи, гарантирует
@@ -126,7 +126,7 @@ model User {
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
   /// Backref для CASCADE на logout-all и trip-history.
-  sessions     Session[]
+  sessions Session[]
 
   @@index([email], map: "idx_users_email")
   @@map("users")
@@ -143,12 +143,12 @@ model User {
 /// userId — soft-reference на users.id (без FK, cross-module policy).
 /// Один User → один Client (unique constraint на userId).
 model Client {
-  id          String        @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   /// Soft-reference на users.id. Без FK (cross-module policy).
-  userId      String        @unique @map("user_id") @db.Uuid
-  createdAt   DateTime      @default(now()) @map("created_at")
+  userId    String   @unique @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
 
-  profile     ClientProfile?
+  profile ClientProfile?
 
   @@index([userId], map: "idx_clients_user_id")
   @@map("clients")
@@ -195,25 +195,136 @@ model ClientProfile {
 /// если revokedAt уже стоит, и снова приходит запрос → атака → invalidate
 /// все сессии user'а.
 model Session {
-  id                String    @id @default(uuid()) @db.Uuid
-  userId            String    @map("user_id") @db.Uuid
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
   /// argon2id-хеш refresh-токена. По нему verify при /auth/refresh.
-  refreshTokenHash  String    @map("refresh_token_hash")
+  refreshTokenHash String    @map("refresh_token_hash")
   /// IP при создании. Используется для suspicious-detection (#136).
-  ip                String?
+  ip               String?
   /// User-Agent при создании.
-  userAgent         String?   @map("user_agent")
-  createdAt         DateTime  @default(now()) @map("created_at")
+  userAgent        String?   @map("user_agent")
+  createdAt        DateTime  @default(now()) @map("created_at")
   /// Когда refresh истечёт (createdAt + 30 дней).
-  expiresAt         DateTime  @map("expires_at")
+  expiresAt        DateTime  @map("expires_at")
   /// Установлено при logout / refresh-rotation. NULL = активна.
-  revokedAt         DateTime? @map("revoked_at")
+  revokedAt        DateTime? @map("revoked_at")
   /// Заполняется при revoke — для трейсинга и detection-reuse.
-  revokeReason      String?   @map("revoke_reason")
+  revokeReason     String?   @map("revoke_reason")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, revokedAt], map: "idx_sessions_user_active")
   @@index([expiresAt], map: "idx_sessions_expires_ttl")
   @@map("sessions")
+}
+
+// === catalog модуль (#294 [EPIC 12]) ===
+//
+// Источник: docs/ARCH/CATALOG.md (создаётся в #311), issue #293.
+// catalog — публичный read-only домен туров. Без ПДн, без auth-зависимостей.
+// В фазе 4 — кандидат на extraction в catalog-svc с CDN-кешем.
+//
+// Cross-module rule: НЕТ FK на User/Client. Туры независимы.
+
+enum TourStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@map("tour_status")
+}
+
+/// Тур — публикуемая программа путешествия. Источник для tour landing pages
+/// (`/tours/[slug]`).
+///
+/// Поля costInr* в TourDay — internal (не отдаются в публичный API), для
+/// расчёта маржи и аналитики. См. CatalogService DTO mapping.
+model Tour {
+  id            String     @id @default(uuid()) @db.Uuid
+  /// URL slug, например "tury-kerala-oktyabr-2026". РУ-транслит + сезон.
+  slug          String     @unique
+  status        TourStatus @default(DRAFT)
+  title         String
+  /// Свободный текст: "Тривандрум · Варкала · Джатаю".
+  region        String
+  durationDays  Int        @map("duration_days")
+  /// Свободный текст: "Октябрь 2026", "Ноябрь — декабрь 2026".
+  season        String
+  /// Цена в рублях (минимум). Хранится как Int — копейки в фазе 3 не нужны;
+  /// миграция на Decimal — отдельный issue фазы 4 при подключении биллинга.
+  priceFromRub  Int        @map("price_from_rub")
+  /// Верхняя граница ценового коридора. NULL = только "от X".
+  priceToRub    Int?       @map("price_to_rub")
+  groupSize     String     @map("group_size")
+  heroVideoUrl  String?    @map("hero_video_url")
+  heroPosterUrl String     @map("hero_poster_url")
+  /// Короткий emotional hook (3-4 строки в hero).
+  emotionalHook String     @map("emotional_hook")
+  /// JSONB: { included: string[], notIncluded: string[] }.
+  inclusions    Json
+  /// JSONB: { q: string, a: string }[] — для FAQ-секции и Schema.org FAQPage.
+  faq           Json
+  /// JSONB: string[] — 3 trust-бейджа под hero CTA.
+  trustBadges   Json       @map("trust_badges")
+  /// JSONB: { iconKind: string, label: string, value: string }[] — 6 фактов.
+  facts         Json
+  publishedAt   DateTime?  @map("published_at")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  days  TourDay[]
+  media TourMedia[]
+
+  @@index([status, publishedAt], map: "idx_tours_status_published")
+  @@map("tours")
+}
+
+/// День маршрута. Один день = одна карточка в DayTimeline.
+/// costInr* — internal, для аналитики маржи; в публичный API НЕ отдаётся
+/// (исключаем в CatalogService DTO mapping). См. spec в issue #296.
+model TourDay {
+  id          String  @id @default(uuid()) @db.Uuid
+  tourId      String  @map("tour_id") @db.Uuid
+  /// 1..durationDays. Уникален в рамках тура.
+  dayNumber   Int     @map("day_number")
+  location    String
+  title       String
+  /// Markdown допускается.
+  description String
+  /// JSONB: { kind: 'culture'|'nature'|'food'|'water'|'adventure'|'wellness',
+  ///         label: string }[].
+  /// Типизированный набор kind — для consistency между турами и фильтрации.
+  activities  Json
+  imageUrl    String  @map("image_url")
+  /// true = "на выбор" (треккинг ИЛИ СПА). UI выделяет visualно.
+  isOptional  Boolean @default(false) @map("is_optional")
+  /// Internal: нижняя граница стоимости дня в INR. Для аналитики маржи.
+  /// НЕ отдаётся клиенту (CatalogService excludes из DTO).
+  costInrFrom Int?    @map("cost_inr_from")
+  /// Internal: верхняя граница стоимости дня в INR.
+  costInrTo   Int?    @map("cost_inr_to")
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@unique([tourId, dayNumber], map: "uq_tour_days_tour_day")
+  @@index([tourId], map: "idx_tour_days_tour")
+  @@map("tour_days")
+}
+
+/// Медиа-ассеты тура: фото, видео, в будущем — кружки-отзывы (V2 после #142
+/// Consent). Order — для порядка отображения в галереях.
+model TourMedia {
+  id      String  @id @default(uuid()) @db.Uuid
+  tourId  String  @map("tour_id") @db.Uuid
+  /// 'photo' | 'video' | 'circle-review' (последнее — после Consent #142).
+  kind    String
+  url     String
+  caption String?
+  /// Порядок отображения. Меньше — раньше.
+  order   Int     @default(0)
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@index([tourId, kind], map: "idx_tour_media_tour_kind")
+  @@map("tour_media")
 }
