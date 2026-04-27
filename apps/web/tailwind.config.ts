@@ -24,6 +24,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['var(--font-playfair)', 'Georgia', 'serif'],
         mono: ['ui-monospace', 'JetBrains Mono', 'Consolas', 'monospace'],
       },
       colors: {

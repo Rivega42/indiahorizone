@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>India Horizone · Liquid Glass Travel</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles/glass.css" />
+<link rel="stylesheet" href="styles/sections.css" />
+<link rel="stylesheet" href="styles/map-adv.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=900&q=80" data-resource-id="img00" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=900&q=80" data-resource-id="img01" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1477587458883-47145ed94245?w=900&q=80" data-resource-id="img02" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=900&q=80" data-resource-id="img03" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1000&q=80" data-resource-id="img04" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1000&q=80" data-resource-id="img05" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=1000&q=80" data-resource-id="img06" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1000&q=80" data-resource-id="img07" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=1000&q=80" data-resource-id="img08" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1000&q=80" data-resource-id="img09" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700&q=80" data-resource-id="img10" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=700&q=80" data-resource-id="img11" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=700&q=80" data-resource-id="img12" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700&q=80" data-resource-id="img13" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1514222134-b57cbb8ce073?w=900&q=80" data-resource-id="img14" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=900&q=80" data-resource-id="img15" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=900&q=80" data-resource-id="img16" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1477587458883-47145ed94245?w=700&q=80" data-resource-id="img17" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=700&q=80" data-resource-id="img18" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=900&q=85" data-resource-id="img19" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1000&q=85" data-resource-id="img20" />
+<meta name="ext-resource-dependency" content="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1000&q=85" data-resource-id="img21" />
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#07030d">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bg" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#ff7a2e" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="#07030d" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="800" fill="#07030d"/>
+    <rect width="1200" height="800" fill="url(#bg)"/>
+    <!-- Lotus / sun emblem -->
+    <g transform="translate(600,400)">
+      <circle r="140" fill="none" stroke="#ffc85a" stroke-width="2" opacity="0.35"/>
+      <circle r="90" fill="none" stroke="#ff7a2e" stroke-width="2" opacity="0.6"/>
+      <circle r="42" fill="#ff7a2e"/>
+      <g stroke="#ffc85a" stroke-width="3" fill="none" opacity="0.8">
+        <path d="M0,-140 L0,-92"/>
+        <path d="M99,-99 L65,-65" />
+        <path d="M140,0 L92,0"/>
+        <path d="M99,99 L65,65"/>
+        <path d="M0,140 L0,92"/>
+        <path d="M-99,99 L-65,65"/>
+        <path d="M-140,0 L-92,0"/>
+        <path d="M-99,-99 L-65,-65"/>
+      </g>
+    </g>
+    <text x="600" y="620" font-family="Playfair Display, serif" font-style="italic" font-size="48" fill="#f5ecdb" text-anchor="middle">India Horizone</text>
+    <text x="600" y="660" font-family="monospace" font-size="18" fill="#ffc85a" text-anchor="middle" letter-spacing="6">LIQUID · GLASS · TRAVEL</text>
+  </svg>
+</template>
+
+<div id="root"></div>
+
+<script src="src/data-standalone.js"></script>
+<script type="text/babel" src="src/core-standalone.jsx"></script>
+<script type="text/babel" src="src/sections1.jsx"></script>
+<script type="text/babel" src="src/map.jsx"></script>
+<script type="text/babel" src="src/sections2.jsx"></script>
+<script type="text/babel" src="src/app.jsx"></script>
+<script>
+  (function tryRender() {
+    const r = document.getElementById('root');
+    if (r && r.children.length === 0 && window.App && window.LiquidCursor) {
+      try { ReactDOM.createRoot(r).render(React.createElement(window.App)); return; }
+      catch(e) { console.error('render err', e); }
+    }
+    setTimeout(tryRender, 200);
+  })();
+</script>
+</body>
+</html>

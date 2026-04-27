@@ -1,0 +1,196 @@
+/* ============ Adventure Map (pirate / fantasy cartography) ============ */
+.adv-map-wrap {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+@media (max-width: 900px) {
+  .adv-map-wrap { grid-template-columns: 1fr; }
+}
+
+.adv-map-routes {
+  background: linear-gradient(180deg, rgba(244,227,191,0.08), rgba(244,227,191,0.03));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+.adv-map-routes-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 14px;
+}
+.adv-route-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink-dim);
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.3s var(--ease-out);
+}
+.adv-route-btn-label { flex: 1; line-height: 1.2; }
+.adv-route-btn-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rc) 20%, transparent);
+  color: var(--rc);
+  flex-shrink: 0;
+}
+.adv-route-btn-ico svg { stroke: currentColor; fill: currentColor; }
+.adv-route-btn-ico svg line,
+.adv-route-btn-ico svg path,
+.adv-route-btn-ico svg rect,
+.adv-route-btn-ico svg circle { stroke: currentColor !important; }
+.adv-route-btn:hover {
+  background: rgba(244,227,191,0.04);
+  color: var(--ink);
+  border-color: rgba(244,227,191,0.25);
+}
+.adv-route-btn.active {
+  background: color-mix(in srgb, var(--rc) 15%, transparent);
+  border-color: var(--rc);
+  color: var(--ink);
+}
+.adv-route-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rc);
+  box-shadow: 0 0 12px var(--rc);
+}
+
+.adv-map-stage {
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(244,227,191,0.06), transparent 70%),
+    linear-gradient(180deg, rgba(20,12,8,0.6), rgba(10,6,4,0.9));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 640px;
+}
+
+.adv-map-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 640px;
+  filter: drop-shadow(0 30px 60px rgba(0,0,0,0.55));
+}
+
+/* Pin animations — apply on inner <g> so outer translate is preserved */
+.adv-pin { transition: transform 0.3s var(--ease-out); transform-origin: center; transform-box: fill-box; }
+g:hover > .adv-pin { transform: scale(1.12); }
+.adv-pin.active { transform: scale(1.18); }
+
+.adv-ping {
+  transform-origin: center;
+  animation: adv-ping 1.8s var(--ease-out) infinite;
+}
+.adv-ping-2 { animation-delay: 0.6s; }
+@keyframes adv-ping {
+  0% { opacity: 0.8; transform: scale(0.4); }
+  70%, 100% { opacity: 0; transform: scale(1.6); }
+}
+
+.adv-route-path {
+  animation: adv-dash 32s linear infinite;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.35));
+}
+@keyframes adv-dash {
+  to { stroke-dashoffset: -200; }
+}
+
+/* Detail overlay */
+.adv-map-detail {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 280px;
+  padding: 20px;
+  background: rgba(10,6,4,0.88);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(244,227,191,0.2);
+  border-left: 3px solid var(--dc);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.adv-detail-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dc) 25%, transparent);
+  color: var(--dc);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.adv-map-detail h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+.adv-detail-sub {
+  font-size: 13px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+.adv-detail-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding-top: 12px;
+  border-top: 1px solid rgba(244,227,191,0.15);
+  transition: color 0.2s;
+}
+.adv-detail-cta:hover { color: var(--dc); }
+.adv-detail-cta span {
+  transition: transform 0.2s;
+}
+.adv-detail-cta:hover span {
+  transform: translateX(4px);
+}
+
+@media (max-width: 700px) {
+  .adv-map-detail {
+    position: relative;
+    top: 0;
+    right: 0;
+    width: auto;
+    margin: 12px;
+  }
+}
