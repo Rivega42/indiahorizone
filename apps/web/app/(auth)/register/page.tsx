@@ -89,7 +89,7 @@ export default function RegisterPage(): React.ReactElement {
         </p>
       </div>
 
-      {error && (
+      {error != null && (
         <Alert variant="destructive" role="alert">
           <AlertDescription>{getErrorMessage(error, 'Не удалось создать аккаунт')}</AlertDescription>
         </Alert>

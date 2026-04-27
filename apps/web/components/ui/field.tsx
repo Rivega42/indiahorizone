@@ -38,7 +38,7 @@ export function Field({
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      <Label htmlFor={id} required={required}>
+      <Label htmlFor={id} required={required ?? false}>
         {label}
       </Label>
       <Input
