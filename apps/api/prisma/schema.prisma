@@ -132,6 +132,57 @@ model User {
   @@map("users")
 }
 
+// === clients модуль (#138–#148) ===
+//
+// Источник: docs/BACKLOG/M5/C_CLIENTS.md, docs/ARCH/MICROSERVICES.md § clients-svc.
+// clients — персональные данные туристов (ФИО, паспорт, preferences).
+// Создаётся автоматически при auth.user.registered. Cross-module FK запрещены —
+// ссылка на User идёт через soft-reference (userId без FK).
+
+/// Клиент-профиль туриста. Создаётся автоматически при регистрации пользователя.
+/// userId — soft-reference на users.id (без FK, cross-module policy).
+/// Один User → один Client (unique constraint на userId).
+model Client {
+  id          String        @id @default(uuid()) @db.Uuid
+  /// Soft-reference на users.id. Без FK (cross-module policy).
+  userId      String        @unique @map("user_id") @db.Uuid
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  profile     ClientProfile?
+
+  @@index([userId], map: "idx_clients_user_id")
+  @@map("clients")
+}
+
+/// Персональные данные туриста. ПДн в смысле 152-ФЗ.
+/// Поля с ПДн (firstName, lastName, dateOfBirth, phone) хранятся
+/// в зашифрованном виде (#139 column-level encryption).
+/// preferences — свободный JSONB (языки, диеты, хобби).
+model ClientProfile {
+  id             String    @id @default(uuid()) @db.Uuid
+  clientId       String    @unique @map("client_id") @db.Uuid
+  /// Зашифровано (#139). Хранится как base64(encrypted).
+  firstName      String?   @map("first_name")
+  /// Зашифровано (#139).
+  lastName       String?   @map("last_name")
+  /// Зашифровано (#139).
+  dateOfBirth    DateTime? @map("date_of_birth") @db.Date
+  /// ISO 3166-1 alpha-2, например "RU", "IN".
+  citizenship    String?   @db.Char(2)
+  /// Зашифровано (#139). E.164 формат, например "+79161234567".
+  phone          String?
+  /// Telegram username без @, например "ivan_petrov".
+  telegramHandle String?   @map("telegram_handle")
+  /// Свободный JSONB: языки, диеты, специальные требования.
+  /// Пример: { "languages": ["ru", "en"], "diet": "vegetarian" }
+  preferences    Json?     @default("{}")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("client_profiles")
+}
+
 /// Сессия пользователя (refresh-token instance). Один user может иметь
 /// несколько активных сессий — один на устройство.
 ///
