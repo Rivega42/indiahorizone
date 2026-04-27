@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import {
   Bed,
   Calendar,
@@ -16,18 +15,27 @@ import {
   Waves,
   X,
 } from 'lucide-react';
+import { notFound } from 'next/navigation';
 
-import { getTourBySlug, listToursSlugs, type ActivityKind, type Tour } from '@/lib/mock/tours';
 import { LeadForm } from './lead-form';
+
+import type { ActivityKind, Tour } from '@/lib/mock/tours';
+
+import { getTourBySlug, listTourSlugs } from '@/lib/api/tours';
 
 export const revalidate = 3600;
 
-export function generateStaticParams(): { slug: string }[] {
-  return listToursSlugs().map((slug) => ({ slug }));
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  const slugs = await listTourSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
-export default function TourPage({ params }: { params: { slug: string } }): React.ReactElement {
-  const tour = getTourBySlug(params.slug);
+export default async function TourPage({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<React.ReactElement> {
+  const tour = await getTourBySlug(params.slug);
   if (!tour) notFound();
 
   return (
