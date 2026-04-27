@@ -18,13 +18,18 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /repo
 RUN corepack enable
 
-# ────────────────────────── 2. deps (frozen install с workspace)
+# ────────────────────────── 2. deps (frozen install — scoped to web subgraph)
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/package.json
 COPY apps/api/package.json ./apps/api/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
-RUN pnpm install --frozen-lockfile --prefer-offline
+# рекомендация: ставим только подграф web (web → shared). apps/api не ставим:
+# 1) web не зависит от api;
+# 2) apps/api postinstall = `prisma generate` требует apps/api/prisma/schema.prisma,
+#    которая для web-билда не нужна (issue #326);
+# 3) меньше слой → быстрее build, не тянем libssl/openssl ради ненужного prisma.
+RUN pnpm install --frozen-lockfile --prefer-offline --filter "@indiahorizone/web..."
 
 # ────────────────────────── 3. builder
 FROM base AS builder
