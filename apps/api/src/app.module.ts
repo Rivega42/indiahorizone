@@ -7,6 +7,7 @@ import { OutboxModule } from './common/outbox/outbox.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { RedisModule } from './common/redis/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { HealthModule } from './modules/health/health.module';
 
@@ -22,6 +23,7 @@ import { HealthModule } from './modules/health/health.module';
     OutboxModule,
     AuthModule,
     ClientsModule,
+    CatalogModule,
     CommonAuthModule, // глобальный JwtAuthGuard, требует AuthModule (JwtTokenService)
     HealthModule,
   ],
