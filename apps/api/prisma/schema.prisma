@@ -155,23 +155,25 @@ model Client {
 }
 
 /// Персональные данные туриста. ПДн в смысле 152-ФЗ.
-/// Поля с ПДн (firstName, lastName, dateOfBirth, phone) хранятся
-/// в зашифрованном виде (#139 column-level encryption).
+/// Поля firstName, lastName, dateOfBirth, phone хранятся
+/// в зашифрованном виде (#139 column-level encryption через CryptoService).
+/// На диске — base64(AES-256-GCM(plain)). Все ENCRYPTED_FIELDS — TEXT,
+/// потому что encrypted-payload — base64-строка, не date/etc.
 /// preferences — свободный JSONB (языки, диеты, хобби).
 model ClientProfile {
   id             String    @id @default(uuid()) @db.Uuid
   clientId       String    @unique @map("client_id") @db.Uuid
-  /// Зашифровано (#139). Хранится как base64(encrypted).
+  /// Зашифровано (#139). plaintext: ФИО.
   firstName      String?   @map("first_name")
-  /// Зашифровано (#139).
+  /// Зашифровано (#139). plaintext: ФИО.
   lastName       String?   @map("last_name")
-  /// Зашифровано (#139).
-  dateOfBirth    DateTime? @map("date_of_birth") @db.Date
-  /// ISO 3166-1 alpha-2, например "RU", "IN".
+  /// Зашифровано (#139). plaintext: ISO date 'YYYY-MM-DD'.
+  dateOfBirth    String?   @map("date_of_birth")
+  /// ISO 3166-1 alpha-2, например "RU", "IN". НЕ шифруется (не ПДн сама по себе).
   citizenship    String?   @db.Char(2)
-  /// Зашифровано (#139). E.164 формат, например "+79161234567".
+  /// Зашифровано (#139). plaintext: E.164 формат, например "+79161234567".
   phone          String?
-  /// Telegram username без @, например "ivan_petrov".
+  /// Telegram username без @, публичный handle. НЕ шифруется.
   telegramHandle String?   @map("telegram_handle")
   /// Свободный JSONB: языки, диеты, специальные требования.
   /// Пример: { "languages": ["ru", "en"], "diet": "vegetarian" }

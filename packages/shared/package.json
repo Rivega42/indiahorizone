@@ -10,5 +10,8 @@
     "lint": "eslint .",
     "test": "echo 'TODO: vitest'",
     "type-check": "tsc -b"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.13"
   }
 }
