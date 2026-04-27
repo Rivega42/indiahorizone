@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { LeadApiError, submitLead } from '@/lib/api/leads';
+
 type ContactType = 'phone' | 'telegram' | 'email';
 
 type FormState =
@@ -31,23 +33,26 @@ export function LeadForm({ tourSlug }: { tourSlug: string }): React.ReactElement
     if (!canSubmit) return;
     setState({ kind: 'submitting' });
 
-    /*
-     * TODO #297: подключить POST /leads когда backend Lead endpoint готов.
-     * Пока — симулируем 800ms задержку и показываем success.
-     */
-    await new Promise((r) => setTimeout(r, 800));
-    setState({ kind: 'success' });
-
-    // eslint-disable-next-line no-console
-    console.log('[lead-form mock]', {
+    const payload = {
       source: `tour-${tourSlug}`,
-      name,
+      name: name.trim(),
       contactType,
-      contact,
-      comment,
+      contact: contact.trim(),
+      ...(comment.trim().length > 0 ? { comment: comment.trim() } : {}),
       consent,
       consentTextVersion: CONSENT_TEXT_VERSION,
-    });
+    };
+
+    try {
+      await submitLead(payload);
+      setState({ kind: 'success' });
+    } catch (err) {
+      const message =
+        err instanceof LeadApiError
+          ? err.message
+          : 'Не удалось отправить заявку. Напишите нам в Telegram.';
+      setState({ kind: 'error', message });
+    }
   }
 
   if (state.kind === 'success') {
@@ -63,7 +68,7 @@ export function LeadForm({ tourSlug }: { tourSlug: string }): React.ReactElement
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={(e) => { void onSubmit(e); }} className="space-y-4">
       <div className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
         Заявка на тур
       </div>
