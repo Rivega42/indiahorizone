@@ -1,0 +1,84 @@
+# Deploy apps/web to dev-сервер 2.56.241.126
+#
+# Issue: #320 [devops:vika]
+# Триггеры:
+#   - push в main → авто-deploy
+#   - workflow_dispatch (с веткой) → ручной deploy любой ветки для PR-ревью
+#
+# Vika setup перед первым запуском:
+#   1. Settings → Secrets and variables → Actions → добавить:
+#      - DEV_SSH_HOST = 2.56.241.126
+#      - DEV_SSH_USER = root (или ubuntu — Vika подтвердит)
+#      - DEV_SSH_KEY  = приватный SSH-ключ (один раз сгенерировать пару,
+#                       публичный — на сервер в ~/.ssh/authorized_keys,
+#                       приватный — сюда)
+#   2. На сервере: git clone, см. issue #320 шаг 2
+#
+# Структура на сервере:
+#   /opt/indiahorizone/
+#     deploy/                   ← клон репо (этот workflow git pull'ит сюда)
+#     docker-compose.dev.yml    ← compose-файл (готовит Vika по issue #320)
+
+name: Deploy to dev (2.56.241.126)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Ветка для деплоя (main, feature/..., и т.д.)'
+        required: false
+        default: 'main'
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: SSH deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Echo deploy params
+        run: |
+          echo "Branch: ${{ github.event.inputs.branch || github.ref_name }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "SHA: ${{ github.sha }}"
+
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            BRANCH="${{ github.event.inputs.branch || github.ref_name }}"
+            cd /opt/indiahorizone/deploy
+
+            echo "→ fetching latest"
+            git fetch origin --prune
+            echo "→ checking out $BRANCH"
+            git checkout "$BRANCH"
+            git reset --hard "origin/$BRANCH"
+
+            echo "→ rebuilding indiahorizone-web-dev"
+            cd /opt/indiahorizone
+            docker compose -f docker-compose.dev.yml up -d --build web
+
+            echo "→ wait for healthy (max 60s)"
+            for i in $(seq 1 12); do
+              status=$(docker inspect -f '{{.State.Health.Status}}' indiahorizone-web-dev 2>/dev/null || echo "missing")
+              echo "  attempt $i: $status"
+              if [ "$status" = "healthy" ]; then break; fi
+              sleep 5
+            done
+
+            echo "→ smoke-test localhost:3010"
+            curl -fsS -o /dev/null -w "HTTP %{http_code}\n" http://localhost:3010/ || \
+              (echo "smoke-test FAILED"; docker logs indiahorizone-web-dev --tail 50; exit 1)
+
+            echo "✓ deploy ok"
