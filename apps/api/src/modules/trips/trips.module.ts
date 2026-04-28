@@ -7,14 +7,16 @@
  */
 import { Module } from '@nestjs/common';
 
+import { ItineraryController } from './itinerary/itinerary.controller';
+import { ItineraryService } from './itinerary/itinerary.service';
 import { TripsController } from './trips.controller';
 import { TripsService } from './trips.service';
 import { PrismaModule } from '../../common/prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],
-  controllers: [TripsController],
-  providers: [TripsService],
-  exports: [TripsService],
+  controllers: [TripsController, ItineraryController],
+  providers: [TripsService, ItineraryService],
+  exports: [TripsService, ItineraryService],
 })
 export class TripsModule {}
