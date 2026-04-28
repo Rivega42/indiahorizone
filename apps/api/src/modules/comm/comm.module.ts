@@ -25,6 +25,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ChatController } from './chat/chat.controller';
 import { ChatService } from './chat/chat.service';
 import { NotifyService } from './notify.service';
+import { NotificationPreferencesController } from './preferences/preferences.controller';
+import { NotificationPreferencesService } from './preferences/preferences.service';
 import { EMAIL_PROVIDER, type EmailProvider } from './providers/email.provider';
 import { LogEmailProvider } from './providers/log-email.provider';
 import { SmtpEmailProvider } from './providers/smtp-email.provider';
@@ -38,10 +40,11 @@ import { RedisModule } from '../../common/redis/redis.module';
 @Global()
 @Module({
   imports: [PrismaModule, EventsBusModule, ConfigModule, RedisModule],
-  controllers: [ChatController],
+  controllers: [ChatController, NotificationPreferencesController],
   providers: [
     ChatService,
     NotifyService,
+    NotificationPreferencesService,
     TemplateService,
     LogEmailProvider,
     SmtpEmailProvider,
@@ -63,6 +66,6 @@ import { RedisModule } from '../../common/redis/redis.module';
     WelcomeEmailListener,
     SuspiciousLoginListener,
   ],
-  exports: [NotifyService, ChatService],
+  exports: [NotifyService, ChatService, NotificationPreferencesService],
 })
 export class CommModule {}

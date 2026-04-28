@@ -909,6 +909,40 @@ model Notification {
   @@map("notifications")
 }
 
+/// Категория нотификации (#166) — для preferences. Каждый send имеет category;
+/// user может отписаться от каналов внутри категории (кроме SOS — always-on).
+enum NotificationCategory {
+  /// Транзакции по поездкам: подтверждения, напоминания, изменения маршрута.
+  trips
+  /// Маркетинг: новые туры, акции. По умолчанию OFF (152-ФЗ ст. 18 — opt-in для рекламы).
+  marketing
+  /// SOS — protected, не отключается. Все каналы всегда on.
+  sos
+  /// Security: пароль изменён, suspicious login, 2FA-alerts.
+  system
+
+  @@map("notification_category")
+}
+
+/// Notification preferences (#166) — каналы по категории на user'а.
+///
+/// Один row на (user, category). channels — массив включённых каналов.
+/// Если row отсутствует — используются defaults (см. NotificationPreferencesService).
+/// SOS preferences нельзя disable — service enforces.
+model NotificationPreference {
+  id        String                @id @default(uuid()) @db.Uuid
+  /// Soft-reference на User.
+  userId    String                @map("user_id") @db.Uuid
+  category  NotificationCategory
+  /// Каналы доставки. Пустой = silent для категории. SOS всегда [all 4].
+  channels  NotificationChannel[]
+  enabled   Boolean               @default(true)
+  updatedAt DateTime              @updatedAt @map("updated_at")
+
+  @@unique([userId, category], map: "uq_notification_preferences_user_category")
+  @@map("notification_preferences")
+}
+
 // === feedback модуль (#186+ [M5.G]) ===
 //
 // Источник: docs/BACKLOG/M5/G_FEEDBACK.md, docs/ARCH/MICROSERVICES.md § feedback-svc.
