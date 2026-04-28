@@ -43,9 +43,9 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { Server, Socket } from 'socket.io';
 
 import { ChatService } from './chat.service';
-import { JwtTokenService } from '../../auth/services/jwt.service';
 import { EventsBusService } from '../../../common/events-bus/events-bus.service';
 import { RedisService } from '../../../common/redis/redis.service';
+import { JwtTokenService } from '../../auth/services/jwt.service';
 
 import type { DomainEvent } from '../../../common/events-bus/types';
 
@@ -133,7 +133,7 @@ export class ChatGateway
   handleConnection(client: AuthenticatedSocket): void {
     const token =
       typeof client.handshake.auth?.['token'] === 'string'
-        ? (client.handshake.auth['token'] as string)
+        ? client.handshake.auth['token']
         : undefined;
 
     if (!token) {
@@ -151,17 +151,11 @@ export class ChatGateway
 
     client.userId = payload.sub;
     client.userRole = payload.role;
-    this.logger.debug(
-      { socketId: client.id, userId: client.userId },
-      'chat.ws.connected',
-    );
+    this.logger.debug({ socketId: client.id, userId: client.userId }, 'chat.ws.connected');
   }
 
   handleDisconnect(client: AuthenticatedSocket): void {
-    this.logger.debug(
-      { socketId: client.id, userId: client.userId },
-      'chat.ws.disconnected',
-    );
+    this.logger.debug({ socketId: client.id, userId: client.userId }, 'chat.ws.disconnected');
   }
 
   /**
@@ -238,14 +232,10 @@ export class ChatGateway
   /**
    * Bus-listener: новое сообщение через REST-send → broadcast всем в room.
    */
-  private async handleMessageSent(
-    event: DomainEvent<ChatMessageSentPayload>,
-  ): Promise<void> {
+  private handleMessageSent(event: DomainEvent<ChatMessageSentPayload>): Promise<void> {
     const { threadId, messageId, fromUserId } = event.payload;
-    this.server
-      .to(this.roomFor(threadId))
-      .emit('message:new', { threadId, messageId, fromUserId });
-    return;
+    this.server.to(this.roomFor(threadId)).emit('message:new', { threadId, messageId, fromUserId });
+    return Promise.resolve();
   }
 
   private roomFor(threadId: string): string {

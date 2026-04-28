@@ -26,7 +26,7 @@ interface TourDayJson {
   location: string;
   title: string;
   description: string;
-  activities: Array<{ kind: string; label: string }>;
+  activities: { kind: string; label: string }[];
   imageUrl: string;
   isOptional?: boolean;
   costInrFrom?: number;
@@ -47,9 +47,9 @@ interface TourJson {
   heroPosterUrl: string;
   emotionalHook: string;
   trustBadges: string[];
-  facts: Array<{ iconKind: string; label: string; value: string }>;
+  facts: { iconKind: string; label: string; value: string }[];
   inclusions: { included: string[]; notIncluded: string[] };
-  faq: Array<{ q: string; a: string }>;
+  faq: { q: string; a: string }[];
   days: TourDayJson[];
 }
 
@@ -95,7 +95,7 @@ async function seedTour(file: string): Promise<void> {
         location: day.location,
         title: day.title,
         description: day.description,
-        activities: day.activities as unknown as Prisma.InputJsonValue,
+        activities: day.activities,
         imageUrl: day.imageUrl,
         isOptional: day.isOptional ?? false,
         costInrFrom: day.costInrFrom ?? null,
@@ -105,7 +105,7 @@ async function seedTour(file: string): Promise<void> {
         location: day.location,
         title: day.title,
         description: day.description,
-        activities: day.activities as unknown as Prisma.InputJsonValue,
+        activities: day.activities,
         imageUrl: day.imageUrl,
         isOptional: day.isOptional ?? false,
         costInrFrom: day.costInrFrom ?? null,
@@ -131,7 +131,6 @@ async function main(): Promise<void> {
 main()
   .then(() => prisma.$disconnect())
   .catch((err) => {
-    // eslint-disable-next-line no-console
     console.error('seed failed:', err);
     void prisma.$disconnect().finally(() => process.exit(1));
   });

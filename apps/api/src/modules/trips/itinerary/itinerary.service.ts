@@ -19,12 +19,7 @@
  * - changedDays — где summary, date или items[] отличаются (deep equal)
  * - Diff сохраняется в outbox event `trips.itinerary.updated` для audit (#218)
  */
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
@@ -70,7 +65,7 @@ export class ItineraryService {
       let itineraryId: string;
       let version: number;
 
-      if (lastVersion && lastVersion.publishedAt === null) {
+      if (lastVersion?.publishedAt === null) {
         // Reuse существующий draft — full-replace days.
         await tx.dayPlan.deleteMany({ where: { itineraryId: lastVersion.id } });
         itineraryId = lastVersion.id;
@@ -231,11 +226,7 @@ export class ItineraryService {
    * - admin / manager / concierge / finance → все trips
    * - client → только own trip (через Trip.clientId → Client.userId)
    */
-  private async assertReadAccess(
-    userId: string,
-    role: UserRole,
-    tripId: string,
-  ): Promise<void> {
+  private async assertReadAccess(userId: string, role: UserRole, tripId: string): Promise<void> {
     const trip = await this.prisma.trip.findUnique({
       where: { id: tripId },
       select: { clientId: true },
@@ -244,12 +235,7 @@ export class ItineraryService {
       throw new NotFoundException('Trip не найден');
     }
 
-    if (
-      role === 'admin' ||
-      role === 'manager' ||
-      role === 'concierge' ||
-      role === 'finance'
-    ) {
+    if (role === 'admin' || role === 'manager' || role === 'concierge' || role === 'finance') {
       return;
     }
 
@@ -258,7 +244,7 @@ export class ItineraryService {
         where: { id: trip.clientId },
         select: { userId: true },
       });
-      if (client && client.userId === userId) return;
+      if (client?.userId === userId) return;
     }
 
     throw new ForbiddenException('Нет доступа к маршруту этого trip');

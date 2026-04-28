@@ -115,10 +115,7 @@ export class OutboxRelayWorker implements OnModuleInit, OnModuleDestroy {
         });
 
         if (newAttempts >= MAX_ATTEMPTS) {
-          this.logger.error(
-            { eventId: entry.eventId, type: entry.eventType },
-            'outbox-relay.dlq',
-          );
+          this.logger.error({ eventId: entry.eventId, type: entry.eventType }, 'outbox-relay.dlq');
           // TODO (audit-svc #218): отправить в DLQ-stream для ручного разбора
         }
       }

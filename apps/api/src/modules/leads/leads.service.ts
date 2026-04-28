@@ -10,13 +10,7 @@
  */
 import { createHash } from 'node:crypto';
 
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 
 import { TelegramClient } from './telegram.client';
 import { CryptoService } from '../../common/crypto/crypto.service';
@@ -25,7 +19,6 @@ import { RedisService } from '../../common/redis/redis.service';
 
 import type { CreateLeadDto } from './dto/create-lead.dto';
 import type { Lead } from '@prisma/client';
-
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_SEC = 60;
@@ -111,10 +104,7 @@ export class LeadsService {
    * Лёгкая валидация контакта по типу. Полная — клиент-side через zod;
    * на сервере достаточно sanity-check, чтобы отсечь явный спам.
    */
-  private validateContactByType(
-    type: 'phone' | 'telegram' | 'email',
-    contact: string,
-  ): void {
+  private validateContactByType(type: 'phone' | 'telegram' | 'email', contact: string): void {
     const trimmed = contact.trim();
     if (type === 'email') {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {

@@ -2,7 +2,6 @@ import { crypto as sharedCrypto } from '@indiahorizone/shared';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-
 /**
  * CryptoService — DI-обёртка над shared/crypto для NestJS.
  *

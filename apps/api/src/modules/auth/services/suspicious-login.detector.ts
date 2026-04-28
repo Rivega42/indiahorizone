@@ -54,11 +54,7 @@ export class SuspiciousLoginDetector {
    * @param newSessionId — id только что созданной Session
    * @param context     — ip + userAgent текущего login'а
    */
-  async check(
-    userId: string,
-    newSessionId: string,
-    context: LoginContext,
-  ): Promise<void> {
+  async check(userId: string, newSessionId: string, context: LoginContext): Promise<void> {
     const ip = context.ip;
     const userAgent = context.userAgent;
     if (!ip || !userAgent) {
@@ -79,7 +75,7 @@ export class SuspiciousLoginDetector {
       select: { ip: true, userAgent: true, createdAt: true },
     });
 
-    if (!previous || !previous.ip || !previous.userAgent) {
+    if (!previous?.ip || !previous.userAgent) {
       // Первый login в системе или предыдущий без IP/UA — нечем сравнивать.
       this.logger.debug({ userId }, 'suspicious.skip.no-baseline');
       return;
@@ -96,10 +92,7 @@ export class SuspiciousLoginDetector {
     if (ipChanged) reasons.push('ip-changed');
     if (uaChanged) reasons.push('ua-changed');
 
-    this.logger.warn(
-      { userId, sessionId: newSessionId, reasons },
-      'auth.suspicious.detected',
-    );
+    this.logger.warn({ userId, sessionId: newSessionId, reasons }, 'auth.suspicious.detected');
 
     // Публикуем event через outbox (отдельная транзакция от login — детектор
     // вызывается ПОСЛЕ commit'а Session create, поэтому обёртка $transaction

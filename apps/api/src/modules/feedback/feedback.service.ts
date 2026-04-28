@@ -28,7 +28,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { RedisService } from '../../common/redis/redis.service';
 
 import type { CreateFeedbackDto } from './dto/feedback.dto';
-import type { Feedback, UserRole, Prisma } from '@prisma/client';
+import type { Feedback, UserRole } from '@prisma/client';
 
 const IDEMPOTENCY_TTL_SEC = 24 * 60 * 60;
 const PRISMA_UNIQUE_VIOLATION = 'P2002';
@@ -43,11 +43,7 @@ export class FeedbackService {
     private readonly redis: RedisService,
   ) {}
 
-  async create(
-    userId: string,
-    dto: CreateFeedbackDto,
-    idempotencyKey: string,
-  ): Promise<Feedback> {
+  async create(userId: string, dto: CreateFeedbackDto, idempotencyKey: string): Promise<Feedback> {
     // Access: только клиент собственной trip'ы
     await this.assertClientOwnsTrip(userId, dto.tripId);
 
@@ -115,9 +111,7 @@ export class FeedbackService {
       throw err;
     }
 
-    await this.redis
-      .getClient()
-      .set(idemKey, feedback.id, 'EX', IDEMPOTENCY_TTL_SEC);
+    await this.redis.getClient().set(idemKey, feedback.id, 'EX', IDEMPOTENCY_TTL_SEC);
 
     this.logger.log(
       { feedbackId: feedback.id, tripId: dto.tripId, mood: dto.mood },
@@ -127,11 +121,7 @@ export class FeedbackService {
     return feedback;
   }
 
-  async listByTrip(
-    userId: string,
-    role: UserRole,
-    tripId: string,
-  ): Promise<Feedback[]> {
+  async listByTrip(userId: string, role: UserRole, tripId: string): Promise<Feedback[]> {
     await this.assertReadAccess(userId, role, tripId);
 
     return this.prisma.feedback.findMany({
@@ -161,7 +151,7 @@ export class FeedbackService {
       where: { id: trip.clientId },
       select: { userId: true },
     });
-    if (!client || client.userId !== userId) {
+    if (client?.userId !== userId) {
       throw new ForbiddenException('Только клиент-владелец может оставлять feedback');
     }
   }
@@ -172,11 +162,7 @@ export class FeedbackService {
    * - concierge / manager / admin / finance → любой trip
    * - guide → только trips где он guide (нет такого FK сейчас; TODO когда добавим)
    */
-  private async assertReadAccess(
-    userId: string,
-    role: UserRole,
-    tripId: string,
-  ): Promise<void> {
+  private async assertReadAccess(userId: string, role: UserRole, tripId: string): Promise<void> {
     const trip = await this.prisma.trip.findUnique({
       where: { id: tripId },
       select: { clientId: true },
@@ -185,12 +171,7 @@ export class FeedbackService {
       throw new NotFoundException('Trip не найден');
     }
 
-    if (
-      role === 'admin' ||
-      role === 'concierge' ||
-      role === 'manager' ||
-      role === 'finance'
-    ) {
+    if (role === 'admin' || role === 'concierge' || role === 'manager' || role === 'finance') {
       return; // Полный read-доступ к feedback'ам всех trip'ов.
     }
 
@@ -199,7 +180,7 @@ export class FeedbackService {
         where: { id: trip.clientId },
         select: { userId: true },
       });
-      if (!client || client.userId !== userId) {
+      if (client?.userId !== userId) {
         throw new ForbiddenException('Нет доступа к feedback');
       }
       return;

@@ -25,6 +25,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ChatController } from './chat/chat.controller';
 import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
+import { SuspiciousLoginListener } from './listeners/suspicious-login.listener';
+import { WelcomeEmailListener } from './listeners/welcome.listener';
 import { NotifyService } from './notify.service';
 import { NotificationPreferencesController } from './preferences/preferences.controller';
 import { NotificationPreferencesService } from './preferences/preferences.service';
@@ -32,12 +34,10 @@ import { EMAIL_PROVIDER, type EmailProvider } from './providers/email.provider';
 import { LogEmailProvider } from './providers/log-email.provider';
 import { SmtpEmailProvider } from './providers/smtp-email.provider';
 import { TemplateService } from './template.service';
-import { SuspiciousLoginListener } from './listeners/suspicious-login.listener';
-import { WelcomeEmailListener } from './listeners/welcome.listener';
-import { AuthModule } from '../auth/auth.module';
 import { EventsBusModule } from '../../common/events-bus/events-bus.module';
 import { PrismaModule } from '../../common/prisma/prisma.module';
 import { RedisModule } from '../../common/redis/redis.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Global()
 @Module({

@@ -6,14 +6,14 @@ import Link from 'next/link';
  * помогает быстро открыть все доступные UI'и в одной сессии.
  */
 
-type Interface = {
+interface Interface {
   href: string;
   external?: boolean;
   title: string;
   status: 'ready' | 'prototype' | 'in-progress';
   description: string;
   issue?: string;
-};
+}
 
 const INTERFACES: Interface[] = [
   {
@@ -100,8 +100,8 @@ export default function HomePage(): React.ReactElement {
             India<em className="not-italic text-primary">Horizone</em> · все интерфейсы
           </h1>
           <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Эта страница — временная dev-нав до запуска маркетинговой главной (EPIC 13).
-            Здесь все UI текущей фазы — клик и смотри.
+            Эта страница — временная dev-нав до запуска маркетинговой главной (EPIC 13). Здесь все
+            UI текущей фазы — клик и смотри.
           </p>
         </header>
 
@@ -132,14 +132,10 @@ export default function HomePage(): React.ReactElement {
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-serif text-xl font-medium">{iface.title}</h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {iface.description}
-                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">{iface.description}</p>
                       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                         {iface.issue && (
-                          <span className="font-mono text-muted-foreground">
-                            {iface.issue}
-                          </span>
+                          <span className="font-mono text-muted-foreground">{iface.issue}</span>
                         )}
                         <span className="text-muted-foreground/60">·</span>
                         <span className="font-mono text-muted-foreground">{iface.href}</span>
@@ -165,8 +161,8 @@ export default function HomePage(): React.ReactElement {
             <code className="font-mono">docs/UX/prototypes/from-claude-design/homepage/</code>
           </p>
           <p>
-            <strong className="text-foreground">Эпики:</strong> #293 (Tour Catalog),
-            предстоят 13 (Homepage), 14 (CRM), 15 (Trip Dashboard).
+            <strong className="text-foreground">Эпики:</strong> #293 (Tour Catalog), предстоят 13
+            (Homepage), 14 (CRM), 15 (Trip Dashboard).
           </p>
         </footer>
       </div>

@@ -22,15 +22,12 @@
  */
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
-import {
-  EMAIL_PROVIDER,
-  type EmailProvider,
-} from './providers/email.provider';
+import { EMAIL_PROVIDER, type EmailProvider } from './providers/email.provider';
 import { TemplateService } from './template.service';
 import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
-import type { NotificationChannel } from '@prisma/client';
+import type { NotificationChannel, Prisma } from '@prisma/client';
 
 export interface SendInput {
   channel: NotificationChannel;
@@ -54,9 +51,7 @@ export class NotifyService {
 
   async send(input: SendInput): Promise<{ notificationId: string }> {
     if (input.channel !== 'email') {
-      throw new NotFoundException(
-        `Channel "${input.channel}" пока не реализован (#163/#164/#165)`,
-      );
+      throw new NotFoundException(`Channel "${input.channel}" пока не реализован (#163/#164/#165)`);
     }
     if (!this.templates.exists(input.templateId)) {
       throw new NotFoundException(`Template "${input.templateId}" не найден`);
@@ -67,7 +62,7 @@ export class NotifyService {
         channel: input.channel,
         recipient: input.to,
         templateId: input.templateId,
-        payload: input.data as object,
+        payload: input.data as Prisma.InputJsonValue,
         status: 'pending',
         ...(input.userId !== undefined ? { userId: input.userId } : {}),
       },

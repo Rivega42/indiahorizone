@@ -276,10 +276,7 @@ function Inclusions({ tour }: { tour: Tour }): React.ReactElement {
             <ul className="space-y-3 text-sm sm:text-base">
               {tour.inclusions.notIncluded.map((item) => (
                 <li key={item} className="flex gap-3">
-                  <X
-                    className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
-                    aria-hidden
-                  />
+                  <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
                   <span>{item}</span>
                 </li>
               ))}
@@ -338,10 +335,7 @@ function PriceBlock({ tour }: { tour: Tour }): React.ReactElement {
     : `от ${formatRub(tour.priceFromRub)} ₽`;
 
   return (
-    <section
-      id="price-block"
-      className="bg-foreground text-background py-20 sm:py-28"
-    >
+    <section id="price-block" className="bg-foreground text-background py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
@@ -430,8 +424,8 @@ function FooterLegal(): React.ReactElement {
               India<em className="text-primary not-italic">Horizone</em>
             </div>
             <p className="mt-3 max-w-xs text-xs">
-              Tech-enabled India concierge для русскоязычных клиентов. Не туроператор.
-              Партнёр в Индии — IndiaHorizone IN PVT LTD.
+              Tech-enabled India concierge для русскоязычных клиентов. Не туроператор. Партнёр в
+              Индии — IndiaHorizone IN PVT LTD.
             </p>
           </div>
           <div>

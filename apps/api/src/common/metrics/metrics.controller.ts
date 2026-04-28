@@ -10,13 +10,7 @@
  *
  * Не rate-limited (исключим в throttle.config skipIf), не audited.
  */
-import {
-  Controller,
-  ForbiddenException,
-  Get,
-  Headers,
-  Res,
-} from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Headers, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SkipThrottle } from '@nestjs/throttler';
 

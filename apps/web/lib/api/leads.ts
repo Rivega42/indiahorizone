@@ -50,11 +50,7 @@ export async function submitLead(payload: CreateLeadPayload): Promise<CreateLead
       body: JSON.stringify(payload),
     });
   } catch {
-    throw new LeadApiError(
-      'Не удалось связаться с сервером. Попробуйте Telegram.',
-      0,
-      'network',
-    );
+    throw new LeadApiError('Не удалось связаться с сервером. Попробуйте Telegram.', 0, 'network');
   }
 
   if (res.status === 429) {
@@ -75,11 +71,7 @@ export async function submitLead(payload: CreateLeadPayload): Promise<CreateLead
     throw new LeadApiError(msg, 400, 'validation');
   }
   if (!res.ok) {
-    throw new LeadApiError(
-      'Что-то пошло не так. Напишите нам в Telegram.',
-      res.status,
-      'server',
-    );
+    throw new LeadApiError('Что-то пошло не так. Напишите нам в Telegram.', res.status, 'server');
   }
 
   const result = (await res.json()) as CreateLeadResult;

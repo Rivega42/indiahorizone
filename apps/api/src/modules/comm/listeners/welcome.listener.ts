@@ -14,16 +14,11 @@
  * сообщение, оно попадёт в retry. После N попыток → DLQ (см. outbox-relay.worker
  * MAX_ATTEMPTS).
  */
-import {
-  Injectable,
-  Logger,
-  type OnModuleDestroy,
-  type OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { NotifyService } from '../notify.service';
 import { EventsBusService } from '../../../common/events-bus/events-bus.service';
+import { NotifyService } from '../notify.service';
 
 import type { DomainEvent } from '../../../common/events-bus/types';
 

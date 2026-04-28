@@ -8,7 +8,6 @@ import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { TwoFaChallengeService } from '../two-fa/two-fa-challenge.service';
 
-
 import type { LoginDto, LoginResponse, LoginTokenResponse } from '../dto/login.dto';
 
 const GENERIC_INVALID_CREDS = 'Неверный email или пароль';
@@ -59,8 +58,7 @@ export class LoginService {
 
     // Anti-enumeration: даже если user не найден, выполняем dummy-verify, чтобы
     // timing-side-channel не выдал существование email.
-    const dummyHash =
-      '$argon2id$v=19$m=19456,t=2,p=1$ZHVtbXltb2NraGFzaGRvbnRsb2dpbg$ZHVtbXk';
+    const dummyHash = '$argon2id$v=19$m=19456,t=2,p=1$ZHVtbXltb2NraGFzaGRvbnRsb2dpbg$ZHVtbXk';
     const verifyTarget = user?.passwordHash ?? dummyHash;
     const { valid, needsRehash } = await this.password.verify(verifyTarget, dto.password);
 
@@ -118,10 +116,7 @@ export class LoginService {
     if (user.status !== UserStatus.active) {
       // Generic message — caller должен был проверить раньше; если нет, это bug
       // или race-condition (suspend между чтением и issue).
-      this.logger.warn(
-        { userId: user.id, status: user.status },
-        'issueTokens.blocked-status',
-      );
+      this.logger.warn({ userId: user.id, status: user.status }, 'issueTokens.blocked-status');
       throw new UnauthorizedException(GENERIC_INVALID_CREDS);
     }
 

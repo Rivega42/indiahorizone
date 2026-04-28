@@ -4,7 +4,6 @@ import type { AuthenticatedUser } from './types';
 import type { UserRole } from '@prisma/client';
 import type { Request } from 'express';
 
-
 /**
  * Метаданные для guards.
  */

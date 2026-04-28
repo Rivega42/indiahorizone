@@ -20,7 +20,6 @@ import {
   ParseEnumPipe,
   Post,
 } from '@nestjs/common';
-
 import { ConsentType } from '@prisma/client';
 
 import { ConsentsService } from './consents.service';

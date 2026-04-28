@@ -4,7 +4,6 @@ import {
   IsArray,
   IsDateString,
   IsInt,
-  IsObject,
   IsString,
   MaxLength,
   Min,

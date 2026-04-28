@@ -16,7 +16,6 @@ import {
   ParseEnumPipe,
   Patch,
 } from '@nestjs/common';
-
 import { NotificationCategory } from '@prisma/client';
 
 import {
@@ -34,9 +33,7 @@ export class NotificationPreferencesController {
   constructor(private readonly service: NotificationPreferencesService) {}
 
   @Get()
-  async list(
-    @CurrentUser() user: AuthenticatedUser,
-  ): Promise<ListPreferencesResponse> {
+  async list(@CurrentUser() user: AuthenticatedUser): Promise<ListPreferencesResponse> {
     return this.service.getAll(user.id);
   }
 

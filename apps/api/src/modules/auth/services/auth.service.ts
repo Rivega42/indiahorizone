@@ -1,10 +1,14 @@
-import { ConflictException, Injectable, Logger, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { UserRole, UserStatus } from '@prisma/client';
 
 import { PasswordService } from './password.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-
 
 import type { RegisterDto, RegisterResponse } from '../dto/register.dto';
 

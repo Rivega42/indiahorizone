@@ -21,10 +21,14 @@ const alertVariants = cva(
 );
 
 export interface AlertProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof alertVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {}
 
-export function Alert({ className, variant, role = 'status', ...props }: AlertProps): React.ReactElement {
+export function Alert({
+  className,
+  variant,
+  role = 'status',
+  ...props
+}: AlertProps): React.ReactElement {
   return <div role={role} className={cn(alertVariants({ variant }), className)} {...props} />;
 }
 

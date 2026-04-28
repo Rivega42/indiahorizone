@@ -2,7 +2,6 @@ import { UserRole } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
-
 /**
  * DTO для POST /auth/register.
  *

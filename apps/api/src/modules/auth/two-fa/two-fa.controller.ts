@@ -12,13 +12,13 @@
  */
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 
-import { TwoFaService } from './two-fa.service';
 import {
   type EnrollResponse,
   VerifyEnrollDto,
   type VerifyEnrollResponse,
 } from './dto/verify-enroll.dto';
 import { VerifyTwoFaLoginDto } from './dto/verify-login.dto';
+import { TwoFaService } from './two-fa.service';
 import { CurrentUser, Public } from '../../../common/auth/decorators';
 
 import type { AuthenticatedUser } from '../../../common/auth/types';

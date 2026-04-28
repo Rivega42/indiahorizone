@@ -13,19 +13,11 @@
  * Параллельный transition двумя caller'ами — один из них сработает (count=1),
  * второй вернётся с count=0 и BadRequestException.
  */
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
+import { type TransitionReason, isAllowedTransition } from './status-machine';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import {
-  type TransitionReason,
-  isAllowedTransition,
-} from './status-machine';
 
 import type { TransitionResponse } from './dto/transition.dto';
 import type { TripStatus } from '@prisma/client';
@@ -55,9 +47,7 @@ export class TripStatusService {
     }
 
     if (!isAllowedTransition(trip.status, to)) {
-      throw new BadRequestException(
-        `Переход ${trip.status} → ${to} не разрешён state-machine'ом`,
-      );
+      throw new BadRequestException(`Переход ${trip.status} → ${to} не разрешён state-machine'ом`);
     }
 
     const transitionedAt = new Date();
@@ -90,10 +80,7 @@ export class TripStatusService {
       });
     });
 
-    this.logger.log(
-      { tripId, from: trip.status, to, reason, actorId },
-      'trips.status.changed',
-    );
+    this.logger.log({ tripId, from: trip.status, to, reason, actorId }, 'trips.status.changed');
 
     return {
       tripId,

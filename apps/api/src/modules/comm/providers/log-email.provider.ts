@@ -12,11 +12,7 @@ import { randomUUID } from 'node:crypto';
 
 import { Injectable, Logger } from '@nestjs/common';
 
-import {
-  type EmailMessage,
-  type EmailProvider,
-  type EmailSendResult,
-} from './email.provider';
+import type { EmailMessage, EmailProvider, EmailSendResult } from './email.provider';
 
 @Injectable()
 export class LogEmailProvider implements EmailProvider {

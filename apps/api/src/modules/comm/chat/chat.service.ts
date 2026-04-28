@@ -80,10 +80,7 @@ export class ChatService {
               OR: [
                 { createdAt: { lt: new Date(cursor.createdAt) } },
                 {
-                  AND: [
-                    { createdAt: new Date(cursor.createdAt) },
-                    { id: { lt: cursor.id } },
-                  ],
+                  AND: [{ createdAt: new Date(cursor.createdAt) }, { id: { lt: cursor.id } }],
                 },
               ],
             }
@@ -98,7 +95,7 @@ export class ChatService {
 
     let nextCursor: string | null = null;
     if (hasMore) {
-      const last = page[page.length - 1] as ChatMessage;
+      const last = page[page.length - 1]!;
       nextCursor = this.encodeCursor({
         createdAt: last.createdAt.toISOString(),
         id: last.id,
@@ -171,9 +168,7 @@ export class ChatService {
     });
 
     // Сохраняем idempotency mapping → message.id
-    await this.redis
-      .getClient()
-      .set(idempKey, message.id, 'EX', IDEMPOTENCY_TTL_SEC);
+    await this.redis.getClient().set(idempKey, message.id, 'EX', IDEMPOTENCY_TTL_SEC);
 
     return message;
   }

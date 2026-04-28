@@ -126,8 +126,7 @@ const CORRELATION_HEADER = 'x-correlation-id';
                   id: (req as unknown as { id?: string }).id,
                   method: req.method,
                   url: req.url,
-                  remoteAddress: (req as unknown as { remoteAddress?: string })
-                    .remoteAddress,
+                  remoteAddress: (req as unknown as { remoteAddress?: string }).remoteAddress,
                 };
               },
               res(res: ServerResponse & { statusCode?: number }) {

@@ -14,15 +14,15 @@ jobs:
           script: |
             const branch = context.payload.pull_request.head.ref;
             const labels = [];
-            
+
             if (branch.startsWith('feature/')) labels.push('enhancement');
             if (branch.startsWith('fix/')) labels.push('bug');
             if (branch.startsWith('docs/')) labels.push('documentation');
-            
+
             // Priority from branch name
             if (branch.includes('-p0-') || branch.includes('[P0]')) labels.push('P0');
             if (branch.includes('-p1-') || branch.includes('[P1]')) labels.push('P1');
-            
+
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,

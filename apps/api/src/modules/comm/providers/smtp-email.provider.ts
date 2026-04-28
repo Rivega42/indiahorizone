@@ -21,11 +21,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { type Transporter, createTransport } from 'nodemailer';
 
-import {
-  type EmailMessage,
-  type EmailProvider,
-  type EmailSendResult,
-} from './email.provider';
+import type { EmailMessage, EmailProvider, EmailSendResult } from './email.provider';
 
 @Injectable()
 export class SmtpEmailProvider implements EmailProvider {
@@ -56,23 +52,20 @@ export class SmtpEmailProvider implements EmailProvider {
       maxMessages: 100,
     });
 
-    this.fromAddress = config.get<string>(
-      'EMAIL_FROM',
-      'IndiaHorizone <noreply@indiahorizone.ru>',
-    );
+    this.fromAddress = config.get<string>('EMAIL_FROM', 'IndiaHorizone <noreply@indiahorizone.ru>');
 
     this.logger.log({ host, port, from: this.fromAddress }, 'smtp.transport.created');
   }
 
   async send(message: EmailMessage): Promise<EmailSendResult> {
-    const info = await this.transporter.sendMail({
+    const info = (await this.transporter.sendMail({
       from: this.fromAddress,
       to: message.to,
       subject: message.subject,
       html: message.html,
       // Plain-text fallback генерируется nodemailer'ом из html, если не указан.
       // Лучше так чем без plain-text (anti-spam системы понижают рейтинг).
-    });
+    })) as { messageId: string };
 
     return { messageId: info.messageId };
   }

@@ -13,11 +13,11 @@ import { ConfigService } from '@nestjs/config';
 
 interface NotifyLeadPayload {
   source: string;
-  name: string;          // plaintext (после расшифровки в LeadsService)
+  name: string; // plaintext (после расшифровки в LeadsService)
   contactType: string;
-  contact: string;       // plaintext
+  contact: string; // plaintext
   comment?: string | null;
-  ipHashShort?: string;  // короткий sha256-prefix для тех. идентификации
+  ipHashShort?: string; // короткий sha256-prefix для тех. идентификации
   createdAtIso: string;
 }
 
@@ -33,8 +33,8 @@ export class TelegramClient {
 
     if (!this.botToken || !this.chatId) {
       this.logger.warn(
-        'TELEGRAM_BOT_TOKEN или TELEGRAM_LEADS_CHAT_ID не заданы — нотификации Lead\'ов отключены. ' +
-          'Lead\'ы продолжают сохраняться в БД.',
+        "TELEGRAM_BOT_TOKEN или TELEGRAM_LEADS_CHAT_ID не заданы — нотификации Lead'ов отключены. " +
+          "Lead'ы продолжают сохраняться в БД.",
       );
     }
   }
@@ -63,10 +63,7 @@ export class TelegramClient {
 
       if (!res.ok) {
         const body = await res.text();
-        this.logger.error(
-          { status: res.status, body },
-          'telegram.sendMessage failed',
-        );
+        this.logger.error({ status: res.status, body }, 'telegram.sendMessage failed');
       }
     } catch (err) {
       this.logger.error({ err }, 'telegram.sendMessage error');

@@ -11,16 +11,11 @@
  *
  * Идемпотентность: гарантирована через events-bus consumer-group + processed_events.
  */
-import {
-  Injectable,
-  Logger,
-  type OnModuleDestroy,
-  type OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 
+import { TripStatusService } from './trip-status.service';
 import { EventsBusService } from '../../../common/events-bus/events-bus.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import { TripStatusService } from './trip-status.service';
 
 import type { DomainEvent } from '../../../common/events-bus/types';
 
@@ -79,10 +74,7 @@ export class PaymentReceivedListener implements OnModuleInit, OnModuleDestroy {
       return;
     }
     if (trip.status !== 'draft') {
-      this.logger.debug(
-        { tripId, currentStatus: trip.status },
-        'payment.trip-not-draft.skip',
-      );
+      this.logger.debug({ tripId, currentStatus: trip.status }, 'payment.trip-not-draft.skip');
       return; // already paid / cancelled / etc.
     }
 

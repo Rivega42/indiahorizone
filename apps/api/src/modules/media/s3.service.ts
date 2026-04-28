@@ -31,11 +31,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import {
-  Injectable,
-  Logger,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -49,9 +45,7 @@ export class S3Service {
     if (!bucket) {
       this.client = null;
       this.bucket = '';
-      this.logger.warn(
-        'S3_BUCKET не задан — S3Service в stub-режиме. Все операции вернут 503.',
-      );
+      this.logger.warn('S3_BUCKET не задан — S3Service в stub-режиме. Все операции вернут 503.');
       return;
     }
 
@@ -59,8 +53,7 @@ export class S3Service {
     const region = config.get<string>('S3_REGION', 'auto');
     const accessKeyId = config.get<string>('S3_ACCESS_KEY', '');
     const secretAccessKey = config.get<string>('S3_SECRET_KEY', '');
-    const forcePathStyle =
-      config.get<string>('S3_FORCE_PATH_STYLE', 'false') === 'true';
+    const forcePathStyle = config.get<string>('S3_FORCE_PATH_STYLE', 'false') === 'true';
 
     this.client = new S3Client({
       region,
@@ -81,18 +74,14 @@ export class S3Service {
    * @param mimeType  Content-Type — должен совпадать при PUT
    * @param ttlSec    TTL ссылки (default 15 min — достаточно для upload)
    */
-  async getPresignedPutUrl(
-    key: string,
-    mimeType: string,
-    ttlSec = 15 * 60,
-  ): Promise<string> {
+  async getPresignedPutUrl(key: string, mimeType: string, ttlSec = 15 * 60): Promise<string> {
     this.assertReady();
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
       ContentType: mimeType,
     });
-    return getSignedUrl(this.client as S3Client, command, { expiresIn: ttlSec });
+    return getSignedUrl(this.client!, command, { expiresIn: ttlSec });
   }
 
   /**
@@ -105,7 +94,7 @@ export class S3Service {
   async getPresignedGetUrl(key: string, ttlSec = 60 * 60): Promise<string> {
     this.assertReady();
     const command = new GetObjectCommand({ Bucket: this.bucket, Key: key });
-    return getSignedUrl(this.client as S3Client, command, { expiresIn: ttlSec });
+    return getSignedUrl(this.client!, command, { expiresIn: ttlSec });
   }
 
   /**
@@ -115,7 +104,7 @@ export class S3Service {
   async headObject(key: string): Promise<{ size: number; contentType: string } | null> {
     this.assertReady();
     try {
-      const result = await (this.client as S3Client).send(
+      const result = await this.client!.send(
         new HeadObjectCommand({ Bucket: this.bucket, Key: key }),
       );
       return {
@@ -127,7 +116,7 @@ export class S3Service {
       if (
         err instanceof Error &&
         'name' in err &&
-        ((err as Error).name === 'NotFound' || (err as Error).name === 'NoSuchKey')
+        (err.name === 'NotFound' || err.name === 'NoSuchKey')
       ) {
         return null;
       }
@@ -151,9 +140,7 @@ export class S3Service {
 
   private assertReady(): void {
     if (!this.client) {
-      throw new ServiceUnavailableException(
-        'S3 не сконфигурирован (S3_BUCKET не задан в env)',
-      );
+      throw new ServiceUnavailableException('S3 не сконфигурирован (S3_BUCKET не задан в env)');
     }
   }
 }

@@ -182,7 +182,7 @@ export class TripsService {
       });
       // findUnique({where:{userId}}) гарантирует client.userId === userId,
       // проверяем только что trip принадлежит этому Client.
-      if (!client || client.id !== trip.clientId) {
+      if (client?.id !== trip.clientId) {
         throw new ForbiddenException('Нет доступа к чужому trip');
       }
     } else {
@@ -197,7 +197,7 @@ export class TripsService {
 
     const { _count, ...tripData } = trip;
     return {
-      trip: tripData as Trip,
+      trip: tripData,
       bookingsCount: _count.bookings,
       hasPublishedItinerary: publishedItinerary !== null,
     };

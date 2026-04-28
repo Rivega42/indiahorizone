@@ -14,12 +14,7 @@
  *
  * Соответствует docs/ARCH/SECURITY/AUDIT_LOG.md.
  */
-import {
-  Injectable,
-  Logger,
-  type OnModuleDestroy,
-  type OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 
 import { EventsBusService } from '../../common/events-bus/events-bus.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -44,14 +39,10 @@ export class AuditEventListener implements OnModuleInit, OnModuleDestroy {
   onModuleInit(): void {
     // Подписываемся на оба stream'а: default и SOS-priority.
     // Wildcard `*` в EventsBus обозначает «обрабатывать любой type внутри stream'а».
-    const defaultSub = this.bus.subscribe<unknown>(
-      '*',
-      this.handleEvent.bind(this),
-      {
-        consumerGroup: CONSUMER_GROUP,
-        consumerName: CONSUMER_NAME,
-      },
-    );
+    const defaultSub = this.bus.subscribe<unknown>('*', this.handleEvent.bind(this), {
+      consumerGroup: CONSUMER_GROUP,
+      consumerName: CONSUMER_NAME,
+    });
     this.subscriptions.push(defaultSub);
 
     this.logger.log({ group: CONSUMER_GROUP, consumer: CONSUMER_NAME }, 'audit.listener.started');
@@ -86,10 +77,7 @@ export class AuditEventListener implements OnModuleInit, OnModuleDestroy {
         'code' in error &&
         (error as { code?: string }).code === PRISMA_UNIQUE_VIOLATION
       ) {
-        this.logger.debug(
-          { eventId: event.id, type: event.type },
-          'audit.event.already-recorded',
-        );
+        this.logger.debug({ eventId: event.id, type: event.type }, 'audit.event.already-recorded');
         return;
       }
       // Любая другая ошибка — re-throw, чтобы EventsBus НЕ ack'нул сообщение

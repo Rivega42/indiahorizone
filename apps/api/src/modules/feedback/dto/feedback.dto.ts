@@ -1,3 +1,4 @@
+import { FeedbackMood, FeedbackType } from '@prisma/client';
 import {
   IsEnum,
   IsInt,
@@ -9,8 +10,6 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-
-import { FeedbackMood, FeedbackType } from '@prisma/client';
 
 import type { Feedback } from '@prisma/client';
 

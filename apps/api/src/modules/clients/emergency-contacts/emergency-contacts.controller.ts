@@ -35,9 +35,7 @@ export class EmergencyContactsController {
   constructor(private readonly contacts: EmergencyContactsService) {}
 
   @Get()
-  async list(
-    @CurrentUser() user: AuthenticatedUser,
-  ): Promise<EmergencyContactDecrypted[]> {
+  async list(@CurrentUser() user: AuthenticatedUser): Promise<EmergencyContactDecrypted[]> {
     return this.contacts.list(user.id);
   }
 

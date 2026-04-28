@@ -22,9 +22,9 @@
  * спустя кто-то напишет `status = 'completed'` из произвольного места и
  * сломает аналитику NPS, refund'ов, закрытых-трип-метрик.
  */
-import { TripStatus } from '@prisma/client';
+import type { TripStatus } from '@prisma/client';
 
-const ALLOWED_TRANSITIONS: Readonly<Record<TripStatus, ReadonlyArray<TripStatus>>> = {
+const ALLOWED_TRANSITIONS: Readonly<Record<TripStatus, readonly TripStatus[]>> = {
   draft: ['paid', 'cancelled'],
   paid: ['in_progress', 'cancelled'],
   in_progress: ['completed', 'cancelled'],
@@ -37,7 +37,7 @@ export function isAllowedTransition(from: TripStatus, to: TripStatus): boolean {
   return ALLOWED_TRANSITIONS[from].includes(to);
 }
 
-export function getAllowedTransitions(from: TripStatus): ReadonlyArray<TripStatus> {
+export function getAllowedTransitions(from: TripStatus): readonly TripStatus[] {
   return ALLOWED_TRANSITIONS[from];
 }
 

@@ -44,9 +44,7 @@ export class ChatController {
   constructor(private readonly chat: ChatService) {}
 
   @Get('threads')
-  async listThreads(
-    @CurrentUser() user: AuthenticatedUser,
-  ): Promise<ListThreadsResponse> {
+  async listThreads(@CurrentUser() user: AuthenticatedUser): Promise<ListThreadsResponse> {
     return this.chat.listThreads(user.id);
   }
 
