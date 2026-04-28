@@ -2,7 +2,7 @@
 
 > Закрывает [#92](https://github.com/Rivega42/indiahorizone/issues/92).
 > Документ обновляется живьём по мере прогресса.
-> Дата актуализации: 2026-04-25.
+> Дата актуализации: **2026-04-28**.
 
 ## Контекст фазы 3
 
@@ -66,11 +66,32 @@
 Чек-листы гида, регламенты онбординга клиента, договор с гидом, остальные согласия. См. карту в [#89](https://github.com/Rivega42/indiahorizone/issues/89).
 
 ### M5: «Кружок» Production + архитектура
-Архитектура и backlog зафиксированы:
-- [x] `docs/ARCH/README.md`, `MICROSERVICES.md`, `OFFLINE.md`, `EVENTS.md`, `VIDEO_CIRCLE/README.md`
-- [x] `docs/BACKLOG/M5/` — 11 slices (A–K), ~118 атомарных issues, ~586 часов
-- [ ] Утверждение founders → массовое создание issues в GitHub
-- [ ] Реализация по slice'ам (начиная с A → MVP-1)
+
+**Backend M5 — практически завершён по состоянию на 2026-04-28** 🎉
+
+Backend slices status:
+
+| Slice | Что | Статус |
+|---|---|---|
+| **A** Bootstrap | Prisma + Redis + outbox + idempotency + pino + OTel + Prometheus | ✅ DONE |
+| **B** Auth | register/login/JWT/refresh/logout/RBAC/2FA enroll+verify/password-reset/suspicious-detection | ✅ DONE (только #137 Playwright e2e ждёт frontend 2FA UI) |
+| **C** Clients | Client + ClientProfile + AES-256-GCM encryption + GET/PATCH /me + Consent (4 типа granular) + EmergencyContact CRUD | ✅ DONE (только #141 passport ждёт media endpoints) |
+| **D** Trips | Trip+Itinerary+DayPlan+Booking schema + POST /trips + itinerary versioning + publish + GET | 🟢 99% (только #160 status transitions ждёт finance.payment.received event) |
+| **E** Comm | comm-svc base + email-провайдер + welcome + chat schema + REST + WebSocket gateway + notification preferences (4 категории) + suspicious-login email | ✅ DONE |
+| **F** Media | MediaAsset schema + S3 client wrapper (R2/Beget/MinIO compatible) | 🟡 schema готов, endpoints (#174-178) ждут Beget creds (#350) |
+| **G** Feedback | FeedbackRequest + Feedback schema + POST/GET endpoints + outbox event | ✅ DONE (только #189 AI signals enrichment ждёт LLM-флоу) |
+| **K** Cross-cut | append-only audit log + admin GET /audit + rate-limit (4 профиля) + pino + OTel + Prometheus | 🟢 95% (только #220 Vault, #224 Grafana — devops) |
+
+Всего за апрель 2026: **18+ PR'ов merged, 30+ issues закрыто, ~6000 строк production-кода**.
+
+### Что блокирует frontend / production
+
+- **Email отправка**: ждёт credentials (#349 Mailgun/Yandex/Postmark) — пока работает в LogProvider stub
+- **Media upload**: ждёт Beget Object Storage creds (#350)
+- **Push notifications**: ждёт Firebase project (#353)
+- **APNs / iOS native**: фаза 4 (требует Apple Developer $99/year)
+- **Frontend / UI**: дизайн D1-D7 для tour landing (#312-318) + Trip Dashboard frontend (#152-#161) + 2FA / chat UI (#170)
+- **Vault/KMS** (#220), **Grafana dashboards** (#224) — devops Вика
 
 ### M6: Growth & Optional
 Программа лояльности (см. [`docs/LOYALTY/`](../LOYALTY/)), GDPR (если нужно), OpenAPI, traces, расширения дашборда (гайды/утилиты/соц/сервис).
