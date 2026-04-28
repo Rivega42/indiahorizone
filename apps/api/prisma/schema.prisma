@@ -908,3 +908,94 @@ model Notification {
   @@index([userId, createdAt(sort: Desc)], map: "idx_notifications_user_created")
   @@map("notifications")
 }
+
+// === feedback модуль (#186+ [M5.G]) ===
+//
+// Источник: docs/BACKLOG/M5/G_FEEDBACK.md, docs/ARCH/MICROSERVICES.md § feedback-svc.
+// feedback — daily feedback клиента в активной поездке. Один из наших ключевых
+// продуктовых элементов: «как прошёл день», mood-эмодзи, опционально кружок.
+//
+// Cross-module rule: tripId — soft-ref на Trip (cross-module). Никаких FK
+// на Trip — feedback должен переживать удаление поездки (для аналитики).
+// mediaId — soft-ref на MediaAsset (#173 будущий).
+
+/// Request на feedback — отправляется клиенту вечером дня (push/email/in-app).
+/// Если клиент НЕ отвечает в течение expiresAt — feedback считается пропущенным
+/// (но не критично; signal используется для retention-аналитики).
+model FeedbackRequest {
+  id          String   @id @default(uuid()) @db.Uuid
+  /// Soft-reference на Trip.id (cross-module).
+  tripId      String   @map("trip_id") @db.Uuid
+  /// 1..durationDays. Один request на (trip, dayNumber).
+  dayNumber   Int      @map("day_number")
+  requestedAt DateTime @default(now()) @map("requested_at")
+  /// Когда «пора напомнить». Обычно requestedAt + 24h. После — feedback
+  /// можно отправлять, но reminder не работает.
+  expiresAt   DateTime @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([tripId, dayNumber], map: "uq_feedback_requests_trip_day")
+  @@index([expiresAt], map: "idx_feedback_requests_expires")
+  @@map("feedback_requests")
+}
+
+/// Тип feedback: text (свободный текст + mood) ИЛИ circle (видео-кружок + mood).
+/// В V2 могут добавляться другие типы (audio-only, photo-comment).
+enum FeedbackType {
+  text
+  circle
+
+  @@map("feedback_type")
+}
+
+/// Mood — пятиградусная шкала эмодзи (UX-ориентир для клиента).
+/// Соответствует стандарту NPS-feeling: от 1 (плохо) до 5 (восторг).
+enum FeedbackMood {
+  /// 😔 — плохо
+  bad
+  /// 😐 — средне
+  neutral
+  /// 🙂 — нормально
+  ok
+  /// 😊 — хорошо
+  good
+  /// 🤩 — восторг
+  excellent
+
+  @@map("feedback_mood")
+}
+
+/// Feedback — ответ клиента на FeedbackRequest (или спонтанный).
+///
+/// requestId — может быть NULL: клиент пишет feedback по своей инициативе
+/// без выходящего request'а (например через «оставить отзыв» в trip dashboard).
+///
+/// Уникальность: один feedback на (trip, dayNumber) — на день можно оставить
+/// только одну запись. Изменение через PATCH endpoint (отдельный issue).
+///
+/// signals JSONB — обогащение через AI-аналитику в #189 (sentiment, topics,
+/// keywords). Сейчас пустой объект `{}`.
+model Feedback {
+  id        String        @id @default(uuid()) @db.Uuid
+  /// Опционально — ссылка на FeedbackRequest. NULL = спонтанный feedback.
+  requestId String?       @map("request_id") @db.Uuid
+  /// Soft-reference на Trip.id (cross-module).
+  tripId    String        @map("trip_id") @db.Uuid
+  dayNumber Int           @map("day_number")
+  type      FeedbackType
+  /// Текст / описание кружка. Для type=text — основной контент.
+  /// Для type=circle — caption (опционально).
+  body      String
+  mood      FeedbackMood
+  /// Soft-reference на MediaAsset.id (#173) — для type=circle.
+  mediaId   String?       @map("media_id") @db.Uuid
+  /// JSONB: AI-обогащение (sentiment, topics, keywords, etc.). Заполняется
+  /// в #189 (post-feedback AI processing). По умолчанию `{}`.
+  signals   Json          @default("{}")
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  @@unique([tripId, dayNumber], map: "uq_feedback_trip_day")
+  @@index([tripId, createdAt], map: "idx_feedback_trip_created")
+  @@index([mood, createdAt], map: "idx_feedback_mood_created")
+  @@map("feedback")
+}
