@@ -178,6 +178,7 @@ model User {
   sessions            Session[]
   recoveryCodes       RecoveryCode[]
   passwordResetTokens PasswordResetToken[]
+  pushSubscriptions   PushSubscription[]
 
   @@index([email], map: "idx_users_email")
   @@map("users")
@@ -1095,4 +1096,69 @@ model Feedback {
   @@index([tripId, createdAt], map: "idx_feedback_trip_created")
   @@index([mood, createdAt], map: "idx_feedback_mood_created")
   @@map("feedback")
+}
+
+/// Платформа push-устройства (#163).
+///
+/// V1: web — W3C Web Push (Chrome/Firefox/Safari + iOS PWA standalone).
+/// V2: ios_native (через APNs), android_native (через FCM v1) — отдельный
+///     issue после получения Apple Developer / Firebase credentials.
+enum PushPlatform {
+  /// Web Push API: endpoint + keys.p256dh + keys.auth. Покрывает iOS PWA
+  /// (через push-сервер Apple), Android (через FCM auto-routing), desktop.
+  web
+  /// Apple Push Notification Service — нативное iOS-приложение (фаза 4).
+  /// Требует APNs cert / token-based auth.
+  ios_native
+  /// Firebase Cloud Messaging — нативное Android-приложение (фаза 4).
+  /// Требует Firebase project + service account.
+  android_native
+
+  @@map("push_platform")
+}
+
+/// Push subscription (#163) — связь user'а с конкретным устройством/браузером.
+///
+/// W3C Web Push сохраняет endpoint + keys (p256dh + auth) на стороне сервера,
+/// чтобы потом подписать payload через VAPID и отправить на endpoint браузера
+/// (тот сам доставляет через FCM/APNs/Mozilla autopush — для нас прозрачно).
+///
+/// Уникальность: один (userId, endpoint) — переподписка на том же устройстве
+/// делает upsert (обновляет keys + lastSeenAt). Отсутствие unique constraint'а
+/// на endpoint без userId — другой user может зарегистрировать subscription
+/// на тот же endpoint после logout/login (редко, но возможно).
+///
+/// Удаление: soft-delete через deletedAt — сохраняем для аудита (compliance).
+/// При expired endpoint (410 Gone от провайдера) — помечаем deletedAt = now.
+model PushSubscription {
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       String       @map("user_id") @db.Uuid
+  platform     PushPlatform @default(web)
+  /// W3C Web Push endpoint URL — длинный (300-500 chars типично). Для
+  /// ios_native / android_native — device token строкой того же поля.
+  endpoint     String       @db.VarChar(2048)
+  /// Web Push: public key клиента (base64url-кодированный, 87 chars). Для
+  /// native — null (FCM/APNs не используют клиентский ключ — push шифруется
+  /// провайдером по token'у).
+  p256dh       String?      @db.VarChar(255)
+  /// Web Push: auth secret (base64url, 22 chars). Для native — null.
+  auth         String?      @db.VarChar(255)
+  /// Человекочитаемая метка устройства: "iPhone 15 Pro", "Chrome Desktop" —
+  /// для UI личного кабинета («ваши устройства»). Detected из User-Agent
+  /// фронтендом при subscribe.
+  deviceLabel  String?      @map("device_label") @db.VarChar(120)
+  /// Обновляется при каждом успешном push'е. NULL = ни одного успешного
+  /// доставления (только что subscribe'нулись). Для cleanup stale subscriptions.
+  lastSeenAt   DateTime?    @map("last_seen_at")
+  /// Soft-delete. NULL = active.
+  deletedAt    DateTime?    @map("deleted_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint], map: "uq_push_subs_user_endpoint")
+  @@index([userId], map: "idx_push_subs_user")
+  @@index([deletedAt], map: "idx_push_subs_deleted")
+  @@map("push_subscriptions")
 }

@@ -33,6 +33,10 @@ import { NotificationPreferencesService } from './preferences/preferences.servic
 import { EMAIL_PROVIDER, type EmailProvider } from './providers/email.provider';
 import { LogEmailProvider } from './providers/log-email.provider';
 import { SmtpEmailProvider } from './providers/smtp-email.provider';
+import { LogPushProvider } from './push/log-push.provider';
+import { PushController } from './push/push.controller';
+import { PUSH_PROVIDER } from './push/push.provider';
+import { PushService } from './push/push.service';
 import { TemplateService } from './template.service';
 import { EventsBusModule } from '../../common/events-bus/events-bus.module';
 import { PrismaModule } from '../../common/prisma/prisma.module';
@@ -42,7 +46,7 @@ import { AuthModule } from '../auth/auth.module';
 @Global()
 @Module({
   imports: [PrismaModule, EventsBusModule, ConfigModule, RedisModule, AuthModule],
-  controllers: [ChatController, NotificationPreferencesController],
+  controllers: [ChatController, NotificationPreferencesController, PushController],
   providers: [
     ChatService,
     ChatGateway,
@@ -66,9 +70,17 @@ import { AuthModule } from '../auth/auth.module';
         return host ? smtp : log;
       },
     },
+    PushService,
+    LogPushProvider,
+    {
+      // Push provider: пока только log-stub. Когда VAPID keys будут готовы (#353)
+      // — добавить WebPushProvider (через `web-push` npm) и переключать через env.
+      provide: PUSH_PROVIDER,
+      useExisting: LogPushProvider,
+    },
     WelcomeEmailListener,
     SuspiciousLoginListener,
   ],
-  exports: [NotifyService, ChatService, NotificationPreferencesService],
+  exports: [NotifyService, ChatService, NotificationPreferencesService, PushService],
 })
 export class CommModule {}
