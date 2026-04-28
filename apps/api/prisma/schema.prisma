@@ -122,14 +122,43 @@ model User {
   passwordHash String     @map("password_hash")
   role         UserRole   @default(client)
   status       UserStatus @default(active)
+  /// 2FA TOTP активирован после успешного verify-enroll (#132).
+  /// false → /login возвращает токены сразу.
+  /// true  → /login возвращает { challengeId } и требует /auth/2fa/verify (#133).
+  twoFaEnabled Boolean    @default(false) @map("two_fa_enabled")
+  /// TOTP secret (base32-string), зашифрован через CryptoService (AES-256-GCM).
+  /// Заполняется в /auth/2fa/enroll, сохраняется при verify-enroll, очищается при disable.
+  twoFaSecret  String?    @map("two_fa_secret")
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
   /// Backref для CASCADE на logout-all и trip-history.
-  sessions Session[]
+  sessions      Session[]
+  recoveryCodes RecoveryCode[]
 
   @@index([email], map: "idx_users_email")
   @@map("users")
+}
+
+/// Recovery codes для 2FA — одноразовые fallback при потере устройства (#132).
+/// Хранятся как argon2id-хеши. Plaintext выдаётся пользователю ОДИН раз при
+/// /auth/2fa/verify-enroll (или при regenerate). После use — usedAt заполняется,
+/// код больше не принимается.
+///
+/// Cross-module FK на User ОК (тот же модуль auth, единая extraction unit).
+model RecoveryCode {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  /// argon2id(plaintext_code). Plaintext НИКОГДА не хранится.
+  codeHash  String    @map("code_hash")
+  createdAt DateTime  @default(now()) @map("created_at")
+  /// NULL — код активен. Заполняется при первом успешном использовании.
+  usedAt    DateTime? @map("used_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt], map: "idx_recovery_codes_user_active")
+  @@map("recovery_codes")
 }
 
 // === clients модуль (#138–#148) ===

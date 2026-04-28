@@ -8,6 +8,9 @@ import { LoginService } from './services/login.service';
 import { LogoutService } from './services/logout.service';
 import { PasswordService } from './services/password.service';
 import { RefreshService } from './services/refresh.service';
+import { TwoFaChallengeService } from './two-fa/two-fa-challenge.service';
+import { TwoFaController } from './two-fa/two-fa.controller';
+import { TwoFaService } from './two-fa/two-fa.service';
 
 /**
  * Auth module — register / login / logout / refresh / 2FA / password-reset.
@@ -27,7 +30,7 @@ import { RefreshService } from './services/refresh.service';
     // Глобальный module не требуется — JwtTokenService сам читает env через ConfigService.
     JwtModule.register({}),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, TwoFaController],
   providers: [
     AuthService,
     LoginService,
@@ -35,6 +38,8 @@ import { RefreshService } from './services/refresh.service';
     LogoutService,
     PasswordService,
     JwtTokenService,
+    TwoFaService,
+    TwoFaChallengeService,
   ],
   exports: [
     AuthService,
@@ -43,6 +48,8 @@ import { RefreshService } from './services/refresh.service';
     LogoutService,
     PasswordService,
     JwtTokenService,
+    TwoFaService,
+    TwoFaChallengeService,
   ],
 })
 export class AuthModule {}
