@@ -84,6 +84,48 @@ model ProcessedEvent {
   @@map("processed_events")
 }
 
+/// AuditEvent — append-only журнал ВСЕХ domain-events (#218).
+///
+/// Подписан wildcard'ом `*` через EventsBus. Каждое событие, прошедшее
+/// outbox-relay → Redis Stream → consumer группу `audit-svc`, записывается
+/// сюда. Один event = одна запись (idempotency через processed_events
+/// таблицу + UNIQUE constraint на eventId).
+///
+/// Append-only — критично для security/compliance:
+/// - Postgres trigger блокирует UPDATE и DELETE (см. миграцию)
+/// - Никто, включая admin'а, не может изменить запись audit-log
+/// - При инциденте безопасности это единственный надёжный источник истины
+///
+/// Используется (будущее):
+/// - GET /admin/audit (#219) — фильтр по actor/type/period
+/// - 152-ФЗ доказательство кому/когда/что отдавалось
+/// - Расследование suspicious-session (#136)
+/// - Forensics при compromise
+model AuditEvent {
+  /// DomainEvent.id (UUIDv4 из outbox). UNIQUE — гарантия idempotency.
+  eventId      String   @id @map("event_id") @db.Uuid
+  /// Тип события: `auth.user.registered`, `clients.profile.updated`, etc.
+  type         String
+  /// JSONB EventActor: `{type: 'user'|'system'|'gateway', id?, role?}`
+  actor        Json
+  /// Полный payload события. ПДн уже maskedRedacted на стороне продьюсера —
+  /// audit пишет то что пришло (privacy-by-default уже соблюдён).
+  payload      Json
+  /// ISO timestamp когда событие произошло (DomainEvent.occurredAt).
+  occurredAt   DateTime @map("occurred_at")
+  /// Когда audit-svc записал. Может отличаться от occurredAt при retry/replay.
+  recordedAt   DateTime @default(now()) @map("recorded_at")
+  /// Версия схемы payload (DomainEvent.schemaVersion).
+  schemaVersion Int     @default(1) @map("schema_version")
+  /// correlationId/causationId (опционально из envelope) для трейсинга.
+  correlationId String? @map("correlation_id")
+  causationId   String? @map("causation_id")
+
+  @@index([type, occurredAt(sort: Desc)], map: "idx_audit_events_type_occurred")
+  @@index([occurredAt(sort: Desc)], map: "idx_audit_events_occurred")
+  @@map("audit_events")
+}
+
 // === auth модуль (#126–#137) ===
 //
 // Источник: docs/BACKLOG/M5/B_AUTH.md, docs/ARCH/MICROSERVICES.md § auth-svc.
