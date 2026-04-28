@@ -16,6 +16,7 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed:tours": "ts-node prisma/seed/tours.ts",
+    "db:seed:admin": "ts-node prisma/seed/admin.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
