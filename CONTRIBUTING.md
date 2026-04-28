@@ -445,6 +445,24 @@ Closes #12
 
 ---
 
+## Database changes (Prisma)
+
+Если твой PR меняет `apps/api/prisma/schema.prisma` — **обязательно** создай миграцию:
+
+```bash
+cd apps/api
+pnpm exec prisma migrate dev --name <описание_изменения>
+# Пример: prisma migrate dev --name add_session_model
+```
+
+CI (`prisma-check.yml`) автоматически проверяет что schema.prisma ↔ migrations в синке.
+PR без миграции → CI fail.
+
+**Почему это важно:** однажды модель `Session` была добавлена в schema без миграции
+— баг обнаружился только на dev-деплое, потеряли ~2 часа (hotfix #335).
+
+---
+
 ## Связь с командой
 
 - **GitHub Issues:** основной канал для задач и багов
