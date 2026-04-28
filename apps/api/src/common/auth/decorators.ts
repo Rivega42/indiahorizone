@@ -1,9 +1,9 @@
 import { type ExecutionContext, SetMetadata, createParamDecorator } from '@nestjs/common';
 
-import type { Request } from 'express';
-import type { UserRole } from '@prisma/client';
-
 import type { AuthenticatedUser } from './types';
+import type { UserRole } from '@prisma/client';
+import type { Request } from 'express';
+
 
 /**
  * Метаданные для guards.
@@ -13,11 +13,11 @@ export const PUBLIC_KEY = 'isPublic';
 
 /**
  * @Roles('admin', 'concierge') — требует одну из перечисленных ролей.
+ * Применяется и к методу, и к классу (через SetMetadata от NestJS).
  * Если декоратор не применён И @Public() тоже не применён — by default
  * требуется аутентификация без role-restriction (любой залогиненный).
  */
-export const Roles = (...roles: UserRole[]): MethodDecorator =>
-  SetMetadata(ROLES_KEY, roles);
+export const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);
 
 /**
  * @Public() — endpoint доступен без аутентификации.

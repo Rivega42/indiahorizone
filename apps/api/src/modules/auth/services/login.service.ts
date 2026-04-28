@@ -1,12 +1,12 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserStatus, type UserRole } from '@prisma/client';
 
+import { JwtTokenService } from './jwt.service';
+import { PasswordService } from './password.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { TwoFaChallengeService } from '../two-fa/two-fa-challenge.service';
 
-import { JwtTokenService } from './jwt.service';
-import { PasswordService } from './password.service';
 
 import type { LoginDto, LoginResponse, LoginTokenResponse } from '../dto/login.dto';
 

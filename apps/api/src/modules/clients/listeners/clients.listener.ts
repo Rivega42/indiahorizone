@@ -10,7 +10,6 @@
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 
 import { EventsBusService } from '../../../common/events-bus/events-bus.service';
-
 import { ClientsService } from '../clients.service';
 
 interface UserRegisteredPayload {
