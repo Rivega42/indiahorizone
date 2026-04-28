@@ -190,24 +190,24 @@ model Client {
 /// потому что encrypted-payload — base64-строка, не date/etc.
 /// preferences — свободный JSONB (языки, диеты, хобби).
 model ClientProfile {
-  id             String    @id @default(uuid()) @db.Uuid
-  clientId       String    @unique @map("client_id") @db.Uuid
+  id             String   @id @default(uuid()) @db.Uuid
+  clientId       String   @unique @map("client_id") @db.Uuid
   /// Зашифровано (#139). plaintext: ФИО.
-  firstName      String?   @map("first_name")
+  firstName      String?  @map("first_name")
   /// Зашифровано (#139). plaintext: ФИО.
-  lastName       String?   @map("last_name")
+  lastName       String?  @map("last_name")
   /// Зашифровано (#139). plaintext: ISO date 'YYYY-MM-DD'.
-  dateOfBirth    String?   @map("date_of_birth")
+  dateOfBirth    String?  @map("date_of_birth")
   /// ISO 3166-1 alpha-2, например "RU", "IN". НЕ шифруется (не ПДн сама по себе).
-  citizenship    String?   @db.Char(2)
+  citizenship    String?  @db.Char(2)
   /// Зашифровано (#139). plaintext: E.164 формат, например "+79161234567".
   phone          String?
   /// Telegram username без @, публичный handle. НЕ шифруется.
-  telegramHandle String?   @map("telegram_handle")
+  telegramHandle String?  @map("telegram_handle")
   /// Свободный JSONB: языки, диеты, специальные требования.
   /// Пример: { "languages": ["ru", "en"], "diet": "vegetarian" }
-  preferences    Json?     @default("{}")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  preferences    Json?    @default("{}")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
@@ -387,32 +387,201 @@ enum LeadStatus {
 /// status workflow: NEW → CONTACTED → CONVERTED|REJECTED. Переходы делает
 /// менеджер через будущую CRM (EPIC 14). До этого — все Lead'ы NEW.
 model Lead {
-  id          String     @id @default(uuid()) @db.Uuid
+  id                 String     @id @default(uuid()) @db.Uuid
   /// Источник заявки. Свободный slug:
   /// - "tour-tury-kerala-oktyabr-2026" — кнопка с tour landing page
   /// - "general" — общая форма с главной (когда будет)
-  source      String
+  source             String
   /// Зашифровано (#139). plaintext: имя клиента (2–100 символов).
-  name        String
+  name               String
   /// Тип контакта: 'phone' | 'telegram' | 'email'. Не шифруется (enum-like).
-  contactType String     @map("contact_type")
+  contactType        String     @map("contact_type")
   /// Зашифровано (#139). plaintext: телефон / @username / email.
-  contact     String
+  contact            String
   /// Зашифровано (#139). plaintext: свободный комментарий клиента (опционально).
-  comment     String?
+  comment            String?
   /// Версия текста consent на момент согласия. При обновлении Политики
   /// конфиденциальности версия меняется → новый клиент подписывает новую,
   /// старый Lead.consentTextVersion сохраняет старую (для аудита 152-ФЗ).
   /// Формат: 'YYYY-MM-DD-vN'.
-  consentTextVersion String @map("consent_text_version")
+  consentTextVersion String     @map("consent_text_version")
   /// sha256(ip) — для rate-limit и антифрод-аналитики, не raw IP (privacy).
-  ipHash      String?    @map("ip_hash")
-  userAgent   String?    @map("user_agent")
-  status      LeadStatus @default(NEW)
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  ipHash             String?    @map("ip_hash")
+  userAgent          String?    @map("user_agent")
+  status             LeadStatus @default(NEW)
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @updatedAt @map("updated_at")
 
   @@index([status, createdAt], map: "idx_leads_status_created")
   @@index([source], map: "idx_leads_source")
   @@map("leads")
+}
+
+// === trips модуль (#149+ [M5.D]) ===
+//
+// Источник: docs/BACKLOG/M5/D_TRIPS.md, docs/ARCH/MICROSERVICES.md § trips-svc.
+// trips — ядро домена путешествий: Trip = одна поездка клиента.
+// Itinerary = версия маршрута; одной Trip может принадлежать несколько Itinerary
+// (для версионирования при правках после publish).
+// DayPlan = детализация одного дня поездки (отель, переезды, активности).
+// Booking = конкретная бронь (отель/трансфер/активность/гид) — сама по себе
+// независима от DayPlan'а (для агрегатной маржинальности и расчётов).
+//
+// Cross-module rule (CLAUDE.md princip 5):
+// - clientId → soft-reference на clients.id (без FK)
+// - createdBy → soft-reference на users.id (без FK; обычно manager)
+// - vendorId → свободный string (внешний vendor / partner-id)
+
+enum TripStatus {
+  draft
+  paid
+  in_progress
+  completed
+  cancelled
+
+  @@map("trip_status")
+}
+
+enum BookingType {
+  hotel
+  transfer
+  activity
+  guide
+
+  @@map("booking_type")
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+  failed
+
+  @@map("booking_status")
+}
+
+/// Trip — одна поездка клиента.
+/// Создаётся менеджером (createdBy = userId менеджера). status переходит:
+/// draft → paid (после оплаты, #275) → in_progress (с момента startsAt) →
+/// completed (по факту endsAt) → cancelled (anywhere).
+///
+/// totalAmount/currency — итог цены тура для клиента (RUB по умолчанию).
+/// Для маржи — агрегируем Booking.amount в INR (см. будущий margin-report).
+model Trip {
+  id          String     @id @default(uuid()) @db.Uuid
+  /// Soft-reference на clients.id (cross-module).
+  clientId    String     @map("client_id") @db.Uuid
+  status      TripStatus @default(draft)
+  startsAt    DateTime   @map("starts_at")
+  endsAt      DateTime   @map("ends_at")
+  /// Свободный текст: "Керала", "Раджастан", "Гоа+Хампи".
+  region      String
+  /// Стоимость тура для клиента. Хранится в копейках, чтобы избежать float-проблем
+  /// (Decimal требовал бы pg_decimal-плагин и более тяжёлых RPC; копейки — простой и точный).
+  /// NULL до оплаты / финализации сметы.
+  totalAmount BigInt?    @map("total_amount")
+  currency    String     @default("RUB") @db.Char(3)
+  /// Soft-reference на users.id (cross-module). Обычно manager, иногда admin.
+  createdBy   String     @map("created_by") @db.Uuid
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  itineraries Itinerary[]
+  bookings    Booking[]
+
+  @@index([clientId, status], map: "idx_trips_client_status")
+  @@index([startsAt], map: "idx_trips_starts")
+  @@index([createdBy], map: "idx_trips_created_by")
+  @@map("trips")
+}
+
+/// Itinerary — версия маршрута.
+/// version инкрементируется при каждом значимом change'е (новый отель, перенос дня).
+/// publishedAt = NULL → DRAFT (виден только менеджеру). Заполнен → PUBLISHED
+/// (виден клиенту в trip dashboard, кешируется в его offline storage).
+///
+/// Versioning нужен для:
+/// 1. Аудита (что показывали клиенту до правки)
+/// 2. Offline-cache: клиент может видеть старую version'у пока не синхронизировал
+model Itinerary {
+  id          String    @id @default(uuid()) @db.Uuid
+  tripId      String    @map("trip_id") @db.Uuid
+  version     Int       @default(1)
+  /// NULL = draft. Set при publish'е.
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  trip Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  days DayPlan[]
+
+  @@unique([tripId, version], map: "uq_itineraries_trip_version")
+  @@index([tripId, publishedAt], map: "idx_itineraries_trip_published")
+  @@map("itineraries")
+}
+
+/// DayPlan — один день в маршруте.
+/// items: массив plan-объектов одного дня. Свободный JSON для гибкости —
+/// разные дни имеют разную структуру (морской день / город / трекинг).
+///
+/// Пример items:
+/// [
+///   { kind: 'transfer', from: 'TRV airport', to: 'Hotel X', time: '14:00' },
+///   { kind: 'activity', label: 'Welcome dinner', time: '19:00', notes: '...' }
+/// ]
+///
+/// Активности из tour'а (catalog domain) сюда копируются как snapshot —
+/// чтобы trip dashboard не зависел от изменений в каталоге после publish.
+model DayPlan {
+  id          String   @id @default(uuid()) @db.Uuid
+  itineraryId String   @map("itinerary_id") @db.Uuid
+  dayNumber   Int      @map("day_number")
+  /// Конкретная дата дня (в отличие от TourDay где относительный dayNumber).
+  date        DateTime @db.Date
+  /// Короткое описание дня (1-2 предложения для timeline preview).
+  summary     String
+  /// JSONB array (см. описание выше).
+  items       Json
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  itinerary Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+
+  @@unique([itineraryId, dayNumber], map: "uq_day_plans_itinerary_day")
+  @@index([itineraryId, date], map: "idx_day_plans_itinerary_date")
+  @@map("day_plans")
+}
+
+/// Booking — одна бронь в рамках Trip.
+/// type определяет shape payload'а (hotel: {hotelName, checkIn, checkOut, rooms},
+/// transfer: {from, to, time, vehicle}, activity: {label, time, vendor}, guide: {guideId, days}).
+///
+/// vendorId — внешний идентификатор: ID отеля в booking-провайдере, slug гида,
+/// ID такси-сервиса. В фазе 3 — свободный string; в фазе 4 — отдельная модель Vendor.
+///
+/// status workflow:
+/// pending → confirmed (подтверждение от vendor'а)
+/// pending → failed (vendor отказал, нужно переоформить)
+/// confirmed → cancelled (отменено клиентом / нами).
+model Booking {
+  id        String        @id @default(uuid()) @db.Uuid
+  tripId    String        @map("trip_id") @db.Uuid
+  type      BookingType
+  /// Свободный string. Внешний vendor identifier.
+  vendorId  String        @map("vendor_id")
+  status    BookingStatus @default(pending)
+  /// JSONB — type-specific shape (см. описание выше).
+  payload   Json
+  /// Стоимость в native currency vendor'а (обычно INR для индийских поставщиков).
+  /// Хранится в копейках/paise для точности. NULL = ещё не зафиксировано.
+  amount    BigInt?
+  /// ISO 4217 валюта стоимости (INR, USD, RUB).
+  currency  String        @db.Char(3)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId, type], map: "idx_bookings_trip_type")
+  @@index([status, createdAt], map: "idx_bookings_status_created")
+  @@map("bookings")
 }
