@@ -814,3 +814,68 @@ model ChatMessage {
   @@index([fromUserId, createdAt(sort: Desc)], map: "idx_chat_messages_from_user_created")
   @@map("chat_messages")
 }
+
+/// Канал доставки нотификации (#162). Сначала email; push/sms/telegram —
+/// последующие issue (#163, #164, #165). Каждый канал имеет свой провайдер
+/// (EmailProvider, PushProvider, etc.) с общим интерфейсом NotifyService.
+enum NotificationChannel {
+  email
+  push
+  sms
+  telegram
+
+  @@map("notification_channel")
+}
+
+enum NotificationStatus {
+  /// Создана, ещё не отправлялась (или в очереди retry).
+  pending
+  /// Успешно отправлена провайдером (delivered=ok с точки зрения SMTP/FCM).
+  sent
+  /// Permanent fail (invalid address, blocked by recipient, etc.).
+  /// Retry уже не имеет смысла.
+  failed
+
+  @@map("notification_status")
+}
+
+/// Notification — запись об отправке сообщения по любому каналу (#162).
+///
+/// Создаётся при NotifyService.send(). Status pending → sent | failed после
+/// попытки доставки провайдером. Outbox-event `comm.message.sent` или
+/// `comm.message.failed` публикуется в той же транзакции.
+///
+/// payload — данные для template-render'а (НЕ финальный текст). Финальный
+/// текст рендерится из template (apps/api/src/modules/comm/templates/) +
+/// payload во время send. Это позволяет задним числом изменить шаблон без
+/// изменения исторических Notification-записей.
+///
+/// Cross-module: recipient — свободный string (email/phone/push-token).
+/// userId опционален — для transactional notifications привязан к юзеру,
+/// для marketing/system без user'а.
+model Notification {
+  id           String              @id @default(uuid()) @db.Uuid
+  channel      NotificationChannel
+  /// email-address / E.164 phone / FCM-token / Telegram chat_id.
+  recipient    String
+  /// Имя template'а (например 'welcome', 'password-reset', 'sos-alert').
+  /// Файл template — apps/api/src/modules/comm/templates/<id>/{subject,body}.hbs.
+  templateId   String              @map("template_id")
+  /// JSONB — данные для подстановки в Handlebars-шаблон.
+  payload      Json
+  status       NotificationStatus  @default(pending)
+  /// NULL до успешной отправки.
+  sentAt       DateTime?           @map("sent_at")
+  /// NULL пока не упало; заполняется при permanent fail.
+  failedAt     DateTime?           @map("failed_at")
+  /// Сообщение об ошибке провайдера (для diag). Не показываем клиенту.
+  errorMessage String?             @map("error_message")
+  /// Soft-ref на User (cross-module), опционально. Для transactional notifications.
+  userId       String?             @map("user_id") @db.Uuid
+  createdAt    DateTime            @default(now()) @map("created_at")
+
+  @@index([status, createdAt], map: "idx_notifications_status_created")
+  @@index([recipient, createdAt(sort: Desc)], map: "idx_notifications_recipient_created")
+  @@index([userId, createdAt(sort: Desc)], map: "idx_notifications_user_created")
+  @@map("notifications")
+}
