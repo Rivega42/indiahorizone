@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { CommonAuthModule } from './common/auth/auth.module';
 import { CryptoModule } from './common/crypto/crypto.module';
 import { EventsBusModule } from './common/events-bus/events-bus.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { MetricsMiddleware } from './common/metrics/metrics.middleware';
+import { MetricsModule } from './common/metrics/metrics.module';
 import { OutboxModule } from './common/outbox/outbox.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { RedisModule } from './common/redis/redis.module';
@@ -27,6 +29,7 @@ import { TripsModule } from './modules/trips/trips.module';
       cache: true,
     }),
     LoggerModule, // pino + correlation-id (#124) — должен быть выше остальных
+    MetricsModule, // Prometheus metrics + /metrics endpoint (#125)
     CryptoModule, // global, нужен PrismaService в фазе 4 + ClientsService уже сейчас (#139)
     PrismaModule,
     RedisModule,
@@ -46,4 +49,9 @@ import { TripsModule } from './modules/trips/trips.module';
     HealthModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    // HTTP request duration metric — на все routes (#125)
+    consumer.apply(MetricsMiddleware).forRoutes('*');
+  }
+}
