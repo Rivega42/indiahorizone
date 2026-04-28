@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 
 import { AuthController } from './auth.controller';
+import { PasswordResetController } from './password-reset/password-reset.controller';
+import { PasswordResetService } from './password-reset/password-reset.service';
 import { AuthService } from './services/auth.service';
 import { JwtTokenService } from './services/jwt.service';
 import { LoginService } from './services/login.service';
@@ -30,7 +32,7 @@ import { TwoFaService } from './two-fa/two-fa.service';
     // Глобальный module не требуется — JwtTokenService сам читает env через ConfigService.
     JwtModule.register({}),
   ],
-  controllers: [AuthController, TwoFaController],
+  controllers: [AuthController, TwoFaController, PasswordResetController],
   providers: [
     AuthService,
     LoginService,
@@ -40,6 +42,7 @@ import { TwoFaService } from './two-fa/two-fa.service';
     JwtTokenService,
     TwoFaService,
     TwoFaChallengeService,
+    PasswordResetService,
   ],
   exports: [
     AuthService,
@@ -50,6 +53,7 @@ import { TwoFaService } from './two-fa/two-fa.service';
     JwtTokenService,
     TwoFaService,
     TwoFaChallengeService,
+    PasswordResetService,
   ],
 })
 export class AuthModule {}
