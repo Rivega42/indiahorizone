@@ -27,6 +27,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { ConflictException } from '@nestjs/common';
+import { UserStatus } from '@prisma/client';
 import { generateSecret, generateURI, verifySync } from 'otplib';
 
 import { LoginService } from '../services/login.service';
@@ -211,6 +212,7 @@ export class TwoFaService {
         id: true,
         email: true,
         role: true,
+        status: true,
         twoFaEnabled: true,
         twoFaSecret: true,
       },
@@ -219,6 +221,16 @@ export class TwoFaService {
       // Edge case: между созданием challenge и verify — admin отключил 2FA.
       // Безопасно возвращаем generic error.
       this.logger.warn({ userId: payload.userId }, '2fa.verify.user-not-eligible');
+      throw new UnauthorizedException('Невалидный или истёкший код');
+    }
+    if (user.status !== UserStatus.active) {
+      // Между password-step и 2FA verify admin/concierge мог suspend'нуть аккаунт
+      // (incident response). Не выпускаем токены — even если код валидный.
+      // Generic error — anti-enumeration.
+      this.logger.warn(
+        { userId: user.id, status: user.status },
+        '2fa.verify.blocked-status',
+      );
       throw new UnauthorizedException('Невалидный или истёкший код');
     }
 
@@ -243,7 +255,7 @@ export class TwoFaService {
       ...(payload.userAgent !== undefined ? { userAgent: payload.userAgent } : {}),
     };
     return this.login.issueTokensForUser(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, status: user.status },
       ctx,
     );
   }
