@@ -34,8 +34,8 @@ RUN pnpm install --frozen-lockfile --prefer-offline --filter "@indiahorizone/web
 # ────────────────────────── 3. builder
 FROM base AS builder
 COPY --from=deps /repo/node_modules ./node_modules
-COPY --from=deps /repo/apps/web/node_modules ./apps/web/node_modules 2>/dev/null || true
-COPY --from=deps /repo/packages/shared/node_modules ./packages/shared/node_modules 2>/dev/null || true
+COPY --from=deps /repo/apps/web/node_modules ./apps/web/node_modules
+# shared has no separate node_modules (installed in root)
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
