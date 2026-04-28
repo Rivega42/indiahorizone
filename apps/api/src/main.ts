@@ -1,13 +1,19 @@
 import 'reflect-metadata';
 
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { Logger } from 'nestjs-pino';
 
 import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
+  // bufferLogs=true — pino логгер подменит default ниже, до этого момента
+  // логи буферизуются и сбросятся через pino.
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+
+  // Pino logger (#124) с correlation-id и redact ПДн/токенов
+  app.useLogger(app.get(Logger));
 
   const config = app.get(ConfigService);
   const port = config.get<number>('API_PORT', 4000);
@@ -25,7 +31,7 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks();
 
   await app.listen(port, host);
-  Logger.log(`🚀 API listening on http://${host}:${port}`, 'Bootstrap');
+  app.get(Logger).log(`🚀 API listening on http://${host}:${port}`, 'Bootstrap');
 }
 
 void bootstrap();
