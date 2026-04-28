@@ -8,7 +8,7 @@
  *
  * Cross-module rule: userId — soft-reference, без FK на таблицу users.
  */
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import {
   decryptClientWithProfile,
@@ -17,9 +17,23 @@ import {
   type EncryptableProfileInput,
 } from './lib/profile-encryption';
 import { CryptoService } from '../../common/crypto/crypto.service';
+import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
-import type { Client, ClientProfile } from '@prisma/client';
+import type { Client, ClientProfile, Prisma } from '@prisma/client';
+
+/**
+ * Поля профиля, которые можно обновлять через PATCH /clients/me.
+ * - ПДн (firstName/lastName/dateOfBirth/phone) — шифруются перед записью.
+ * - non-ПДн (citizenship/telegramHandle/preferences) — пишутся в открытом виде.
+ *
+ * Patch-семантика: omitted поле = нет изменений; явный null = очистить.
+ */
+export type UpdateProfilePatch = EncryptableProfileInput & {
+  citizenship?: string | null;
+  telegramHandle?: string | null;
+  preferences?: Prisma.InputJsonValue;
+};
 
 
 @Injectable()
@@ -29,6 +43,7 @@ export class ClientsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly crypto: CryptoService,
+    private readonly outbox: OutboxService,
   ) {}
 
   /**
@@ -81,24 +96,22 @@ export class ClientsService {
   }
 
   /**
-   * Обновить ПДн поля профиля. Используется в #140 (`PATCH /clients/me`).
+   * Обновить профиль клиента. Используется в #140 (`PATCH /clients/me`).
    *
    * Логика:
    * 1. Найти Client + Profile по userId.
-   * 2. Зашифровать переданные поля через encryptProfile().
-   * 3. Update profile.
+   * 2. Зашифровать ПДн поля через encryptProfile().
+   * 3. Update profile в транзакции + публикация `clients.profile.updated`
+   *    через outbox (changedFields = только реально присутствующие в patch).
    * 4. Расшифровать результат для возврата.
    *
-   * @throws ClientNotFoundError если у user нет Client (race-condition после
-   *   register'а — listener ещё не отработал; caller должен сделать retry или
-   *   provisionForUser явно).
+   * Patch-семантика: omitted = no change; явный null = очистить значение.
+   * Subscriber'ы события (CRM, finance — будущие) видят только список ИМЁН
+   * изменённых полей, не значения ПДн (privacy by default).
    */
   async updateProfile(
     userId: string,
-    patch: EncryptableProfileInput & {
-      citizenship?: string | null;
-      telegramHandle?: string | null;
-    },
+    patch: UpdateProfilePatch,
   ): Promise<ClientProfile> {
     const client = await this.prisma.client.findUnique({
       where: { userId },
@@ -106,33 +119,63 @@ export class ClientsService {
     });
 
     if (!client) {
-      throw new Error(`Client not found for userId=${userId}`);
+      throw new NotFoundException(`Client not found for userId=${userId}`);
     }
 
-    if (!client.profile) {
-      // ClientProfile должен быть создан в provisionForUser. Если его нет —
-      // создаём сейчас (defensive).
-      const encrypted = encryptProfile(patch, this.crypto);
-      const created = await this.prisma.clientProfile.create({
-        data: {
-          clientId: client.id,
-          ...encrypted,
-        },
+    const changedFields = Object.keys(patch).filter(
+      (k) => (patch as Record<string, unknown>)[k] !== undefined,
+    );
+
+    if (changedFields.length === 0) {
+      // Идемпотентный no-op: пустой patch не должен публиковать событие.
+      // Возвращаем текущее состояние (или 204 в контроллере — тут возвращаем профиль).
+      const current = await this.prisma.clientProfile.findUnique({
+        where: { clientId: client.id },
       });
-      return decryptProfile(created, this.crypto);
+      if (!current) {
+        throw new NotFoundException(`Profile not found for clientId=${client.id}`);
+      }
+      return decryptProfile(current, this.crypto);
     }
 
-    // Разделяем шифруемые и не-шифруемые поля
-    const { citizenship, telegramHandle, ...encryptable } = patch;
+    const { citizenship, telegramHandle, preferences, ...encryptable } = patch;
     const encrypted = encryptProfile(encryptable, this.crypto);
 
-    const updated = await this.prisma.clientProfile.update({
-      where: { id: client.profile.id },
-      data: {
-        ...encrypted,
-        ...(citizenship !== undefined ? { citizenship } : {}),
-        ...(telegramHandle !== undefined ? { telegramHandle } : {}),
-      },
+    const data: Prisma.ClientProfileUpdateInput = {
+      ...encrypted,
+      ...(citizenship !== undefined ? { citizenship } : {}),
+      ...(telegramHandle !== undefined ? { telegramHandle } : {}),
+      ...(preferences !== undefined ? { preferences } : {}),
+    };
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = client.profile
+        ? await tx.clientProfile.update({
+            where: { id: client.profile.id },
+            data,
+          })
+        : await tx.clientProfile.create({
+            data: {
+              clientId: client.id,
+              ...encrypted,
+              ...(citizenship !== undefined ? { citizenship } : {}),
+              ...(telegramHandle !== undefined ? { telegramHandle } : {}),
+              ...(preferences !== undefined ? { preferences } : {}),
+            },
+          });
+
+      await this.outbox.add(tx, {
+        type: 'clients.profile.updated',
+        schemaVersion: 1,
+        actor: { type: 'user', id: userId },
+        payload: {
+          userId,
+          clientId: client.id,
+          changedFields,
+        },
+      });
+
+      return result;
     });
 
     return decryptProfile(updated, this.crypto);

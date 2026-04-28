@@ -8,13 +8,13 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import type { Request } from 'express';
-import type { UserRole } from '@prisma/client';
-
-import { JwtTokenService } from '../../modules/auth/services/jwt.service';
 
 import { PUBLIC_KEY, ROLES_KEY } from './decorators';
+import { JwtTokenService } from '../../modules/auth/services/jwt.service';
+
 import type { AuthenticatedUser } from './types';
+import type { UserRole } from '@prisma/client';
+import type { Request } from 'express';
 
 /**
  * Глобальный JwtAuthGuard — требует валидный access-token в Authorization

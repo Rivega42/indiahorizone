@@ -8,7 +8,6 @@ import {
   Post,
 } from '@nestjs/common';
 
-import { CurrentUser, Public } from '../../common/auth/decorators';
 
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
@@ -17,11 +16,12 @@ import { AuthService } from './services/auth.service';
 import { LoginService } from './services/login.service';
 import { LogoutService } from './services/logout.service';
 import { RefreshService } from './services/refresh.service';
+import { CurrentUser, Public } from '../../common/auth/decorators';
 
-import type { AuthenticatedUser } from '../../common/auth/types';
 import type { LoginResponse } from './dto/login.dto';
 import type { RefreshResponse } from './dto/refresh.dto';
 import type { RegisterResponse } from './dto/register.dto';
+import type { AuthenticatedUser } from '../../common/auth/types';
 
 @Controller('auth')
 export class AuthController {
