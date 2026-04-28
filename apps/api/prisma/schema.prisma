@@ -177,8 +177,9 @@ model Client {
   userId    String   @unique @map("user_id") @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
 
-  profile  ClientProfile?
-  consents Consent[]
+  profile           ClientProfile?
+  consents          Consent[]
+  emergencyContacts EmergencyContact[]
 
   @@index([userId], map: "idx_clients_user_id")
   @@map("clients")
@@ -233,6 +234,49 @@ model Consent {
   @@index([clientId, type], map: "idx_consents_client_type")
   @@index([clientId, revokedAt], map: "idx_consents_client_active")
   @@map("consents")
+}
+
+/// Приоритет контакта экстренной связи. Максимум 2 на клиента — primary
+/// (главный, звонит первым) + secondary (резервный). См. #144.
+enum EmergencyContactPriority {
+  primary
+  secondary
+
+  @@map("emergency_contact_priority")
+}
+
+/// Контакт экстренной связи (#144). Используется при SOS — concierge звонит
+/// сначала primary, при недозвоне — secondary.
+///
+/// Сохранение/обновление требует активного Consent типа emergency_contacts
+/// со scope.allowed=true (#142). Без него endpoint возвращает 403.
+///
+/// Поля name/phone — ПДн (имя третьего лица + его телефон). Шифруются через
+/// CryptoService (как в ClientProfile, #139). relation/language — нет.
+///
+/// Cross-module FK на Client OK (один модуль clients).
+model EmergencyContact {
+  id        String                   @id @default(uuid()) @db.Uuid
+  clientId  String                   @map("client_id") @db.Uuid
+  /// Зашифровано (#139). plaintext: ФИО контакта.
+  name      String
+  /// Зашифровано (#139). plaintext: E.164 телефон.
+  phone     String
+  /// Свободный текст: "Отец", "Жена", "Друг". Не шифруется (не идентифицирует
+  /// само по себе).
+  relation  String
+  /// ISO 639-1 (например 'ru', 'en'). Подсказка оператору на каком языке
+  /// можно говорить с контактом.
+  language  String                   @db.Char(2)
+  priority  EmergencyContactPriority
+  createdAt DateTime                 @default(now()) @map("created_at")
+  updatedAt DateTime                 @updatedAt @map("updated_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  /// Один контакт на (client, priority) → максимум 2 контакта на клиента.
+  @@unique([clientId, priority], map: "uq_emergency_contacts_client_priority")
+  @@map("emergency_contacts")
 }
 
 /// Персональные данные туриста. ПДн в смысле 152-ФЗ.
