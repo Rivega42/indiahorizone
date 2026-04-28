@@ -61,14 +61,22 @@ jobs:
       - name: Install api dependencies
         run: pnpm install --frozen-lockfile --filter "@indiahorizone/api..."
 
-      # Применяем все миграции к чистой БД
+      # Применяем все миграции к main БД
       - name: Apply migrations
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test?schema=public
         working-directory: apps/api
         run: pnpm exec prisma migrate deploy
 
-      # Сравниваем schema.prisma против примёненных миграций.
+      # Создаём shadow-БД для prisma migrate diff. Без неё команда падает с
+      # "You must pass the --shadow-database-url if you want to diff a migrations
+      # directory" — это причина false-positive failures после #351.
+      - name: Create shadow database
+        env:
+          PGPASSWORD: test
+        run: psql -h localhost -U test -d test -c 'CREATE DATABASE test_shadow;'
+
+      # Сравниваем schema.prisma против применённых миграций.
       # exit 0 = в синке, exit 2 = дрифт (новые таблицы/поля в schema без migration).
       # Если дрифт — выводим понятный текст и фейлим CI.
       - name: Check schema ↔ migrations drift
@@ -80,6 +88,7 @@ jobs:
           if ! pnpm exec prisma migrate diff \
             --from-migrations prisma/migrations \
             --to-schema-datamodel prisma/schema.prisma \
+            --shadow-database-url "postgresql://test:test@localhost:5432/test_shadow?schema=public" \
             --exit-code; then
             echo ""
             echo "❌ Schema drift detected!"
