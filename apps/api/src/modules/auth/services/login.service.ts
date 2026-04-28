@@ -101,11 +101,28 @@ export class LoginService {
    * Выпуск JWT-токенов + создание Session + outbox.
    * Используется в успешном /login (без 2FA) и в /auth/2fa/verify после
    * подтверждения второго фактора (#133).
+   *
+   * Defense-in-depth: caller обязан передать user после проверки status === active.
+   * На случай если будущий caller забудет — повторно валидируем status здесь.
+   * JwtAuthGuard на каждом запросе НЕ ходит в БД — поэтому suspend существующей
+   * сессии работает только через revoke в Session table, не через user.status.
+   * Здесь — единственное место, где status гарантированно проверяется перед
+   * созданием новой Session.
    */
   async issueTokensForUser(
-    user: { id: string; email: string; role: UserRole },
+    user: { id: string; email: string; role: UserRole; status: UserStatus },
     context: { ip?: string | undefined; userAgent?: string | undefined },
   ): Promise<LoginTokenResponse> {
+    if (user.status !== UserStatus.active) {
+      // Generic message — caller должен был проверить раньше; если нет, это bug
+      // или race-condition (suspend между чтением и issue).
+      this.logger.warn(
+        { userId: user.id, status: user.status },
+        'issueTokens.blocked-status',
+      );
+      throw new UnauthorizedException(GENERIC_INVALID_CREDS);
+    }
+
     const refresh = this.jwt.generateRefresh();
     const refreshHash = await this.password.hash(refresh.random);
 
