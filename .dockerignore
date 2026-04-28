@@ -1,0 +1,14 @@
+.git
+.github
+node_modules
+**/node_modules
+**/.next
+**/dist
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+*.zip
+docs/UX/prototypes/from-claude-design/project
+deploy
