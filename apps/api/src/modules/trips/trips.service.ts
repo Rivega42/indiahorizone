@@ -3,13 +3,23 @@
  *
  * Currently:
  * - createTrip (#150) — создание Trip + outbox `trips.created`
+ * - listForUser (#361) — RBAC-aware list (client/manager/admin)
+ * - findById (#361) — single trip с details
  *
- * Будущее (#151+): editor versioning, status transitions, bookings nesting.
+ * Будущее (#160): status transitions.
  */
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
+
+import type { Trip, UserRole } from '@prisma/client';
 
 export interface CreateTripInput {
   clientId: string;
@@ -91,5 +101,105 @@ export class TripsService {
       'trips.created',
     );
     return { tripId };
+  }
+
+  /**
+   * GET /trips/me — список trip'ов с фильтром по роли (#361):
+   * - client → only Trip.clientId == own client_id
+   * - manager → only Trip.createdBy == self user_id
+   * - admin / concierge / finance → все
+   * - guide → пока ничего (нет Trip.guideId attribution)
+   *
+   * Сортировка: startsAt DESC (свежие сверху).
+   */
+  async listForUser(userId: string, role: UserRole): Promise<Trip[]> {
+    if (role === 'admin' || role === 'concierge' || role === 'finance') {
+      return this.prisma.trip.findMany({
+        orderBy: { startsAt: 'desc' },
+        take: 100,
+      });
+    }
+
+    if (role === 'manager') {
+      return this.prisma.trip.findMany({
+        where: { createdBy: userId },
+        orderBy: { startsAt: 'desc' },
+        take: 100,
+      });
+    }
+
+    if (role === 'client') {
+      const client = await this.prisma.client.findUnique({
+        where: { userId },
+        select: { id: true },
+      });
+      if (!client) return [];
+      return this.prisma.trip.findMany({
+        where: { clientId: client.id },
+        orderBy: { startsAt: 'desc' },
+        take: 100,
+      });
+    }
+
+    // guide — не имеет trip-attribution в текущей schema
+    return [];
+  }
+
+  /**
+   * GET /trips/:id — детали одной trip с RBAC.
+   * Возвращает Trip + bookings count + флаг hasPublishedItinerary.
+   */
+  async findById(
+    userId: string,
+    role: UserRole,
+    tripId: string,
+  ): Promise<{
+    trip: Trip;
+    bookingsCount: number;
+    hasPublishedItinerary: boolean;
+  }> {
+    const trip = await this.prisma.trip.findUnique({
+      where: { id: tripId },
+      include: {
+        _count: { select: { bookings: true } },
+      },
+    });
+    if (!trip) {
+      throw new NotFoundException('Trip не найден');
+    }
+
+    // RBAC
+    if (role === 'admin' || role === 'concierge' || role === 'finance') {
+      // Полный доступ
+    } else if (role === 'manager') {
+      if (trip.createdBy !== userId) {
+        throw new ForbiddenException('Нет доступа: trip создан другим manager');
+      }
+    } else if (role === 'client') {
+      const client = await this.prisma.client.findUnique({
+        where: { userId },
+        select: { id: true },
+      });
+      // findUnique({where:{userId}}) гарантирует client.userId === userId,
+      // проверяем только что trip принадлежит этому Client.
+      if (!client || client.id !== trip.clientId) {
+        throw new ForbiddenException('Нет доступа к чужому trip');
+      }
+    } else {
+      // guide и прочее
+      throw new ForbiddenException('Нет доступа');
+    }
+
+    const publishedItinerary = await this.prisma.itinerary.findFirst({
+      where: { tripId, publishedAt: { not: null } },
+      select: { id: true },
+    });
+
+    const { _count, ...tripData } = trip;
+    return {
+      trip: tripData as Trip,
+      bookingsCount: _count.bookings,
+      hasPublishedItinerary: publishedItinerary !== null,
+    };
   }
 }
