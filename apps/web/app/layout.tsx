@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 
+import { ServiceWorkerRegistration } from '../components/sw-registration';
 import { Providers } from '../lib/providers';
 
 import './globals.css';
@@ -29,6 +30,21 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  // Apple Touch Icon для iOS «Добавить на главный экран» (#122 + #356)
+  icons: {
+    icon: [
+      { url: '/icons/icon-192.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
+    ],
+  },
+  // iOS PWA-specific meta — для standalone-режима в Add-to-Home-Screen
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'IndiaHorizone',
+  },
 };
 
 export const viewport: Viewport = {
@@ -50,6 +66,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${inter.variable} ${playfair.variable}`}>
       <body>
+        <ServiceWorkerRegistration />
         <Providers>{children}</Providers>
       </body>
     </html>

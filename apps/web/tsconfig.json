@@ -4,22 +4,35 @@
     "composite": true,
     "rootDir": ".",
     "outDir": "./dist",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "jsx": "preserve",
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "incremental": true,
     "plugins": [
-      { "name": "next" }
+      {
+        "name": "next"
+      }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowJs": true
   },
   "references": [
-    { "path": "../../packages/shared" },
-    { "path": "../../packages/ui" }
+    {
+      "path": "../../packages/shared"
+    },
+    {
+      "path": "../../packages/ui"
+    }
   ],
   "include": [
     "next-env.d.ts",
@@ -27,5 +40,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "dist", ".next"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".next"
+  ]
 }
