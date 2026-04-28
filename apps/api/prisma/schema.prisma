@@ -177,10 +177,62 @@ model Client {
   userId    String   @unique @map("user_id") @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
 
-  profile ClientProfile?
+  profile  ClientProfile?
+  consents Consent[]
 
   @@index([userId], map: "idx_clients_user_id")
   @@map("clients")
+}
+
+/// Тип согласия (#142). 4 категории, каждая с своим scope:
+/// - pdn — общая обработка ПДн (ФИО, паспорт, контакты, реквизиты). scope: {}
+/// - photo_video — фото/видео клиента в материалах. scope: {level: 1..4, useName?: boolean}
+/// - geo — геолокация. scope: {modes: ('A'|'B'|'C'|'D')[]}
+/// - emergency_contacts — обработка контактов экстренных лиц. scope: {allowed: boolean}
+///
+/// Подробности в docs/LEGAL/CONSENTS/.
+enum ConsentType {
+  pdn
+  photo_video
+  geo
+  emergency_contacts
+
+  @@map("consent_type")
+}
+
+/// Granular consent клиента на обработку определённого scope (#142).
+/// 152-ФЗ ст. 9: для каждой категории ПДн — отдельное явное согласие.
+///
+/// Один активный (revokedAt IS NULL) consent на пару (clientId, type) — обеспечивается
+/// partial unique index в миграции (Prisma ещё не поддерживает partial unique нативно).
+/// При отзыве revokedAt заполняется; новое согласие — отдельная запись (история сохраняется
+/// как audit-trail для проверок Роскомнадзора 152-ФЗ ст. 14).
+///
+/// scope JSONB шейп:
+/// - pdn: `{}` (просто маркер что консент дан)
+/// - photo_video: `{level: 1|2|3|4, useName?: boolean}` см. PHOTO_VIDEO.md
+/// - geo: `{modes: ('A'|'B'|'C'|'D')[]}` см. GEO.md
+/// - emergency_contacts: `{allowed: boolean}` см. EMERGENCY_CONTACTS.md
+///
+/// version — формат '<DATE>-v<N>', например '2026-04-25-v1'. Меняется при правке
+/// шаблона текста в docs/LEGAL/CONSENTS/. Сохраняем версию для каждого consent'а
+/// чтобы в случае спора показать какой именно текст подписал клиент.
+model Consent {
+  id        String      @id @default(uuid()) @db.Uuid
+  clientId  String      @map("client_id") @db.Uuid
+  type      ConsentType
+  scope     Json
+  /// Версия текста согласия на момент grant'а (snapshot для аудита 152-ФЗ).
+  version   String
+  grantedAt DateTime    @default(now()) @map("granted_at")
+  /// NULL = активен. После отзыва — заполняется (audit-trail сохраняется).
+  revokedAt DateTime?   @map("revoked_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, type], map: "idx_consents_client_type")
+  @@index([clientId, revokedAt], map: "idx_consents_client_active")
+  @@map("consents")
 }
 
 /// Персональные данные туриста. ПДн в смысле 152-ФЗ.
