@@ -23,6 +23,7 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { EMAIL_PROVIDER, type EmailProvider } from './providers/email.provider';
+import { PushService } from './push/push.service';
 import { TemplateService } from './template.service';
 import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -38,6 +39,23 @@ export interface SendInput {
   userId?: string;
 }
 
+/**
+ * Push payload — короткое уведомление в браузер/устройство.
+ *
+ * `title` + `body` — отображается в нотификации.
+ * `url` — куда вести при клике (default '/').
+ * `tag` — для группировки (один tag → одна notification, не стек). Удобно для
+ * сценариев типа «обновился статус trip» — каждый trip имеет свой tag, новая
+ * push заменяет старую вместо стека.
+ */
+export interface SendPushInput {
+  userId: string;
+  title: string;
+  body: string;
+  url?: string;
+  tag?: string;
+}
+
 @Injectable()
 export class NotifyService {
   private readonly logger = new Logger(NotifyService.name);
@@ -47,11 +65,14 @@ export class NotifyService {
     private readonly outbox: OutboxService,
     private readonly templates: TemplateService,
     @Inject(EMAIL_PROVIDER) private readonly emailProvider: EmailProvider,
+    private readonly push: PushService,
   ) {}
 
   async send(input: SendInput): Promise<{ notificationId: string }> {
     if (input.channel !== 'email') {
-      throw new NotFoundException(`Channel "${input.channel}" пока не реализован (#163/#164/#165)`);
+      throw new NotFoundException(
+        `Channel "${input.channel}" в .send() не поддерживается. Для push используйте .sendPush(); для sms/telegram — отдельные методы (#164/#165)`,
+      );
     }
     if (!this.templates.exists(input.templateId)) {
       throw new NotFoundException(`Template "${input.templateId}" не найден`);
@@ -136,5 +157,103 @@ export class NotifyService {
       // основного business flow.
       throw err;
     }
+  }
+
+  /**
+   * Отправить push на ВСЕ активные устройства user'а.
+   *
+   * Создаёт ОДНУ Notification запись (агрегат "интент уведомить"), независимо
+   * от того сколько device-subscription'ов было затронуто. Детализация
+   * delivery/expired счётчиков — в логах PushService.sendToUser + outbox-event
+   * comm.message.sent.
+   *
+   * Returns sent/failed/expired counters — caller может решить что делать
+   * (например, если sent=0 → ескалировать через email).
+   *
+   * Best-effort: не throw'ит на отдельных device failures. Throw только при
+   * полном сбое DB (не должен возникать).
+   */
+  async sendPush(input: SendPushInput): Promise<{
+    notificationId: string;
+    sent: number;
+    failed: number;
+    expired: number;
+  }> {
+    const notification = await this.prisma.notification.create({
+      data: {
+        channel: 'push',
+        // recipient у push — это userId (не email/phone). Для аналитики достаточно.
+        recipient: input.userId,
+        templateId: 'push:inline', // нет template-системы для push в V1 — title/body передаются inline
+        payload: {
+          title: input.title,
+          body: input.body,
+          ...(input.url !== undefined ? { url: input.url } : {}),
+          ...(input.tag !== undefined ? { tag: input.tag } : {}),
+        },
+        status: 'pending',
+        userId: input.userId,
+      },
+      select: { id: true },
+    });
+
+    const result = await this.push.sendToUser(input.userId, {
+      title: input.title,
+      body: input.body,
+      ...(input.url !== undefined ? { url: input.url } : {}),
+      ...(input.tag !== undefined ? { tag: input.tag } : {}),
+    });
+
+    // Status: sent если хоть один device получил, failed если все провалились
+    // (вкл. expired). pending → для случая sent=0+failed=0+expired=0 (нет subs).
+    const finalStatus =
+      result.sent > 0 ? 'sent' : result.failed + result.expired > 0 ? 'failed' : 'pending';
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.notification.update({
+        where: { id: notification.id },
+        data: {
+          status: finalStatus,
+          ...(finalStatus === 'sent' ? { sentAt: new Date() } : {}),
+          ...(finalStatus === 'failed' ? { failedAt: new Date() } : {}),
+        },
+      });
+
+      if (finalStatus === 'sent') {
+        await this.outbox.add(tx, {
+          type: 'comm.message.sent',
+          schemaVersion: 1,
+          actor: { type: 'system' },
+          payload: {
+            notificationId: notification.id,
+            channel: 'push',
+            templateId: 'push:inline',
+            // recipient НЕ публикуем (privacy)
+            providerMessageId: `push:${result.sent}/${result.sent + result.failed + result.expired}`,
+            userId: input.userId,
+          },
+        });
+      } else if (finalStatus === 'failed') {
+        await this.outbox.add(tx, {
+          type: 'comm.message.failed',
+          schemaVersion: 1,
+          actor: { type: 'system' },
+          payload: {
+            notificationId: notification.id,
+            channel: 'push',
+            templateId: 'push:inline',
+            errorMessage: `failed=${result.failed}, expired=${result.expired}`,
+            userId: input.userId,
+          },
+        });
+      }
+    });
+
+    this.logger.log(
+      { notificationId: notification.id, userId: input.userId, ...result, status: finalStatus },
+      finalStatus === 'sent' ? 'comm.push.sent' : 'comm.push.no-devices-or-failed',
+    );
+
+    return { notificationId: notification.id, ...result };
   }
 }
