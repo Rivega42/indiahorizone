@@ -76,22 +76,40 @@ Backend slices status:
 | **A** Bootstrap | Prisma + Redis + outbox + idempotency + pino + OTel + Prometheus | ✅ DONE |
 | **B** Auth | register/login/JWT/refresh/logout/RBAC/2FA enroll+verify/password-reset/suspicious-detection | ✅ DONE (только #137 Playwright e2e ждёт frontend 2FA UI) |
 | **C** Clients | Client + ClientProfile + AES-256-GCM encryption + GET/PATCH /me + Consent (4 типа granular) + EmergencyContact CRUD | ✅ DONE (только #141 passport ждёт media endpoints) |
-| **D** Trips | Trip+Itinerary+DayPlan+Booking schema + POST /trips + itinerary versioning + publish + GET | 🟢 99% (только #160 status transitions ждёт finance.payment.received event) |
-| **E** Comm | comm-svc base + email-провайдер + welcome + chat schema + REST + WebSocket gateway + notification preferences (4 категории) + suspicious-login email | ✅ DONE |
+| **D** Trips | Trip+Itinerary+DayPlan+Booking schema + POST /trips + itinerary versioning + publish + GET + status state-machine + payment listener + cron auto-transitions | ✅ DONE (#160, #361, #364) |
+| **E** Comm | comm-svc base + email-провайдер + welcome + chat schema + REST + WebSocket gateway + notification preferences (4 категории) + suspicious-login email + **PushSubscription model + POST /comm/push/subscribe + LogPushProvider stub (#163 phase 1)** | 🟢 95% (real WebPushProvider ждёт VAPID #353) |
 | **F** Media | MediaAsset schema + S3 client wrapper (R2/Beget/MinIO compatible) | 🟡 schema готов, endpoints (#174-178) ждут Beget creds (#350) |
 | **G** Feedback | FeedbackRequest + Feedback schema + POST/GET endpoints + outbox event | ✅ DONE (только #189 AI signals enrichment ждёт LLM-флоу) |
 | **K** Cross-cut | append-only audit log + admin GET /audit + rate-limit (4 профиля) + pino + OTel + Prometheus | 🟢 95% (только #220 Vault, #224 Grafana — devops) |
 
-Всего за апрель 2026: **18+ PR'ов merged, 30+ issues закрыто, ~6000 строк production-кода**.
+Всего за апрель 2026: **25+ PR'ов merged, 35+ issues закрыто, ~7000 строк production-кода**.
 
-### Что блокирует frontend / production
+### Frontend (Tour Landing + onboarding) — 28 апреля 2026
 
-- **Email отправка**: ждёт credentials (#349 Mailgun/Yandex/Postmark) — пока работает в LogProvider stub
+| Что | Статус | Issue |
+|---|---|---|
+| `/tours/[slug]` route + ISR + generateStaticParams | ✅ DONE | #298 |
+| Hero + Facts + DayTimeline + Inclusions + Reviews + PriceBlock + FAQ + FooterLegal — все секции | ✅ DONE (inline в page.tsx) | #299–#306 |
+| LeadForm с consent чекбоксом ПДн | ✅ DONE | #304 |
+| Catalog API `GET /tours` + `GET /tours/:slug` | ✅ DONE | #296 |
+| SEO — Schema.org TouristTrip + FAQPage + Open Graph + Twitter + robots.txt + sitemap.xml + Yandex-verification | ✅ DONE | #308 |
+| `/privacy` + `/consent` + `/offer` legal страницы (DRAFT, требуют юр.review) | ✅ DRAFT | #307 |
+| Performance: next/image для hero+timeline, dynamic import LeadForm, AVIF/WebP | ✅ DONE | #309 (Lighthouse-замер ждёт deploy) |
+| PWA manifest + Service Worker + iOS-friendly icons | ✅ DONE | #122 |
+| iOS PWA push prompt (usePushSupport hook + IosInstallInstructions + EnableNotificationsButton) | ✅ DONE | #356 |
+| Auth UI (login/register) | ✅ DONE | #135 |
+| Дизайн D1-D7 для Tour Landing | ⏳ В работе (Claude Design) | #312–#318 |
+| Trip Dashboard frontend | ⏳ Не начато | #152–#161 |
+| 2FA enroll / chat UI | ⏳ Не начато | #170 |
+
+### Что блокирует production
+
+- **Email отправка**: ждёт credentials (#349 Mailgun**ER** / Yandex / Postmark) — пока работает в LogProvider stub
 - **Media upload**: ждёт Beget Object Storage creds (#350)
-- **Push notifications**: ждёт Firebase project (#353)
+- **Push notifications real delivery**: ждёт VAPID keys (#353 Firebase) — pipeline уже ready (LogPushProvider stub)
 - **APNs / iOS native**: фаза 4 (требует Apple Developer $99/year)
-- **Frontend / UI**: дизайн D1-D7 для tour landing (#312-318) + Trip Dashboard frontend (#152-#161) + 2FA / chat UI (#170)
-- **Vault/KMS** (#220), **Grafana dashboards** (#224) — devops Вика
+- **Юридические тексты в /privacy /consent**: ждут юр.review (Roman + юрист)
+- **Vault/KMS** (#220), **Grafana dashboards** (#224), **Lighthouse CI** — devops Вика
 
 ### M6: Growth & Optional
 Программа лояльности (см. [`docs/LOYALTY/`](../LOYALTY/)), GDPR (если нужно), OpenAPI, traces, расширения дашборда (гайды/утилиты/соц/сервис).
