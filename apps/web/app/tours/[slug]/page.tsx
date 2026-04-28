@@ -15,15 +15,20 @@ import {
   Waves,
   X,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
-
-import { LeadForm } from './lead-form';
 
 import type { ActivityKind, Tour } from '@/lib/mock/tours';
 import type { Metadata } from 'next';
 
 import { getTourBySlug, listTourSlugs } from '@/lib/api/tours';
 import { buildFaqPageJsonLd, buildTouristTripJsonLd } from '@/lib/seo/tour-jsonld';
+
+// LeadForm — below-the-fold (#price-block). Динамический импорт убирает
+// axios + react-hook-form клиент-бандл из initial JS, ускоряя LCP/INP.
+// SSR=true сохраняет HTML pre-render → нет layout shift при гидратации.
+const LeadForm = dynamic(() => import('./lead-form').then((mod) => ({ default: mod.LeadForm })));
 
 export const revalidate = 3600;
 
@@ -148,9 +153,19 @@ function Hero({ tour }: { tour: Tour }): React.ReactElement {
 
   return (
     <section className="relative min-h-[100svh] overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${tour.heroPosterUrl})` }}
+      {/*
+        Hero LCP-image (#309): next/image с priority + fill для responsive cover.
+        sizes="100vw" — занимает всю ширину viewport. AVIF/WebP отдаются автоматически
+        Next.js'ом через /\_next/image route. priority=true → preload-link в head'е,
+        не lazy-loaded.
+      */}
+      <Image
+        src={tour.heroPosterUrl}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
         aria-hidden
       />
       <div
@@ -307,12 +322,16 @@ function DayTimeline({ tour }: { tour: Tour }): React.ReactElement {
                 />
               </summary>
               <div className="grid gap-6 px-5 pb-6 sm:grid-cols-2 sm:px-6">
-                <div
-                  className="aspect-[16/9] rounded-xl bg-cover bg-center"
-                  style={{ backgroundImage: `url(${day.imageUrl})` }}
-                  aria-label={`Фото: ${day.location}`}
-                  role="img"
-                />
+                <div className="relative aspect-[16/9] overflow-hidden rounded-xl">
+                  <Image
+                    src={day.imageUrl}
+                    alt={`Фото: ${day.location}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    loading="lazy"
+                    className="object-cover"
+                  />
+                </div>
                 <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
                   {day.description}
                 </p>
