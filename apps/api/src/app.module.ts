@@ -13,6 +13,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { CommModule } from './modules/comm/comm.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 import { HealthModule } from './modules/health/health.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { TripsModule } from './modules/trips/trips.module';
@@ -35,6 +36,7 @@ import { TripsModule } from './modules/trips/trips.module';
     LeadsModule,
     TripsModule,
     CommModule,
+    FeedbackModule,
     AuditModule,
     CommonAuthModule, // глобальный JwtAuthGuard, требует AuthModule (JwtTokenService)
     HealthModule,
