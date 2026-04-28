@@ -1,3 +1,8 @@
+// КРИТИЧНО: tracing/init ДОЛЖЕН быть импортирован ПЕРВЫМ —
+// до любых других модулей, которые нужно инструментировать (#223).
+// SDK no-op если OTEL_EXPORTER_OTLP_ENDPOINT не задан.
+import './common/tracing/init';
+
 import 'reflect-metadata';
 
 import { ValidationPipe } from '@nestjs/common';
