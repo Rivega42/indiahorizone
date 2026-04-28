@@ -7,6 +7,7 @@ import { EventsBusModule } from './common/events-bus/events-bus.module';
 import { OutboxModule } from './common/outbox/outbox.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { RedisModule } from './common/redis/redis.module';
+import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ClientsModule } from './modules/clients/clients.module';
@@ -30,6 +31,7 @@ import { TripsModule } from './modules/trips/trips.module';
     CatalogModule,
     LeadsModule,
     TripsModule,
+    AuditModule,
     CommonAuthModule, // глобальный JwtAuthGuard, требует AuthModule (JwtTokenService)
     HealthModule,
   ],
