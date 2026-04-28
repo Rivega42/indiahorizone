@@ -17,7 +17,7 @@ CREATE TABLE "push_subscriptions" (
   "last_seen_at"  TIMESTAMP(3),
   "deleted_at"    TIMESTAMP(3),
   "created_at"    TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at"    TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at"    TIMESTAMP(3) NOT NULL,
 
   CONSTRAINT "push_subscriptions_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "push_subscriptions_user_fk" FOREIGN KEY ("user_id")
