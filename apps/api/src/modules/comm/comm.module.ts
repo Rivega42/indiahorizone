@@ -35,8 +35,9 @@ import { LogEmailProvider } from './providers/log-email.provider';
 import { SmtpEmailProvider } from './providers/smtp-email.provider';
 import { LogPushProvider } from './push/log-push.provider';
 import { PushController } from './push/push.controller';
-import { PUSH_PROVIDER } from './push/push.provider';
+import { PUSH_PROVIDER, type PushProvider } from './push/push.provider';
 import { PushService } from './push/push.service';
+import { WebPushProvider } from './push/web-push.provider';
 import { TemplateService } from './template.service';
 import { EventsBusModule } from '../../common/events-bus/events-bus.module';
 import { PrismaModule } from '../../common/prisma/prisma.module';
@@ -72,11 +73,25 @@ import { AuthModule } from '../auth/auth.module';
     },
     PushService,
     LogPushProvider,
+    WebPushProvider,
     {
-      // Push provider: пока только log-stub. Когда VAPID keys будут готовы (#353)
-      // — добавить WebPushProvider (через `web-push` npm) и переключать через env.
+      // Push provider: WebPushProvider если VAPID_PRIVATE_KEY задан, иначе
+      // LogPushProvider (dev fallback). VAPID-ключи генерируются один раз
+      // через `pnpm --filter @indiahorizone/api exec web-push generate-vapid-keys`
+      // и кладутся в Vault (см. .env.example).
+      //
+      // Frontend получает VAPID_PUBLIC_KEY как NEXT_PUBLIC_VAPID_PUBLIC_KEY —
+      // это публично, утечка не страшна. VAPID_PRIVATE_KEY — только backend.
       provide: PUSH_PROVIDER,
-      useExisting: LogPushProvider,
+      inject: [ConfigService, WebPushProvider, LogPushProvider],
+      useFactory: (
+        config: ConfigService,
+        webPush: WebPushProvider,
+        log: LogPushProvider,
+      ): PushProvider => {
+        const privateKey = config.get<string>('VAPID_PRIVATE_KEY');
+        return privateKey ? webPush : log;
+      },
     },
     WelcomeEmailListener,
     SuspiciousLoginListener,
