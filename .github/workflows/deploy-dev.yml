@@ -65,9 +65,13 @@ jobs:
             git checkout "$BRANCH"
             git reset --hard "origin/$BRANCH"
 
-            echo "→ rebuilding indiahorizone-web-dev"
+            echo "→ rebuilding containers"
             cd /opt/indiahorizone
-            docker compose -f docker-compose.dev.yml up -d --build web
+            docker compose --env-file .env -f docker-compose.dev.yml up -d --build api web
+
+            echo "→ running migrations"
+            docker compose --env-file .env -f docker-compose.dev.yml run --rm api \
+              sh -c 'cd /app/apps/api && /app/apps/api/node_modules/.bin/prisma migrate deploy' || true
 
             echo "→ wait for healthy (max 60s)"
             for i in $(seq 1 12); do
