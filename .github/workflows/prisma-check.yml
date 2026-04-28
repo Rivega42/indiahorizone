@@ -1,0 +1,106 @@
+name: Prisma Schema Check
+
+# Запускается только когда PR трогает Prisma-файлы.
+# Цель: поймать расхождение schema.prisma ↔ migrations ДО merge в main.
+# Контекст: hotfix #335 (missing sessions migration) стоил ~2 часов — этот guard
+# делает такое невозможным.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/api/prisma/schema.prisma'
+      - 'apps/api/prisma/migrations/**'
+
+concurrency:
+  group: prisma-check-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: '9.12.0'
+  NODE_VERSION: '20'
+
+jobs:
+  prisma-drift:
+    name: Schema ↔ Migrations in sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      # Ставим только зависимости api (включает Prisma CLI)
+      - name: Install api dependencies
+        run: pnpm install --frozen-lockfile --filter "@indiahorizone/api..."
+
+      # Применяем все миграции к чистой БД
+      - name: Apply migrations
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test?schema=public
+        working-directory: apps/api
+        run: pnpm exec prisma migrate deploy
+
+      # Сравниваем schema.prisma против примёненных миграций.
+      # exit 0 = в синке, exit 2 = дрифт (новые таблицы/поля в schema без migration).
+      # Если дрифт — выводим понятный текст и фейлим CI.
+      - name: Check schema ↔ migrations drift
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test?schema=public
+        working-directory: apps/api
+        run: |
+          echo "Comparing schema.prisma against applied migrations..."
+          if ! pnpm exec prisma migrate diff \
+            --from-migrations prisma/migrations \
+            --to-schema-datamodel prisma/schema.prisma \
+            --exit-code; then
+            echo ""
+            echo "❌ Schema drift detected!"
+            echo ""
+            echo "schema.prisma содержит изменения, для которых нет миграции."
+            echo "Скорее всего ты добавил модель/поле в schema.prisma, но забыл"
+            echo "запустить: pnpm --filter @indiahorizone/api db:migrate:dev"
+            echo ""
+            echo "Как исправить:"
+            echo "  cd apps/api"
+            echo "  pnpm exec prisma migrate dev --name <описание_изменения>"
+            echo "  git add prisma/migrations"
+            echo "  git commit -m 'feat(db): add migration for ...'"
+            exit 2
+          fi
+          echo "✅ Schema and migrations are in sync"
+
+      # Дополнительно: валидация синтаксиса schema.prisma (1 секунда, ловит опечатки)
+      - name: Validate schema syntax
+        working-directory: apps/api
+        run: |
+          echo "Validating schema.prisma syntax..."
+          pnpm exec prisma validate
+          echo "✅ Schema syntax is valid"
