@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Maskable icon (Android adaptive). Safe area = 80% центра (40% padding со всех сторон),
+  чтобы при кропе ОС иконка оставалась читаемой.
+  Здесь логотип в центре 60% canvas, остальное — saffron-фон.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#e07a3c"/>
+  <text x="256" y="316" font-family="Georgia, 'Playfair Display', serif" font-size="160" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">IH</text>
+</svg>

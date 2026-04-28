@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Apple Touch Icon (180x180). iOS использует для «Добавить на главный экран».
+  Без rounded corners — iOS сам обрезает до своего radius (corner-radius).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <rect width="180" height="180" fill="#e07a3c"/>
+  <text x="90" y="112" font-family="Georgia, 'Playfair Display', serif" font-size="80" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">IH</text>
+</svg>
