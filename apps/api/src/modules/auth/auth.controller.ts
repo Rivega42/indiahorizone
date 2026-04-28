@@ -7,6 +7,7 @@ import {
   Ip,
   Post,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 
 
 import { LoginDto } from './dto/login.dto';
@@ -17,13 +18,19 @@ import { LoginService } from './services/login.service';
 import { LogoutService } from './services/logout.service';
 import { RefreshService } from './services/refresh.service';
 import { CurrentUser, Public } from '../../common/auth/decorators';
+import { THROTTLE_PROFILE } from '../../common/throttle/throttle.config';
 
 import type { LoginResponse } from './dto/login.dto';
 import type { RefreshResponse } from './dto/refresh.dto';
 import type { RegisterResponse } from './dto/register.dto';
 import type { AuthenticatedUser } from '../../common/auth/types';
 
+/**
+ * Rate-limit (#221): на /auth/* применяется профиль `auth` (10/min/IP).
+ * IP-based чтобы атакующий не мог обойти лимит через смену email.
+ */
 @Controller('auth')
+@Throttle({ [THROTTLE_PROFILE.auth]: { limit: 10, ttl: 60_000 } })
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
