@@ -27,6 +27,7 @@ import { EMAIL_PROVIDER, type EmailProvider } from './providers/email.provider';
 import { LogEmailProvider } from './providers/log-email.provider';
 import { SmtpEmailProvider } from './providers/smtp-email.provider';
 import { TemplateService } from './template.service';
+import { SuspiciousLoginListener } from './listeners/suspicious-login.listener';
 import { WelcomeEmailListener } from './listeners/welcome.listener';
 import { EventsBusModule } from '../../common/events-bus/events-bus.module';
 import { PrismaModule } from '../../common/prisma/prisma.module';
@@ -55,6 +56,7 @@ import { PrismaModule } from '../../common/prisma/prisma.module';
       },
     },
     WelcomeEmailListener,
+    SuspiciousLoginListener,
   ],
   exports: [NotifyService],
 })

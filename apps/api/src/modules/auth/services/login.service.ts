@@ -3,6 +3,7 @@ import { UserStatus, type UserRole } from '@prisma/client';
 
 import { JwtTokenService } from './jwt.service';
 import { PasswordService } from './password.service';
+import { SuspiciousLoginDetector } from './suspicious-login.detector';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { TwoFaChallengeService } from '../two-fa/two-fa-challenge.service';
@@ -37,6 +38,7 @@ export class LoginService {
     private readonly password: PasswordService,
     private readonly jwt: JwtTokenService,
     private readonly twoFaChallenge: TwoFaChallengeService,
+    private readonly suspicious: SuspiciousLoginDetector,
   ) {}
 
   async login(
@@ -157,6 +159,12 @@ export class LoginService {
     const access = this.jwt.signAccess({ userId: user.id, sessionId, role: user.role });
 
     this.logger.log({ userId: user.id, sessionId }, 'auth.user.logged_in');
+
+    // Suspicious-detection (#136) — soft-signal, не блокирует login.
+    // Async fire-and-log: ошибки детектора не должны влиять на UX login'а.
+    void this.suspicious.check(user.id, sessionId, context).catch((err: unknown) => {
+      this.logger.warn({ err, userId: user.id }, 'suspicious-detector.failed');
+    });
 
     return {
       accessToken: access,
