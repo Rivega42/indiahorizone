@@ -41,7 +41,7 @@ datasource db {
 /// Это гарантия, что события не потеряются при rollback'нутой транзакции, и не
 /// появятся при failed publish'е — основная гигиена event-driven систем.
 model OutboxEntry {
-  id            String    @id @default(uuid()) @db.Uuid
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Тип события: <service>.<entity>.<verb>, например "auth.user.registered"
   eventType     String    @map("event_type")
   /// Версия схемы payload (DomainEvent.schemaVersion)
@@ -157,7 +157,7 @@ enum UserStatus {
 /// (имя, паспорт, preferences) — отдельная сущность Client в модуле clients
 /// (#138), привязка через userId без FK.
 model User {
-  id           String     @id @default(uuid()) @db.Uuid
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Email lowercased (приведение в коде на уровне приложения).
   /// Unique с case-insensitive collation в Postgres (citext или lower-index).
   email        String     @unique
@@ -191,7 +191,7 @@ model User {
 ///
 /// Cross-module FK на User ОК (тот же модуль auth, единая extraction unit).
 model RecoveryCode {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String    @map("user_id") @db.Uuid
   /// argon2id(plaintext_code). Plaintext НИКОГДА не хранится.
   codeHash  String    @map("code_hash")
@@ -216,7 +216,7 @@ model RecoveryCode {
 ///
 /// Cross-module FK на User OK (тот же модуль auth).
 model PasswordResetToken {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String    @map("user_id") @db.Uuid
   /// argon2id(plain_token). Plain никогда не хранится.
   tokenHash String    @map("token_hash")
@@ -244,7 +244,7 @@ model PasswordResetToken {
 /// userId — soft-reference на users.id (без FK, cross-module policy).
 /// Один User → один Client (unique constraint на userId).
 model Client {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Soft-reference на users.id. Без FK (cross-module policy).
   userId    String   @unique @map("user_id") @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
@@ -291,7 +291,7 @@ enum ConsentType {
 /// шаблона текста в docs/LEGAL/CONSENTS/. Сохраняем версию для каждого consent'а
 /// чтобы в случае спора показать какой именно текст подписал клиент.
 model Consent {
-  id        String      @id @default(uuid()) @db.Uuid
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   clientId  String      @map("client_id") @db.Uuid
   type      ConsentType
   scope     Json
@@ -328,7 +328,7 @@ enum EmergencyContactPriority {
 ///
 /// Cross-module FK на Client OK (один модуль clients).
 model EmergencyContact {
-  id        String                   @id @default(uuid()) @db.Uuid
+  id        String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   clientId  String                   @map("client_id") @db.Uuid
   /// Зашифровано (#139). plaintext: ФИО контакта.
   name      String
@@ -358,7 +358,7 @@ model EmergencyContact {
 /// потому что encrypted-payload — base64-строка, не date/etc.
 /// preferences — свободный JSONB (языки, диеты, хобби).
 model ClientProfile {
-  id             String   @id @default(uuid()) @db.Uuid
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   clientId       String   @unique @map("client_id") @db.Uuid
   /// Зашифровано (#139). plaintext: ФИО.
   firstName      String?  @map("first_name")
@@ -394,7 +394,7 @@ model ClientProfile {
 /// если revokedAt уже стоит, и снова приходит запрос → атака → invalidate
 /// все сессии user'а.
 model Session {
-  id               String    @id @default(uuid()) @db.Uuid
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId           String    @map("user_id") @db.Uuid
   /// argon2id-хеш refresh-токена. По нему verify при /auth/refresh.
   refreshTokenHash String    @map("refresh_token_hash")
@@ -439,7 +439,7 @@ enum TourStatus {
 /// Поля costInr* в TourDay — internal (не отдаются в публичный API), для
 /// расчёта маржи и аналитики. См. CatalogService DTO mapping.
 model Tour {
-  id            String     @id @default(uuid()) @db.Uuid
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// URL slug, например "tury-kerala-oktyabr-2026". РУ-транслит + сезон.
   slug          String     @unique
   status        TourStatus @default(DRAFT)
@@ -482,7 +482,7 @@ model Tour {
 /// costInr* — internal, для аналитики маржи; в публичный API НЕ отдаётся
 /// (исключаем в CatalogService DTO mapping). См. spec в issue #296.
 model TourDay {
-  id          String  @id @default(uuid()) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tourId      String  @map("tour_id") @db.Uuid
   /// 1..durationDays. Уникален в рамках тура.
   dayNumber   Int     @map("day_number")
@@ -513,7 +513,7 @@ model TourDay {
 /// Медиа-ассеты тура: фото, видео, в будущем — кружки-отзывы (V2 после #142
 /// Consent). Order — для порядка отображения в галереях.
 model TourMedia {
-  id      String  @id @default(uuid()) @db.Uuid
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tourId  String  @map("tour_id") @db.Uuid
   /// 'photo' | 'video' | 'circle-review' (последнее — после Consent #142).
   kind    String
@@ -555,7 +555,7 @@ enum LeadStatus {
 /// status workflow: NEW → CONTACTED → CONVERTED|REJECTED. Переходы делает
 /// менеджер через будущую CRM (EPIC 14). До этого — все Lead'ы NEW.
 model Lead {
-  id                 String     @id @default(uuid()) @db.Uuid
+  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Источник заявки. Свободный slug:
   /// - "tour-tury-kerala-oktyabr-2026" — кнопка с tour landing page
   /// - "general" — общая форма с главной (когда будет)
@@ -636,7 +636,7 @@ enum BookingStatus {
 /// totalAmount/currency — итог цены тура для клиента (RUB по умолчанию).
 /// Для маржи — агрегируем Booking.amount в INR (см. будущий margin-report).
 model Trip {
-  id          String     @id @default(uuid()) @db.Uuid
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Soft-reference на clients.id (cross-module).
   clientId    String     @map("client_id") @db.Uuid
   status      TripStatus @default(draft)
@@ -672,7 +672,7 @@ model Trip {
 /// 1. Аудита (что показывали клиенту до правки)
 /// 2. Offline-cache: клиент может видеть старую version'у пока не синхронизировал
 model Itinerary {
-  id          String    @id @default(uuid()) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tripId      String    @map("trip_id") @db.Uuid
   version     Int       @default(1)
   /// NULL = draft. Set при publish'е.
@@ -700,7 +700,7 @@ model Itinerary {
 /// Активности из tour'а (catalog domain) сюда копируются как snapshot —
 /// чтобы trip dashboard не зависел от изменений в каталоге после publish.
 model DayPlan {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   itineraryId String   @map("itinerary_id") @db.Uuid
   dayNumber   Int      @map("day_number")
   /// Конкретная дата дня (в отличие от TourDay где относительный dayNumber).
@@ -731,7 +731,7 @@ model DayPlan {
 /// pending → failed (vendor отказал, нужно переоформить)
 /// confirmed → cancelled (отменено клиентом / нами).
 model Booking {
-  id        String        @id @default(uuid()) @db.Uuid
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tripId    String        @map("trip_id") @db.Uuid
   type      BookingType
   /// Свободный string. Внешний vendor identifier.
@@ -793,7 +793,7 @@ enum ChatThreadStatus {
 /// переписок при reopened sales-deal'е). Если важно — добавим partial unique
 /// `(kind, subject_id) WHERE status='open'` в отдельной миграции.
 model ChatThread {
-  id           String           @id @default(uuid()) @db.Uuid
+  id           String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   kind         ChatThreadKind
   /// Soft-reference на основной объект:
   /// - kind=trip  → Trip.id
@@ -801,7 +801,7 @@ model ChatThread {
   /// - kind=sales → Lead.id (модель из #297)
   subjectId    String           @map("subject_id") @db.Uuid
   /// Массив user.id (UUID) — soft-refs на User. cross-module policy.
-  participants String[]         @default([])
+  participants String[]         @default([]) @db.Uuid
   status       ChatThreadStatus @default(open)
   createdAt    DateTime         @default(now()) @map("created_at")
   updatedAt    DateTime         @updatedAt @map("updated_at")
@@ -823,14 +823,14 @@ model ChatThread {
 /// String[] — без FK, без валидации существования asset'а на schema-уровне.
 /// Service будет проверять при write (когда media-svc появится).
 model ChatMessage {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   threadId    String   @map("thread_id") @db.Uuid
   /// Soft-reference на users.id. cross-module policy.
   fromUserId  String   @map("from_user_id") @db.Uuid
   /// Plain-text сообщение. Markdown rendering на клиенте (V2).
   body        String
   /// MediaAsset.id (UUID) массив. Поддержка после #173.
-  attachments String[] @default([])
+  attachments String[] @default([]) @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at")
   /// JSONB: { "<userId>": "<ISO timestamp>" }. Кто и когда прочитал.
   /// `{}` = ещё никто (включая отправителя — отправка ≠ чтение).
@@ -884,7 +884,7 @@ enum NotificationStatus {
 /// userId опционален — для transactional notifications привязан к юзеру,
 /// для marketing/system без user'а.
 model Notification {
-  id           String              @id @default(uuid()) @db.Uuid
+  id           String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   channel      NotificationChannel
   /// email-address / E.164 phone / FCM-token / Telegram chat_id.
   recipient    String
@@ -931,12 +931,12 @@ enum NotificationCategory {
 /// Если row отсутствует — используются defaults (см. NotificationPreferencesService).
 /// SOS preferences нельзя disable — service enforces.
 model NotificationPreference {
-  id        String                @id @default(uuid()) @db.Uuid
+  id        String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Soft-reference на User.
   userId    String                @map("user_id") @db.Uuid
   category  NotificationCategory
   /// Каналы доставки. Пустой = silent для категории. SOS всегда [all 4].
-  channels  NotificationChannel[]
+  channels  NotificationChannel[] @default([])
   enabled   Boolean               @default(true)
   updatedAt DateTime              @updatedAt @map("updated_at")
 
@@ -985,7 +985,7 @@ enum MediaAssetStatus {
 /// Storage: bucket private, SSE-S3 server-side encryption. Доступ к содержимому
 /// — только через signed URLs (#177) с TTL.
 model MediaAsset {
-  id        String           @id @default(uuid()) @db.Uuid
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Soft-ref на User.id — кто загрузил.
   ownerId   String           @map("owner_id") @db.Uuid
   kind      MediaAssetKind
@@ -1021,7 +1021,7 @@ model MediaAsset {
 /// Если клиент НЕ отвечает в течение expiresAt — feedback считается пропущенным
 /// (но не критично; signal используется для retention-аналитики).
 model FeedbackRequest {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Soft-reference на Trip.id (cross-module).
   tripId      String   @map("trip_id") @db.Uuid
   /// 1..durationDays. Один request на (trip, dayNumber).
@@ -1074,7 +1074,7 @@ enum FeedbackMood {
 /// signals JSONB — обогащение через AI-аналитику в #189 (sentiment, topics,
 /// keywords). Сейчас пустой объект `{}`.
 model Feedback {
-  id        String        @id @default(uuid()) @db.Uuid
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Опционально — ссылка на FeedbackRequest. NULL = спонтанный feedback.
   requestId String?       @map("request_id") @db.Uuid
   /// Soft-reference на Trip.id (cross-module).
@@ -1131,7 +1131,7 @@ enum PushPlatform {
 /// Удаление: soft-delete через deletedAt — сохраняем для аудита (compliance).
 /// При expired endpoint (410 Gone от провайдера) — помечаем deletedAt = now.
 model PushSubscription {
-  id           String       @id @default(uuid()) @db.Uuid
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String       @map("user_id") @db.Uuid
   platform     PushPlatform @default(web)
   /// W3C Web Push endpoint URL — длинный (300-500 chars типично). Для
