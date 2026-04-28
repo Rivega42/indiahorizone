@@ -32,7 +32,7 @@ export class HealthController {
     return {
       status: 'ok',
       uptime: process.uptime(),
-      version: process.env.npm_package_version ?? '0.0.0',
+      version: process.env['npm_package_version'] ?? '0.0.0',
       timestamp: new Date().toISOString(),
     };
   }

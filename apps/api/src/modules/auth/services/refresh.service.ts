@@ -51,7 +51,7 @@ export class RefreshService {
 
   async refresh(
     dto: RefreshDto,
-    context: { ip?: string; userAgent?: string },
+    context: { ip?: string | undefined; userAgent?: string | undefined },
   ): Promise<RefreshResponse> {
     const parsed = this.jwt.parseRefresh(dto.refreshToken);
     if (!parsed) {
@@ -112,8 +112,8 @@ export class RefreshService {
         data: {
           userId: session.userId,
           refreshTokenHash: newRefreshHash,
-          ip: context.ip,
-          userAgent: context.userAgent,
+          ip: context.ip ?? null,
+          userAgent: context.userAgent ?? null,
           expiresAt: newRefresh.expiresAt,
         },
         select: { id: true },
@@ -165,7 +165,7 @@ export class RefreshService {
   private async handleReuseAttempt(
     userId: string,
     suspiciousSessionId: string,
-    context: { ip?: string; userAgent?: string },
+    context: { ip?: string | undefined; userAgent?: string | undefined },
   ): Promise<void> {
     this.logger.warn(
       {

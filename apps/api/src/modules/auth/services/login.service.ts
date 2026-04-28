@@ -39,7 +39,7 @@ export class LoginService {
 
   async login(
     dto: LoginDto,
-    context: { ip?: string; userAgent?: string },
+    context: { ip?: string | undefined; userAgent?: string | undefined },
   ): Promise<LoginResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -82,8 +82,8 @@ export class LoginService {
         data: {
           userId: user.id,
           refreshTokenHash: refreshHash,
-          ip: context.ip,
-          userAgent: context.userAgent,
+          ip: context.ip ?? null,
+          userAgent: context.userAgent ?? null,
           expiresAt: refresh.expiresAt,
         },
         select: { id: true },
