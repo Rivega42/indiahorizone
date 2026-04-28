@@ -94,39 +94,38 @@ interface DomainEvent<T> {
 
 ### auth-svc
 
-| Type | Когда | Payload |
-|---|---|---|
-| `auth.user.registered` | После register | `{userId, email, source}` |
-| `auth.user.logged_in` | Успешный login | `{userId, ip, userAgent}` |
-| `auth.user.logout` | Logout | `{userId}` |
-| `auth.2fa.enabled` | 2FA включён | `{userId, method}` |
-| `auth.2fa.disabled` | 2FA выключен | `{userId}` |
-| `auth.password.changed` | Смена пароля | `{userId}` |
-| `auth.session.suspicious` | Аномалия (новая страна и т.п.) | `{userId, reason}` |
+| Type | Когда | Payload | Implemented |
+|---|---|---|---|
+| `auth.user.registered` | После register | `{userId, email, role, source}` | ✅ #127 |
+| `auth.user.logged_in` | Успешный login | `{userId, sessionId, ip, userAgent}` | ✅ #128 |
+| `auth.user.logout` | Logout | `{userId, sessionId}` | ✅ #130 |
+| `auth.session.refreshed` | Refresh-token rotated | `{userId, oldSessionId, newSessionId, ip}` | ✅ #129 |
+| `auth.session.suspicious` | Reuse-detect или новая IP/страна | `{userId, sessionId, reasons[], ipMasked, userAgent}` | ✅ #129+#136 |
+| `auth.2fa.enabled` | После verify-enroll | `{userId, recoveryCodesGenerated}` | ✅ #132 |
+| `auth.2fa.disabled` | (TODO когда сделаем disable-endpoint) | `{userId}` | ⏳ |
+| `auth.password.changed` | Смена пароля (через reset) | `{userId, method: 'reset-via-email'}` | ✅ #134 |
 
 ### clients-svc
 
-| Type | Когда | Payload |
-|---|---|---|
-| `clients.profile.created` | Профиль создан | `{clientId, userId}` |
-| `clients.profile.updated` | Изменены ПДн / preferences | `{clientId, fields[]}` |
-| `clients.consent.granted` | Согласие дано | `{clientId, type, scope, version}` |
-| `clients.consent.revoked` | Согласие отозвано | `{clientId, type}` |
-| `clients.passport.uploaded` | Загружен скан | `{clientId, mediaId}` |
-| `clients.emergency_contact.added` | Добавлен контакт | `{clientId, contactId}` |
+| Type | Когда | Payload | Implemented |
+|---|---|---|---|
+| `clients.profile.created` | Auto при auth.user.registered | `{clientId, userId}` | ✅ #138 |
+| `clients.profile.updated` | PATCH /clients/me | `{userId, clientId, changedFields[]}` (без значений ПДн) | ✅ #140 |
+| `clients.consent.granted` | POST /consents/:type | `{userId, clientId, consentType, version, previousVersionId, newScopeKeys}` | ✅ #143 |
+| `clients.consent.revoked` | DELETE /consents/:type | `{userId, clientId, consentType, consentId}` | ✅ #143 |
+| `clients.passport.uploaded` | (TODO после media endpoints) | `{clientId, mediaId}` | ⏳ #141 |
+| `clients.emergency_contact.added` | POST /emergency-contacts (только CREATE) | `{userId, clientId, contactId, priority}` (без name/phone) | ✅ #144 |
 
 ### trips-svc
 
-| Type | Когда | Payload |
-|---|---|---|
-| `trips.created` | Сделка → trip | `{tripId, clientId, ...}` |
-| `trips.itinerary.updated` | Программа изменилась | `{tripId, dayPlanIds[]}` |
-| `trips.status.changed` | Статус | `{tripId, from, to}` |
-| `trips.day.started` | Начался день N | `{tripId, dayNumber, dayPlanId}` |
-| `trips.day.ended` | Закончился день N | `{tripId, dayNumber}` |
-| `trips.completed` | Поездка закрыта | `{tripId, durationDays}` |
-| `trips.cancelled` | Поездка отменена | `{tripId, reason}` |
-| `trips.document.attached` | Документ привязан | `{tripId, mediaId, docType}` |
+| Type | Когда | Payload | Implemented |
+|---|---|---|---|
+| `trips.created` | POST /trips (manager/admin) | `{tripId, clientId, createdBy, region, startsAt, endsAt}` | ✅ #150 |
+| `trips.itinerary.updated` | POST /trips/:id/itinerary/publish | `{tripId, itineraryId, version, publishedAt, previousVersion, dayPlanIds[], diff: {addedDays, removedDays, changedDays}}` | ✅ #151 |
+| `trips.status.changed` | (TODO state-machine #160) | `{tripId, from, to}` | ⏳ #160 |
+| `trips.day.started` / `trips.day.ended` | Cron-scheduler (#160) | `{tripId, dayNumber}` | ⏳ #160 |
+| `trips.completed` / `trips.cancelled` | Status transitions | `{tripId, ...}` | ⏳ #160 |
+| `trips.document.attached` | (TODO после media #174-178) | `{tripId, mediaId, docType}` | ⏳ |
 
 ### sos-svc
 
@@ -140,30 +139,29 @@ interface DomainEvent<T> {
 
 ### comm-svc
 
-| Type | Когда | Payload |
-|---|---|---|
-| `comm.message.sent` | Push/email/SMS отправлен | `{messageId, channel, to, templateId}` |
-| `comm.message.delivered` | Доставлен (ack от провайдера) | `{messageId}` |
-| `comm.message.failed` | Не доставлен | `{messageId, error}` |
-| `comm.chat.message.posted` | Сообщение в чате | `{threadId, messageId, fromUserId}` |
+| Type | Когда | Payload | Implemented |
+|---|---|---|---|
+| `comm.message.sent` | NotifyService успешно через provider (email/push/sms/tg) | `{notificationId, channel, templateId, providerMessageId, userId?}` (без `recipient` — privacy) | ✅ #162 |
+| `comm.message.failed` | NotifyService permanent fail | `{notificationId, channel, templateId, errorMessage, userId?}` | ✅ #162 |
+| `comm.message.delivered` | Webhook от provider'а (TODO) | `{notificationId}` | ⏳ |
+| `comm.chat.message_sent` | POST /chat/threads/:id/messages | `{threadId, messageId, fromUserId, hasAttachments}` (без body — privacy) | ✅ #169 |
 
 ### media-svc
 
-| Type | Когда | Payload |
-|---|---|---|
-| `media.upload.started` | Получен presigned URL | `{mediaId, kind, size}` |
-| `media.upload.completed` | Файл в S3 | `{mediaId, kind, s3Key}` |
-| `media.transcode.completed` | FFmpeg готов | `{mediaId, variants[]}` |
-| `media.transcode.failed` | Ошибка | `{mediaId, error}` |
-| `media.deleted` | Удалено | `{mediaId, reason}` |
+| Type | Когда | Payload | Implemented |
+|---|---|---|---|
+| `media.asset.uploaded` | MediaService.markUploaded (после finalize) | `{assetId, ownerId, kind, mimeType, sizeBytes, s3Key}` | ✅ #173 (event), ⏳ #174-175 (endpoints) |
+| `media.upload.started` | (TODO после presigned endpoint #174) | `{mediaId, kind, size}` | ⏳ |
+| `media.transcode.completed` / `media.transcode.failed` | (TODO после #176 FFmpeg worker) | `{mediaId, variants[]}` | ⏳ |
+| `media.deleted` | (TODO retention #178) | `{mediaId, reason}` | ⏳ |
 
 ### feedback-svc
 
-| Type | Когда | Payload |
-|---|---|---|
-| `feedback.requested` | Просим клиента | `{tripId, dayNumber, requestedAt}` |
-| `feedback.received` | Клиент отправил | `{feedbackId, type, mood, tripId, dayNumber}` |
-| `feedback.negative.detected` | Маркер боли | `{feedbackId, signals[]}` |
+| Type | Когда | Payload | Implemented |
+|---|---|---|---|
+| `feedback.requested` | (TODO scheduled cron вечером дня поездки) | `{tripId, dayNumber, requestedAt}` | ⏳ |
+| `feedback.received` | POST /feedback (client) | `{feedbackId, tripId, dayNumber, mood, type, hasMedia}` (без `body`/`mediaId` — privacy) | ✅ #188 |
+| `feedback.negative.detected` | AI signals enrichment (TODO #189) | `{feedbackId, signals[]}` | ⏳ #189 |
 
 ### finance-svc
 
@@ -182,6 +180,16 @@ interface DomainEvent<T> {
 | `catalog.guide.activated` | Гид активирован | `{guideId, region}` |
 | `catalog.guide.deactivated` | Деактивирован | `{guideId, reason}` |
 | `catalog.guide.rating.updated` | Рейтинг изменился | `{guideId, newRating, basedOn}` |
+
+### audit-svc (cross-cutting #218)
+
+audit-svc подписан wildcard'ом `*` на ВСЕ события и пишет в append-only `audit_events`. Сам тоже публикует:
+
+| Type | Когда | Payload | Implemented |
+|---|---|---|---|
+| `audit.read` | GET /audit (admin) | `{requesterId, filters: {type, actorId, actorType, from, to}, returnedCount, hasMore}` | ✅ #219 |
+
+Recursive: `audit.read` тоже попадает в audit_events через wildcard subscriber (compliance 152-ФЗ ст. 14 — кто и когда смотрел audit-log).
 
 ## Правила публикации
 
