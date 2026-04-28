@@ -15,10 +15,16 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
 } from '@nestjs/common';
 
 import { CreateTripDto, type CreateTripResponse } from './dto/create-trip.dto';
+import {
+  TransitionStatusDto,
+  type TransitionResponse,
+} from './status/dto/transition.dto';
+import { TripStatusService } from './status/trip-status.service';
 import { TripsService } from './trips.service';
 import { CurrentUser, Roles } from '../../common/auth/decorators';
 
@@ -27,7 +33,10 @@ import type { Trip } from '@prisma/client';
 
 @Controller('trips')
 export class TripsController {
-  constructor(private readonly trips: TripsService) {}
+  constructor(
+    private readonly trips: TripsService,
+    private readonly status: TripStatusService,
+  ) {}
 
   /**
    * POST /trips — создание trip'а. Только manager / admin.
@@ -79,5 +88,20 @@ export class TripsController {
     hasPublishedItinerary: boolean;
   }> {
     return this.trips.findById(user.id, user.role, tripId);
+  }
+
+  /**
+   * PATCH /trips/:id/status — manual transition (#160).
+   * Только manager / admin. Reason для cancelled — рекомендуется явный.
+   */
+  @Patch(':id/status')
+  @HttpCode(HttpStatus.OK)
+  @Roles('manager', 'admin')
+  async transitionStatus(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) tripId: string,
+    @Body() dto: TransitionStatusDto,
+  ): Promise<TransitionResponse> {
+    return this.status.transition(tripId, dto.to, 'manual', user.id, dto.reason);
   }
 }
