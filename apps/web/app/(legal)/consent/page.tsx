@@ -11,15 +11,14 @@
  */
 import type { Metadata } from 'next';
 
+import { CONSENT_VERSION, LEGAL_LAST_UPDATED } from '@/lib/legal/versions';
+
 export const metadata: Metadata = {
   title: 'Согласие на обработку персональных данных',
   description:
     'Текст согласия на обработку персональных данных, который вы даёте при заполнении формы заявки на сайте IndiaHorizone.',
   robots: { index: true, follow: true },
 };
-
-export const CONSENT_VERSION = '0.1.0';
-const LAST_UPDATED = '28 апреля 2026 г.';
 
 export default function ConsentPage(): React.ReactElement {
   return (
@@ -29,7 +28,7 @@ export default function ConsentPage(): React.ReactElement {
           Согласие на обработку персональных данных
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Версия {CONSENT_VERSION} (черновик) · обновлено {LAST_UPDATED}
+          Версия {CONSENT_VERSION} (черновик) · обновлено {LEGAL_LAST_UPDATED}
         </p>
       </header>
 

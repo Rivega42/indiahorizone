@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { LeadApiError, submitLead } from '@/lib/api/leads';
+import { CONSENT_VERSION } from '@/lib/legal/versions';
 
 type ContactType = 'phone' | 'telegram' | 'email';
 
@@ -11,8 +12,6 @@ type FormState =
   | { kind: 'submitting' }
   | { kind: 'success' }
   | { kind: 'error'; message: string };
-
-const CONSENT_TEXT_VERSION = '2026-04-27-v1';
 
 export function LeadForm({ tourSlug }: { tourSlug: string }): React.ReactElement {
   const [name, setName] = useState('');
@@ -37,7 +36,7 @@ export function LeadForm({ tourSlug }: { tourSlug: string }): React.ReactElement
       contact: contact.trim(),
       ...(comment.trim().length > 0 ? { comment: comment.trim() } : {}),
       consent,
-      consentTextVersion: CONSENT_TEXT_VERSION,
+      consentTextVersion: CONSENT_VERSION,
     };
 
     try {
@@ -154,11 +153,15 @@ export function LeadForm({ tourSlug }: { tourSlug: string }): React.ReactElement
           required
         />
         <span className="text-background/80">
-          Согласен(на) с обработкой персональных данных в соответствии с{' '}
+          Даю{' '}
+          <a href="/consent" className="underline hover:text-primary">
+            согласие на обработку персональных данных
+          </a>{' '}
+          в соответствии с{' '}
           <a href="/privacy" className="underline hover:text-primary">
             Политикой конфиденциальности
           </a>
-          . Передача данных партнёру в Индии — для организации поездки.
+          , включая трансграничную передачу партнёру в Индии для организации поездки.
         </span>
       </label>
 
