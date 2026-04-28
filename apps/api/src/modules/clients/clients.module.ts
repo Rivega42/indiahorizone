@@ -10,6 +10,8 @@ import { Module } from '@nestjs/common';
 
 import { ClientsController } from './clients.controller';
 import { ClientsService } from './clients.service';
+import { ConsentsController } from './consents/consents.controller';
+import { ConsentsService } from './consents/consents.service';
 import { EmergencyContactsController } from './emergency-contacts/emergency-contacts.controller';
 import { EmergencyContactsService } from './emergency-contacts/emergency-contacts.service';
 import { ClientsListener } from './listeners/clients.listener';
@@ -18,8 +20,8 @@ import { PrismaModule } from '../../common/prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule, EventsBusModule],
-  controllers: [ClientsController, EmergencyContactsController],
-  providers: [ClientsService, ClientsListener, EmergencyContactsService],
-  exports: [ClientsService, EmergencyContactsService],
+  controllers: [ClientsController, ConsentsController, EmergencyContactsController],
+  providers: [ClientsService, ClientsListener, ConsentsService, EmergencyContactsService],
+  exports: [ClientsService, ConsentsService, EmergencyContactsService],
 })
 export class ClientsModule {}
