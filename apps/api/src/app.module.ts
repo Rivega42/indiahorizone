@@ -7,6 +7,7 @@ import { EventsBusModule } from './common/events-bus/events-bus.module';
 import { OutboxModule } from './common/outbox/outbox.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { RedisModule } from './common/redis/redis.module';
+import { ThrottleModule } from './common/throttle/throttle.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
@@ -24,6 +25,7 @@ import { TripsModule } from './modules/trips/trips.module';
     CryptoModule, // global, нужен PrismaService в фазе 4 + ClientsService уже сейчас (#139)
     PrismaModule,
     RedisModule,
+    ThrottleModule, // global rate-limit (#221)
     EventsBusModule,
     OutboxModule,
     AuthModule,

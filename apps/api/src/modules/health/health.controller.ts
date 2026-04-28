@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 
 import { Public } from '../../common/auth/decorators';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -19,7 +20,12 @@ interface ReadinessStatus {
   };
 }
 
+/**
+ * Health/readiness — НЕ rate-limited (#221): kubernetes/docker liveness-probe
+ * могут долбить чаще 100/min, и блокировка приведёт к ложным restart'ам.
+ */
 @Controller()
+@SkipThrottle()
 export class HealthController {
   constructor(
     private readonly prisma: PrismaService,
