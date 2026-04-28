@@ -4,8 +4,14 @@
     "composite": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    // CommonJS output — apps/api (NestJS, CJS) и apps/web (Next.js, bundler)
+    // оба корректно резолвят CJS-модули из @indiahorizone/shared в runtime'е
+    // (#330: Node ESM не поддерживает directory imports вида `./crypto`,
+    // CJS их прекрасно резолвит).
+    // Node moduleResolution — чтобы tsc понимал bare imports без bundler-magic.
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "verbatimModuleSyntax": false,
     "types": ["node"]
   },
   "include": ["src/**/*"],

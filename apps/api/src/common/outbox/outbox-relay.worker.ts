@@ -91,8 +91,8 @@ export class OutboxRelayWorker implements OnModuleInit, OnModuleDestroy {
           occurredAt: envelope.occurredAt ?? entry.createdAt.toISOString(),
           type: entry.eventType,
           schemaVersion: entry.schemaVersion,
-          correlationId: envelope.correlationId,
-          causationId: envelope.causationId,
+          ...(envelope.correlationId !== undefined && { correlationId: envelope.correlationId }),
+          ...(envelope.causationId !== undefined && { causationId: envelope.causationId }),
           actor: envelope.actor,
           payload: envelope.payload,
         });
