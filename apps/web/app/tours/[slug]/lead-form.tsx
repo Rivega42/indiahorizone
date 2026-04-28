@@ -23,10 +23,7 @@ export function LeadForm({ tourSlug }: { tourSlug: string }): React.ReactElement
   const [state, setState] = useState<FormState>({ kind: 'idle' });
 
   const canSubmit =
-    consent &&
-    name.trim().length >= 2 &&
-    contact.trim().length >= 3 &&
-    state.kind !== 'submitting';
+    consent && name.trim().length >= 2 && contact.trim().length >= 3 && state.kind !== 'submitting';
 
   async function onSubmit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
@@ -68,7 +65,12 @@ export function LeadForm({ tourSlug }: { tourSlug: string }): React.ReactElement
   }
 
   return (
-    <form onSubmit={(e) => { void onSubmit(e); }} className="space-y-4">
+    <form
+      onSubmit={(e) => {
+        void onSubmit(e);
+      }}
+      className="space-y-4"
+    >
       <div className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
         Заявка на тур
       </div>

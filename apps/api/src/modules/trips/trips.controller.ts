@@ -20,10 +20,7 @@ import {
 } from '@nestjs/common';
 
 import { CreateTripDto, type CreateTripResponse } from './dto/create-trip.dto';
-import {
-  TransitionStatusDto,
-  type TransitionResponse,
-} from './status/dto/transition.dto';
+import { TransitionStatusDto, type TransitionResponse } from './status/dto/transition.dto';
 import { TripStatusService } from './status/trip-status.service';
 import { TripsService } from './trips.service';
 import { CurrentUser, Roles } from '../../common/auth/decorators';
@@ -67,9 +64,7 @@ export class TripsController {
    * - admin/concierge/finance → все (top 100)
    */
   @Get('me')
-  async listMine(
-    @CurrentUser() user: AuthenticatedUser,
-  ): Promise<{ items: Trip[] }> {
+  async listMine(@CurrentUser() user: AuthenticatedUser): Promise<{ items: Trip[] }> {
     const items = await this.trips.listForUser(user.id, user.role);
     return { items };
   }

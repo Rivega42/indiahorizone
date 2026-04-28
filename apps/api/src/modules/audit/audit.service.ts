@@ -17,7 +17,7 @@ import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
 import type { ListAuditQueryDto, ListAuditResponse } from './dto/list-audit.dto';
-import type { AuditEvent, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
 interface DecodedCursor {
   recordedAt: string; // ISO
@@ -33,10 +33,7 @@ export class AuditService {
     private readonly outbox: OutboxService,
   ) {}
 
-  async list(
-    requesterId: string,
-    query: ListAuditQueryDto,
-  ): Promise<ListAuditResponse> {
+  async list(requesterId: string, query: ListAuditQueryDto): Promise<ListAuditResponse> {
     const limit = query.limit ?? 50;
 
     const where: Prisma.AuditEventWhereInput = {};
@@ -87,10 +84,7 @@ export class AuditService {
       where.OR = [
         { recordedAt: { lt: new Date(decoded.recordedAt) } },
         {
-          AND: [
-            { recordedAt: new Date(decoded.recordedAt) },
-            { eventId: { lt: decoded.eventId } },
-          ],
+          AND: [{ recordedAt: new Date(decoded.recordedAt) }, { eventId: { lt: decoded.eventId } }],
         },
       ];
     }
@@ -106,7 +100,7 @@ export class AuditService {
 
     let nextCursor: string | null = null;
     if (hasMore) {
-      const last = page[page.length - 1] as AuditEvent;
+      const last = page[page.length - 1]!;
       nextCursor = this.encodeCursor({
         recordedAt: last.recordedAt.toISOString(),
         eventId: last.eventId,

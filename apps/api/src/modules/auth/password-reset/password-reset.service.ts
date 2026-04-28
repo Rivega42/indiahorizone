@@ -19,17 +19,12 @@
  */
 import { randomUUID } from 'node:crypto';
 
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { NotifyService } from '../../comm/notify.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
+import { NotifyService } from '../../comm/notify.service';
 import { PasswordService } from '../services/password.service';
 
 const TOKEN_TTL_MS = 30 * 60 * 1000; // 30 минут
@@ -104,9 +99,7 @@ export class PasswordResetService {
     const strength = this.password.checkStrength(newPassword);
     if (!strength.ok) {
       const hint =
-        strength.warning ||
-        strength.suggestions[0] ||
-        'добавь длины и непредсказуемых символов';
+        strength.warning ?? strength.suggestions[0] ?? 'добавь длины и непредсказуемых символов';
       throw new BadRequestException(`Пароль слишком слабый: ${hint}`);
     }
 

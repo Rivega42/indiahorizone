@@ -78,8 +78,7 @@ function createApiClient(): AxiosInstance {
     (error: AxiosError) => {
       // Логируем correlation-id из request на серверные ошибки — для дебага
       if (error.response && error.response.status >= 500) {
-        const corrId = error.config?.headers?.['X-Correlation-Id'];
-        // eslint-disable-next-line no-console
+        const corrId = error.config?.headers?.['X-Correlation-Id'] as string | undefined;
         console.error('[api]', error.response.status, corrId, error.config?.url);
       }
       return Promise.reject(error);

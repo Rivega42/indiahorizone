@@ -35,7 +35,6 @@ export type UpdateProfilePatch = EncryptableProfileInput & {
   preferences?: Prisma.InputJsonValue;
 };
 
-
 @Injectable()
 export class ClientsService {
   private readonly logger = new Logger(ClientsService.name);
@@ -85,9 +84,7 @@ export class ClientsService {
    * Найти Client с расшифрованным profile. Возвращает null если не найден.
    * Используется в #140 (`GET /clients/me`).
    */
-  async findByUserId(
-    userId: string,
-  ): Promise<(Client & { profile: ClientProfile | null }) | null> {
+  async findByUserId(userId: string): Promise<(Client & { profile: ClientProfile | null }) | null> {
     const result = await this.prisma.client.findUnique({
       where: { userId },
       include: { profile: true },
@@ -109,10 +106,7 @@ export class ClientsService {
    * Subscriber'ы события (CRM, finance — будущие) видят только список ИМЁН
    * изменённых полей, не значения ПДн (privacy by default).
    */
-  async updateProfile(
-    userId: string,
-    patch: UpdateProfilePatch,
-  ): Promise<ClientProfile> {
+  async updateProfile(userId: string, patch: UpdateProfilePatch): Promise<ClientProfile> {
     const client = await this.prisma.client.findUnique({
       where: { userId },
       select: { id: true, profile: { select: { id: true } } },

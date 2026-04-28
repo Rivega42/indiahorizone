@@ -4,7 +4,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { AuthModule as AuthFeatureModule } from '../../modules/auth/auth.module';
 
-
 /**
  * Common Auth Module — регистрирует глобальный JwtAuthGuard.
  *

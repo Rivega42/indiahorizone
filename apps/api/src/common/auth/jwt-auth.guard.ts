@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-
 import { PUBLIC_KEY, ROLES_KEY } from './decorators';
 import { JwtTokenService } from '../../modules/auth/services/jwt.service';
 

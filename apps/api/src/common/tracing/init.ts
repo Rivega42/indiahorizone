@@ -27,14 +27,11 @@
  *   (Jaeger, Tempo, Honeycomb, Datadog, etc.)
  * - Endpoint в env: OTEL_EXPORTER_OTLP_ENDPOINT (например http://jaeger:4318)
  */
-import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import {
-  ATTR_SERVICE_NAME,
-  ATTR_SERVICE_VERSION,
-} from '@opentelemetry/semantic-conventions';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 
 const endpoint = process.env['OTEL_EXPORTER_OTLP_ENDPOINT'];
 
@@ -64,9 +61,7 @@ if (endpoint) {
 
   sdk.start();
   // eslint-disable-next-line no-console
-  console.log(
-    `[otel] SDK started — service=${serviceName} env=${env} → ${endpoint}`,
-  );
+  console.log(`[otel] SDK started — service=${serviceName} env=${env} → ${endpoint}`);
 
   // Graceful shutdown — SDK успеет flush'нуть pending spans до process.exit().
   process.on('SIGTERM', () => {
@@ -74,16 +69,10 @@ if (endpoint) {
       .shutdown()
       // eslint-disable-next-line no-console
       .then(() => console.log('[otel] SDK shut down'))
-      .catch(
-        (err: unknown) =>
-          // eslint-disable-next-line no-console
-          console.error('[otel] SDK shutdown error', err),
-      )
+      .catch((err: unknown) => console.error('[otel] SDK shutdown error', err))
       .finally(() => process.exit(0));
   });
 } else {
   // eslint-disable-next-line no-console
-  console.log(
-    '[otel] OTEL_EXPORTER_OTLP_ENDPOINT не задан — tracing отключён (no-op)',
-  );
+  console.log('[otel] OTEL_EXPORTER_OTLP_ENDPOINT не задан — tracing отключён (no-op)');
 }

@@ -10,25 +10,15 @@
  *   существующий вместо ошибки duplicate.
  * - Публикуем `clients.emergency_contact.added` в outbox при первом save'е.
  */
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { CryptoService } from '../../../common/crypto/crypto.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 
-import type {
-  EmergencyContact,
-  EmergencyContactPriority,
-  Prisma,
-} from '@prisma/client';
+import type { EmergencyContact, EmergencyContactPriority, Prisma } from '@prisma/client';
 
-export interface EmergencyContactDecrypted
-  extends Omit<EmergencyContact, 'name' | 'phone'> {
+export interface EmergencyContactDecrypted extends Omit<EmergencyContact, 'name' | 'phone'> {
   name: string;
   phone: string;
 }

@@ -10,9 +10,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler"
   },
-  "references": [
-    { "path": "../../packages/shared" }
-  ],
+  "references": [{ "path": "../../packages/shared" }],
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", "dist", ".expo"]
 }

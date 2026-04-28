@@ -2,7 +2,13 @@
 
 import { useMutation } from '@tanstack/react-query';
 
-import { authApi, type LoginPayload, type LoginResponse, type RegisterPayload, type RegisterResponse } from './api';
+import {
+  authApi,
+  type LoginPayload,
+  type LoginResponse,
+  type RegisterPayload,
+  type RegisterResponse,
+} from './api';
 import { authStore } from './store';
 
 /**

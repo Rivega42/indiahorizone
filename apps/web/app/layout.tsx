@@ -1,8 +1,9 @@
-import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 
 import { ServiceWorkerRegistration } from '../components/sw-registration';
 import { Providers } from '../lib/providers';
+
+import type { Metadata, Viewport } from 'next';
 
 import './globals.css';
 
@@ -32,12 +33,8 @@ export const metadata: Metadata = {
   },
   // Apple Touch Icon для iOS «Добавить на главный экран» (#122 + #356)
   icons: {
-    icon: [
-      { url: '/icons/icon-192.svg', type: 'image/svg+xml' },
-    ],
-    apple: [
-      { url: '/icons/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
-    ],
+    icon: [{ url: '/icons/icon-192.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/icons/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' }],
   },
   // iOS PWA-specific meta — для standalone-режима в Add-to-Home-Screen
   appleWebApp: {

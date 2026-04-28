@@ -8,17 +8,12 @@
  * Privacy: full IP в payload не публикуется (см. detector). Здесь работаем
  * с уже masked-IP. UA truncated to 200 chars в детекторе.
  */
-import {
-  Injectable,
-  Logger,
-  type OnModuleDestroy,
-  type OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { NotifyService } from '../notify.service';
 import { EventsBusService } from '../../../common/events-bus/events-bus.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
+import { NotifyService } from '../notify.service';
 
 import type { DomainEvent } from '../../../common/events-bus/types';
 

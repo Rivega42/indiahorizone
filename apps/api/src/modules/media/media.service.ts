@@ -13,15 +13,11 @@
  */
 import { randomUUID } from 'node:crypto';
 
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
+import { S3Service } from './s3.service';
 import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { S3Service } from './s3.service';
 
 import type { MediaAsset, MediaAssetKind } from '@prisma/client';
 
@@ -112,10 +108,7 @@ export class MediaService {
       return asset;
     });
 
-    this.logger.log(
-      { assetId: updated.id, sizeBytes: actualSize },
-      'media.asset.uploaded',
-    );
+    this.logger.log({ assetId: updated.id, sizeBytes: actualSize }, 'media.asset.uploaded');
 
     return updated;
   }

@@ -1,4 +1,4 @@
-import { ConsentType } from '@prisma/client';
+import type { ConsentType } from '@prisma/client';
 
 /**
  * Текущие версии текстов согласий из docs/LEGAL/CONSENTS/.

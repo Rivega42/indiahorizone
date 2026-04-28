@@ -6,17 +6,7 @@
  *
  * Issue: #297 [12.4]
  */
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Ip,
-  Post,
-  Req,
-} from '@nestjs/common';
-
-
+import { Body, Controller, HttpCode, HttpStatus, Ip, Post, Req } from '@nestjs/common';
 
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { LeadsService } from './leads.service';
@@ -41,10 +31,7 @@ export class LeadsController {
      * Иначе req.ip (Express trust proxy = 1).
      */
     const forwarded = req.header('x-forwarded-for');
-    const realIp =
-      forwarded != null && forwarded.length > 0
-        ? forwarded.split(',')[0]?.trim()
-        : ip;
+    const realIp = forwarded != null && forwarded.length > 0 ? forwarded.split(',')[0]?.trim() : ip;
 
     const userAgent = req.header('user-agent');
 

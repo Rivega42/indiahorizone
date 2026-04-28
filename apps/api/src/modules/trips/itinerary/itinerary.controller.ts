@@ -20,7 +20,6 @@ import {
   Post,
 } from '@nestjs/common';
 
-import { CurrentUser, Roles } from '../../../common/auth/decorators';
 import {
   type CreateVersionResponse,
   type ItineraryWithDays,
@@ -28,6 +27,7 @@ import {
   UpsertItineraryDto,
 } from './dto/itinerary.dto';
 import { ItineraryService } from './itinerary.service';
+import { CurrentUser, Roles } from '../../../common/auth/decorators';
 
 import type { AuthenticatedUser } from '../../../common/auth/types';
 

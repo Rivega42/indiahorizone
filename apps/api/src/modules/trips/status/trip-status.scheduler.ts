@@ -15,8 +15,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { PrismaService } from '../../../common/prisma/prisma.service';
 import { TripStatusService } from './trip-status.service';
+import { PrismaService } from '../../../common/prisma/prisma.service';
 
 const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
 

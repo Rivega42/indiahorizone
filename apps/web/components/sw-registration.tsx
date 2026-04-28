@@ -21,12 +21,9 @@ export function ServiceWorkerRegistration(): null {
     // В dev — мешает HMR.
     if (process.env['NEXT_PUBLIC_ENABLE_SW'] !== 'true') return;
 
-    void navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
-      .catch((err: unknown) => {
-        // eslint-disable-next-line no-console
-        console.warn('[sw] registration failed', err);
-      });
+    void navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((err: unknown) => {
+      console.warn('[sw] registration failed', err);
+    });
   }, []);
 
   return null;

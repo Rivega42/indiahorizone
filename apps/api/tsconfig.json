@@ -12,9 +12,7 @@
     "emitDecoratorMetadata": true,
     "verbatimModuleSyntax": false
   },
-  "references": [
-    { "path": "../../packages/shared" }
-  ],
+  "references": [{ "path": "../../packages/shared" }],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
 }

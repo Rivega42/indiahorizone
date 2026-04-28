@@ -25,17 +25,17 @@ import {
   NotFoundException,
   UnauthorizedException,
   forwardRef,
+  ConflictException,
 } from '@nestjs/common';
-import { ConflictException } from '@nestjs/common';
 import { UserStatus } from '@prisma/client';
 import { generateSecret, generateURI, verifySync } from 'otplib';
 
-import { LoginService } from '../services/login.service';
-import { PasswordService } from '../services/password.service';
+import { TwoFaChallengeService } from './two-fa-challenge.service';
 import { CryptoService } from '../../../common/crypto/crypto.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import { TwoFaChallengeService } from './two-fa-challenge.service';
+import { LoginService } from '../services/login.service';
+import { PasswordService } from '../services/password.service';
 
 import type { LoginTokenResponse } from '../dto/login.dto';
 import type { EnrollResponse, VerifyEnrollResponse } from './dto/verify-enroll.dto';
@@ -130,9 +130,7 @@ export class TwoFaService {
       throw new ConflictException('2FA уже активирован');
     }
     if (!user.twoFaSecret) {
-      throw new BadRequestException(
-        'Enroll не начат — сначала вызовите POST /auth/2fa/enroll',
-      );
+      throw new BadRequestException('Enroll не начат — сначала вызовите POST /auth/2fa/enroll');
     }
 
     const secret = this.crypto.decrypt(user.twoFaSecret);
@@ -227,10 +225,7 @@ export class TwoFaService {
       // Между password-step и 2FA verify admin/concierge мог suspend'нуть аккаунт
       // (incident response). Не выпускаем токены — even если код валидный.
       // Generic error — anti-enumeration.
-      this.logger.warn(
-        { userId: user.id, status: user.status },
-        '2fa.verify.blocked-status',
-      );
+      this.logger.warn({ userId: user.id, status: user.status }, '2fa.verify.blocked-status');
       throw new UnauthorizedException('Невалидный или истёкший код');
     }
 

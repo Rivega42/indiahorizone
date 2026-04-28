@@ -26,18 +26,14 @@ export class UpdateClientProfileDto {
   @ValidateIf((_obj, value: unknown) => value !== null)
   @IsString()
   @MaxLength(100)
-  @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.trim() : value,
-  )
+  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   firstName?: string | null;
 
   @IsOptional()
   @ValidateIf((_obj, value: unknown) => value !== null)
   @IsString()
   @MaxLength(100)
-  @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.trim() : value,
-  )
+  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   lastName?: string | null;
 
   /**

@@ -10,12 +10,7 @@
  *   - clients.consent.revoked  при отзыве
  * - version snapshot из CURRENT_CONSENT_VERSIONS на момент grant'а.
  */
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
@@ -90,10 +85,7 @@ export class ConsentsService {
       return created;
     });
 
-    this.logger.log(
-      { userId, consentId: result.id, type, version },
-      'consent.granted',
-    );
+    this.logger.log({ userId, consentId: result.id, type, version }, 'consent.granted');
     return result;
   }
 
@@ -144,9 +136,7 @@ export class ConsentsService {
 
       case 'photo_video': {
         if (dto.level === undefined) {
-          throw new BadRequestException(
-            'photo_video: обязательное поле level (1..4)',
-          );
+          throw new BadRequestException('photo_video: обязательное поле level (1..4)');
         }
         const scope: Record<string, unknown> = { level: dto.level };
         if (dto.useName !== undefined) {
@@ -157,9 +147,7 @@ export class ConsentsService {
 
       case 'geo': {
         if (!dto.modes || dto.modes.length === 0) {
-          throw new BadRequestException(
-            'geo: обязательное поле modes (массив из A/B/C/D)',
-          );
+          throw new BadRequestException('geo: обязательное поле modes (массив из A/B/C/D)');
         }
         return { modes: dto.modes };
       }

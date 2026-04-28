@@ -13,13 +13,7 @@
  * Endpoint /metrics реализуется в MetricsController (защита internal-token).
  */
 import { Injectable, type OnModuleInit } from '@nestjs/common';
-import {
-  Counter,
-  Gauge,
-  Histogram,
-  Registry,
-  collectDefaultMetrics,
-} from 'prom-client';
+import { Counter, Gauge, Histogram, Registry, collectDefaultMetrics } from 'prom-client';
 
 @Injectable()
 export class MetricsService implements OnModuleInit {

@@ -1,6 +1,5 @@
-import { IsEnum, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
-
 import { EmergencyContactPriority } from '@prisma/client';
+import { IsEnum, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
 
 /**
  * DTO для POST/PATCH /clients/me/emergency-contacts (#144).

@@ -6,7 +6,6 @@ import { PasswordService } from './password.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 
-
 import type { RefreshDto, RefreshResponse } from '../dto/refresh.dto';
 
 const GENERIC_INVALID = 'Невалидный или истёкший refresh-токен';

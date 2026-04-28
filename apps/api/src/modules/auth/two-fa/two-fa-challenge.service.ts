@@ -84,9 +84,7 @@ export class TwoFaChallengeService {
    * Удалить challenge после успешной верификации (или превышения лимита).
    */
   async cleanup(challengeId: string): Promise<void> {
-    await this.redis
-      .getClient()
-      .del(this.dataKey(challengeId), this.attemptsKey(challengeId));
+    await this.redis.getClient().del(this.dataKey(challengeId), this.attemptsKey(challengeId));
   }
 
   private dataKey(challengeId: string): string {

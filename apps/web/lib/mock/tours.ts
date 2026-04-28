@@ -6,20 +6,14 @@
  * (см. P0-блокер в EPIC 13).
  */
 
-export type ActivityKind =
-  | 'culture'
-  | 'nature'
-  | 'food'
-  | 'water'
-  | 'adventure'
-  | 'wellness';
+export type ActivityKind = 'culture' | 'nature' | 'food' | 'water' | 'adventure' | 'wellness';
 
-export type Activity = {
+export interface Activity {
   kind: ActivityKind;
   label: string;
-};
+}
 
-export type TourDay = {
+export interface TourDay {
   dayNumber: number;
   location: string;
   title: string;
@@ -27,22 +21,22 @@ export type TourDay = {
   activities: Activity[];
   imageUrl: string;
   isOptional?: boolean;
-};
+}
 
-export type TourReview = {
+export interface TourReview {
   authorName: string;
   city: string;
   tripDate: string;
   rating: 1 | 2 | 3 | 4 | 5;
   quote: string;
-};
+}
 
-export type TourFAQ = {
+export interface TourFAQ {
   q: string;
   a: string;
-};
+}
 
-export type Tour = {
+export interface Tour {
   slug: string;
   title: string;
   region: string;
@@ -61,7 +55,7 @@ export type Tour = {
   inclusions: { included: string[]; notIncluded: string[] };
   reviews: TourReview[];
   faq: TourFAQ[];
-};
+}
 
 export const KERALA_TOUR: Tour = {
   slug: 'tury-kerala-oktyabr-2026',
@@ -73,15 +67,10 @@ export const KERALA_TOUR: Tour = {
   season: 'Октябрь 2026',
   priceFromRub: 250_000,
   priceToRub: 320_000,
-  heroPosterUrl:
-    'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1920&q=85',
+  heroPosterUrl: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1920&q=85',
   emotionalHook:
     'Тропики, океан и тишина — без давки, без разводов, без сюрпризов на ресепшене. Команда на земле, которая знает Кералу как свой двор.',
-  trustBadges: [
-    'SOS 24/7',
-    'Русскоязычный concierge',
-    'Билеты подбираем под вашу гибкость',
-  ],
+  trustBadges: ['SOS 24/7', 'Русскоязычный concierge', 'Билеты подбираем под вашу гибкость'],
   facts: [
     { iconKind: 'clock', label: 'Длительность', value: '10 дней / 9 ночей' },
     { iconKind: 'users', label: 'Размер группы', value: 'до 6 человек' },
@@ -101,8 +90,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'culture', label: 'Храм' },
         { kind: 'culture', label: 'Шоу Катхакали' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=1200&q=80',
     },
     {
       dayNumber: 2,
@@ -114,8 +102,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'culture', label: 'Музеи' },
         { kind: 'water', label: 'Пляж' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1582719471137-c3967ffb1c42?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1582719471137-c3967ffb1c42?w=1200&q=80',
     },
     {
       dayNumber: 3,
@@ -128,8 +115,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'nature', label: 'Мангры' },
         { kind: 'food', label: 'Локальная кухня' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=80',
     },
     {
       dayNumber: 4,
@@ -141,8 +127,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'nature', label: 'Утёс' },
         { kind: 'food', label: 'Закат-ужин' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=1200&q=80',
     },
     {
       dayNumber: 5,
@@ -155,8 +140,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'water', label: 'Сёрф' },
         { kind: 'wellness', label: 'Аюрведа' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200&q=80',
       isOptional: true,
     },
     {
@@ -169,8 +153,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'culture', label: 'Скульптурный парк' },
         { kind: 'adventure', label: 'Зиплайн' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=80',
     },
     {
       dayNumber: 7,
@@ -182,8 +165,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'culture', label: 'Храм' },
         { kind: 'water', label: 'Каяк' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1609766975914-b10b7a537bc0?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1609766975914-b10b7a537bc0?w=1200&q=80',
     },
     {
       dayNumber: 8,
@@ -195,8 +177,7 @@ export const KERALA_TOUR: Tour = {
         { kind: 'adventure', label: 'Треккинг' },
         { kind: 'wellness', label: 'СПА' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1514222134-b57cbb8ce073?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1514222134-b57cbb8ce073?w=1200&q=80',
       isOptional: true,
     },
     {
@@ -209,18 +190,15 @@ export const KERALA_TOUR: Tour = {
         { kind: 'water', label: 'Дельфины' },
         { kind: 'food', label: 'Мастер-класс' },
       ],
-      imageUrl:
-        'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200&q=80',
     },
     {
       dayNumber: 10,
       location: 'Тривандрум',
       title: 'Возвращение домой',
-      description:
-        'Завтрак, неспешный чек-аут, трансфер в аэропорт. Вылет.',
+      description: 'Завтрак, неспешный чек-аут, трансфер в аэропорт. Вылет.',
       activities: [{ kind: 'culture', label: 'Прощание' }],
-      imageUrl:
-        'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
     },
   ],
   inclusions: {

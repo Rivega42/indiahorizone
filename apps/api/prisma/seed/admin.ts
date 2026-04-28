@@ -71,10 +71,10 @@ function readEnv(): BootstrapEnv | null {
 
   const strength = zxcvbn(password, [email]);
   if (strength.score < MIN_ZXCVBN_SCORE) {
-    const hint =
-      strength.feedback.warning ||
-      strength.feedback.suggestions[0] ||
-      'добавь длины и непредсказуемых символов';
+    const warning = strength.feedback.warning;
+    const hint = warning
+      ? warning
+      : (strength.feedback.suggestions[0] ?? 'добавь длины и непредсказуемых символов');
     throw new Error(
       `пароль слишком слабый (zxcvbn score ${strength.score} < ${MIN_ZXCVBN_SCORE}): ${hint}`,
     );
@@ -126,7 +126,6 @@ async function main(): Promise<void> {
 main()
   .then(() => prisma.$disconnect())
   .catch((err) => {
-    // eslint-disable-next-line no-console
     console.error('[seed:admin] failed:', err instanceof Error ? err.message : err);
     void prisma.$disconnect().finally(() => process.exit(1));
   });

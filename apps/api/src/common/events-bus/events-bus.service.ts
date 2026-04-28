@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 
 import { Injectable, Logger, type OnModuleDestroy } from '@nestjs/common';
 
-
 import { IdempotencyService } from './idempotency.service';
 import {
   type DomainEvent,
@@ -42,7 +41,7 @@ export class EventsBusService implements OnModuleDestroy {
     private readonly idempotency: IdempotencyService,
   ) {}
 
-  async onModuleDestroy(): Promise<void> {
+  onModuleDestroy(): void {
     for (const sub of this.subscriptions) {
       sub.stop();
     }
@@ -118,7 +117,7 @@ export class EventsBusService implements OnModuleDestroy {
         try {
           const result = (await this.redis
             .getSubscriber()
-             
+
             .xreadgroup(
               'GROUP',
               options.consumerGroup,

@@ -1,12 +1,5 @@
-import {
-  ArrayUnique,
-  IsArray,
-  IsBoolean,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
-
 import { NotificationCategory, NotificationChannel } from '@prisma/client';
+import { ArrayUnique, IsArray, IsBoolean, IsEnum, IsOptional } from 'class-validator';
 
 /**
  * PATCH /comm/preferences/:category — частичное обновление предпочтений

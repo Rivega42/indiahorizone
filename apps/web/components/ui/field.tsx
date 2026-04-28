@@ -1,9 +1,8 @@
 import { useId } from 'react';
 
-import { cn } from '../../lib/utils';
-
 import { Input, type InputProps } from './input';
 import { Label } from './label';
+import { cn } from '../../lib/utils';
 
 interface FieldProps extends Omit<InputProps, 'id'> {
   label: string;
@@ -45,7 +44,7 @@ export function Field({
         id={id}
         aria-invalid={hasError || undefined}
         aria-describedby={messageId}
-        aria-required={required || undefined}
+        aria-required={required ? true : undefined}
         {...inputProps}
       />
       {hasError ? (

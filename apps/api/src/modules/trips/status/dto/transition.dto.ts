@@ -1,6 +1,5 @@
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
-
 import { TripStatus } from '@prisma/client';
+import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 
 /**
  * PATCH /trips/:id/status — manual переход (#160).

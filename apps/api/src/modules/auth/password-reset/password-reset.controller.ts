@@ -4,18 +4,9 @@
  * Оба endpoint'а @Public() — клиент не залогинен в момент сброса.
  * Rate-limit (#221): профиль `auth` — 10/min/IP, защита от bruteforce.
  */
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 
-import {
-  ConfirmPasswordResetDto,
-  RequestPasswordResetDto,
-} from './dto/password-reset.dto';
+import { ConfirmPasswordResetDto, RequestPasswordResetDto } from './dto/password-reset.dto';
 import { PasswordResetService } from './password-reset.service';
 import { Public } from '../../../common/auth/decorators';
 

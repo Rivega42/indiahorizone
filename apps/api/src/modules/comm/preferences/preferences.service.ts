@@ -13,11 +13,7 @@
  * - sos:       [push, email, sms, telegram]  enabled=true (PROTECTED)
  * - system:    [email]         enabled=true
  */
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../../../common/prisma/prisma.service';
 
@@ -100,7 +96,7 @@ export class NotificationPreferencesService {
           'SOS-уведомления нельзя отключить (protected). Это требование безопасности.',
         );
       }
-      if (dto.channels !== undefined && dto.channels.length === 0) {
+      if (dto.channels?.length === 0) {
         throw new BadRequestException(
           'SOS должен иметь хотя бы один канал. Все 4 канала включены по умолчанию.',
         );

@@ -18,7 +18,6 @@
 import type { CryptoService } from '../../../common/crypto/crypto.service';
 import type { ClientProfile, Prisma } from '@prisma/client';
 
-
 const ENCRYPTED_FIELDS: readonly (keyof ClientProfile)[] = [
   'firstName',
   'lastName',
@@ -126,9 +125,10 @@ export function decryptProfiles<T extends ClientProfile>(
 /**
  * Helper для Client с include: { profile: true } — расшифровывает вложенный profile.
  */
-export function decryptClientWithProfile<
-  T extends { profile: ClientProfile | null } | null,
->(client: T, crypto: CryptoService): T {
+export function decryptClientWithProfile<T extends { profile: ClientProfile | null } | null>(
+  client: T,
+  crypto: CryptoService,
+): T {
   if (client && client.profile) {
     decryptProfile(client.profile, crypto);
   }
