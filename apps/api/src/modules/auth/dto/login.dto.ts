@@ -13,7 +13,7 @@ export class LoginDto {
   password!: string;
 }
 
-export interface LoginResponse {
+export interface LoginTokenResponse {
   accessToken: string;
   refreshToken: string;
   user: {
@@ -22,3 +22,17 @@ export interface LoginResponse {
     role: string;
   };
 }
+
+/**
+ * Если у user активирован 2FA — login возвращает challengeId вместо токенов.
+ * Клиент должен вызвать POST /auth/2fa/verify { challengeId, code } для
+ * получения токенов. Challenge живёт 5 минут, ≤5 попыток.
+ */
+export interface LoginChallengeResponse {
+  challengeId: string;
+}
+
+/**
+ * Discriminated union: проверять наличие `challengeId` для определения формы.
+ */
+export type LoginResponse = LoginTokenResponse | LoginChallengeResponse;
