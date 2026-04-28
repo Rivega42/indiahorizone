@@ -943,6 +943,69 @@ model NotificationPreference {
   @@map("notification_preferences")
 }
 
+// === media модуль (#173+ [M5.F]) ===
+//
+// Источник: docs/BACKLOG/M5/F_MEDIA_CIRCLE.md, docs/ARCH/MICROSERVICES.md § media-svc.
+// media — фото/видео/кружки/документы клиентов и сервиса. S3-backed
+// (Cloudflare R2 в prod, MinIO в dev).
+//
+// Cross-module rule: ownerId — soft-ref на User. attachments в ChatMessage (#167) /
+// Feedback (#186) ссылаются на media.id без FK. Bucket private, доступ
+// только через signed URLs (#177).
+
+enum MediaAssetKind {
+  photo
+  video
+  /// Видео-кружок (telegram-style) — короткое самозаписанное видео.
+  /// Ключевая product-фича: ежедневный feedback в виде кружка.
+  circle
+  /// Документ: PDF (паспорт/виза/билет), JPEG/PNG скан.
+  document
+
+  @@map("media_asset_kind")
+}
+
+enum MediaAssetStatus {
+  /// DB-row создан + presigned URL выдан, но client ещё не загрузил.
+  pending
+  /// Client закончил upload (multipart complete или single PUT).
+  uploaded
+  /// FFmpeg обработал (для video/circle): чанки, preview, качества.
+  /// Для photo/document — сразу uploaded.
+  transcoded
+  /// S3 upload или transcode упал. Caller может retry.
+  failed
+
+  @@map("media_asset_status")
+}
+
+/// MediaAsset (#173) — bookkeeping S3-загрузок.
+///
+/// Storage: bucket private, SSE-S3 server-side encryption. Доступ к содержимому
+/// — только через signed URLs (#177) с TTL.
+model MediaAsset {
+  id        String           @id @default(uuid()) @db.Uuid
+  /// Soft-ref на User.id — кто загрузил.
+  ownerId   String           @map("owner_id") @db.Uuid
+  kind      MediaAssetKind
+  /// MIME из upload-request'а или detected из file-content. Для валидации
+  /// (chat attachment должен быть image/* или video/*).
+  mimeType  String           @map("mime_type")
+  /// Размер в байтах. Для multipart — sum всех parts. Updates при finalize.
+  size      BigInt
+  /// S3 key: `<env>/<kind>/<yyyymmdd>/<uuid>.<ext>`. Без bucket-prefix.
+  s3Key     String           @map("s3_key")
+  status    MediaAssetStatus @default(pending)
+  /// Опционально: caption / alt text. Для UX и accessibility.
+  caption   String?
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  @@index([ownerId, kind, createdAt(sort: Desc)], map: "idx_media_assets_owner_kind_created")
+  @@index([status, createdAt], map: "idx_media_assets_status_created")
+  @@map("media_assets")
+}
+
 // === feedback модуль (#186+ [M5.G]) ===
 //
 // Источник: docs/BACKLOG/M5/G_FEEDBACK.md, docs/ARCH/MICROSERVICES.md § feedback-svc.

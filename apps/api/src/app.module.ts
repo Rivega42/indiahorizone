@@ -16,6 +16,7 @@ import { CommModule } from './modules/comm/comm.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
 import { HealthModule } from './modules/health/health.module';
 import { LeadsModule } from './modules/leads/leads.module';
+import { MediaModule } from './modules/media/media.module';
 import { TripsModule } from './modules/trips/trips.module';
 
 @Module({
@@ -37,6 +38,7 @@ import { TripsModule } from './modules/trips/trips.module';
     TripsModule,
     CommModule,
     FeedbackModule,
+    MediaModule,
     AuditModule,
     CommonAuthModule, // глобальный JwtAuthGuard, требует AuthModule (JwtTokenService)
     HealthModule,
