@@ -12,6 +12,7 @@ import { Module } from '@nestjs/common';
 import { ItineraryController } from './itinerary/itinerary.controller';
 import { ItineraryService } from './itinerary/itinerary.service';
 import { PaymentReceivedListener } from './status/payment-listener';
+import { TripStatusScheduler } from './status/trip-status.scheduler';
 import { TripStatusService } from './status/trip-status.service';
 import { TripsController } from './trips.controller';
 import { TripsService } from './trips.service';
@@ -21,7 +22,13 @@ import { PrismaModule } from '../../common/prisma/prisma.module';
 @Module({
   imports: [PrismaModule, EventsBusModule],
   controllers: [TripsController, ItineraryController],
-  providers: [TripsService, ItineraryService, TripStatusService, PaymentReceivedListener],
+  providers: [
+    TripsService,
+    ItineraryService,
+    TripStatusService,
+    PaymentReceivedListener,
+    TripStatusScheduler,
+  ],
   exports: [TripsService, ItineraryService, TripStatusService],
 })
 export class TripsModule {}
