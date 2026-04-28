@@ -1,11 +1,11 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserStatus } from '@prisma/client';
 
+import { JwtTokenService } from './jwt.service';
+import { PasswordService } from './password.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 
-import { JwtTokenService } from './jwt.service';
-import { PasswordService } from './password.service';
 
 import type { RefreshDto, RefreshResponse } from '../dto/refresh.dto';
 

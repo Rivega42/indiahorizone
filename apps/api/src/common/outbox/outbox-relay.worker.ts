@@ -1,8 +1,9 @@
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 
 import { EventsBusService } from '../events-bus/events-bus.service';
-import type { DomainEvent } from '../events-bus/types';
 import { PrismaService } from '../prisma/prisma.service';
+
+import type { DomainEvent } from '../events-bus/types';
 
 const POLL_INTERVAL_MS = 1_000;
 const BATCH_SIZE = 50;
