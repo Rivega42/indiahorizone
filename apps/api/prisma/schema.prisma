@@ -723,3 +723,94 @@ model Booking {
   @@index([status, createdAt], map: "idx_bookings_status_created")
   @@map("bookings")
 }
+
+// === comm модуль (#162+ [M5.E]) ===
+//
+// Источник: docs/BACKLOG/M5/E_COMM.md, docs/ARCH/MICROSERVICES.md § comm-svc.
+// comm — переписка между клиентом, менеджером, concierge, гидом + нотификации.
+// Чат — основная коммуникация в активной поездке (вместо WhatsApp/Telegram).
+//
+// Cross-module rule:
+// - ChatThread.subjectId — soft-ref на Trip/SosEvent/Lead (cross-module)
+// - ChatMessage.fromUserId — soft-ref на User
+// - ChatMessage → ChatThread — FK ОК (один модуль)
+
+/// Тип чата определяет subjectId и default-participant'ов.
+/// - trip:  переписка по поездке (clientId + managerId + concierge'и)
+/// - sos:   SOS-инцидент (clientId + concierge + гид)
+/// - sales: pre-trip переписка (leadId + manager)
+enum ChatThreadKind {
+  trip
+  sos
+  sales
+
+  @@map("chat_thread_kind")
+}
+
+enum ChatThreadStatus {
+  open
+  closed
+  archived
+
+  @@map("chat_thread_status")
+}
+
+/// ChatThread — переписка по конкретному объекту (trip/sos/sales-deal).
+/// participants — массив user.id; меняется при escalation (concierge на дежурстве,
+/// гид присоединяется при старте поездки).
+///
+/// Один Thread на subjectId+kind в идеале — но не enforced unique (для legacy
+/// переписок при reopened sales-deal'е). Если важно — добавим partial unique
+/// `(kind, subject_id) WHERE status='open'` в отдельной миграции.
+model ChatThread {
+  id           String           @id @default(uuid()) @db.Uuid
+  kind         ChatThreadKind
+  /// Soft-reference на основной объект:
+  /// - kind=trip  → Trip.id
+  /// - kind=sos   → SosEvent.id (модель будет в #192)
+  /// - kind=sales → Lead.id (модель из #297)
+  subjectId    String           @map("subject_id") @db.Uuid
+  /// Массив user.id (UUID) — soft-refs на User. cross-module policy.
+  participants String[]         @default([])
+  status       ChatThreadStatus @default(open)
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  messages ChatMessage[]
+
+  /// Поиск всех threads по конкретному объекту: GET /trips/:id → его chat thread.
+  @@index([kind, subjectId], map: "idx_chat_threads_kind_subject")
+  /// Inbox-стиль листинг: открытые threads, отсортированные по последней активности.
+  @@index([status, updatedAt(sort: Desc)], map: "idx_chat_threads_status_updated")
+  @@map("chat_threads")
+}
+
+/// ChatMessage — одно сообщение в thread'е.
+/// readBy — JSONB: { userId: ISO-timestamp }, заполняется при просмотре сообщения
+/// клиентом (UI делает PATCH /messages/:id/read).
+///
+/// attachments — массив MediaAsset.id (модель будет в #173). Сейчас просто
+/// String[] — без FK, без валидации существования asset'а на schema-уровне.
+/// Service будет проверять при write (когда media-svc появится).
+model ChatMessage {
+  id          String   @id @default(uuid()) @db.Uuid
+  threadId    String   @map("thread_id") @db.Uuid
+  /// Soft-reference на users.id. cross-module policy.
+  fromUserId  String   @map("from_user_id") @db.Uuid
+  /// Plain-text сообщение. Markdown rendering на клиенте (V2).
+  body        String
+  /// MediaAsset.id (UUID) массив. Поддержка после #173.
+  attachments String[] @default([])
+  createdAt   DateTime @default(now()) @map("created_at")
+  /// JSONB: { "<userId>": "<ISO timestamp>" }. Кто и когда прочитал.
+  /// `{}` = ещё никто (включая отправителя — отправка ≠ чтение).
+  readBy      Json     @default("{}") @map("read_by")
+
+  thread ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  /// Главный hot-path: загрузка thread'а — последние N сообщений.
+  @@index([threadId, createdAt(sort: Desc)], map: "idx_chat_messages_thread_created")
+  /// Поиск «всё что писал user» — для расследования (#218 audit cross-ref).
+  @@index([fromUserId, createdAt(sort: Desc)], map: "idx_chat_messages_from_user_created")
+  @@map("chat_messages")
+}
