@@ -1,13 +1,14 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { UserStatus } from '@prisma/client';
+import { UserStatus, type UserRole } from '@prisma/client';
 
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
+import { TwoFaChallengeService } from '../two-fa/two-fa-challenge.service';
 
 import { JwtTokenService } from './jwt.service';
 import { PasswordService } from './password.service';
 
-import type { LoginDto, LoginResponse } from '../dto/login.dto';
+import type { LoginDto, LoginResponse, LoginTokenResponse } from '../dto/login.dto';
 
 const GENERIC_INVALID_CREDS = 'Неверный email или пароль';
 
@@ -35,6 +36,7 @@ export class LoginService {
     private readonly outbox: OutboxService,
     private readonly password: PasswordService,
     private readonly jwt: JwtTokenService,
+    private readonly twoFaChallenge: TwoFaChallengeService,
   ) {}
 
   async login(
@@ -43,7 +45,14 @@ export class LoginService {
   ): Promise<LoginResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
-      select: { id: true, email: true, role: true, status: true, passwordHash: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        passwordHash: true,
+        twoFaEnabled: true,
+      },
     });
 
     // Anti-enumeration: даже если user не найден, выполняем dummy-verify, чтобы
@@ -73,6 +82,30 @@ export class LoginService {
         .catch((err: unknown) => this.logger.warn({ err, userId: user.id }, 'rehash.failed'));
     }
 
+    // 2FA fork: пароль верный, но второй фактор требуется. Создаём challenge,
+    // токены НЕ выпускаем. Юзер пройдёт POST /auth/2fa/verify (#133).
+    if (user.twoFaEnabled) {
+      const challengeId = await this.twoFaChallenge.create({
+        userId: user.id,
+        ...(context.ip !== undefined ? { ip: context.ip } : {}),
+        ...(context.userAgent !== undefined ? { userAgent: context.userAgent } : {}),
+      });
+      this.logger.log({ userId: user.id, challengeId }, 'auth.login.2fa-challenge');
+      return { challengeId };
+    }
+
+    return this.issueTokensForUser(user, context);
+  }
+
+  /**
+   * Выпуск JWT-токенов + создание Session + outbox.
+   * Используется в успешном /login (без 2FA) и в /auth/2fa/verify после
+   * подтверждения второго фактора (#133).
+   */
+  async issueTokensForUser(
+    user: { id: string; email: string; role: UserRole },
+    context: { ip?: string | undefined; userAgent?: string | undefined },
+  ): Promise<LoginTokenResponse> {
     const refresh = this.jwt.generateRefresh();
     const refreshHash = await this.password.hash(refresh.random);
 
@@ -104,7 +137,6 @@ export class LoginService {
       return session.id;
     });
 
-    // sessionId известен после INSERT'а — теперь подписываем JWT с ним
     const access = this.jwt.signAccess({ userId: user.id, sessionId, role: user.role });
 
     this.logger.log({ userId: user.id, sessionId }, 'auth.user.logged_in');

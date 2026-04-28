@@ -19,19 +19,24 @@ import { randomBytes } from 'node:crypto';
 
 import {
   BadRequestException,
-  ConflictException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 import { generateSecret, generateURI, verifySync } from 'otplib';
 
+import { LoginService } from '../services/login.service';
 import { PasswordService } from '../services/password.service';
 import { CryptoService } from '../../../common/crypto/crypto.service';
 import { OutboxService } from '../../../common/outbox/outbox.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
+import { TwoFaChallengeService } from './two-fa-challenge.service';
 
+import type { LoginTokenResponse } from '../dto/login.dto';
 import type { EnrollResponse, VerifyEnrollResponse } from './dto/verify-enroll.dto';
 
 const TOTP_ISSUER = 'IndiaHorizone';
@@ -49,6 +54,12 @@ export class TwoFaService {
     private readonly crypto: CryptoService,
     private readonly password: PasswordService,
     private readonly outbox: OutboxService,
+    private readonly challenge: TwoFaChallengeService,
+    // forwardRef — LoginService инжектит TwoFaChallengeService, а TwoFaService
+    // (этот класс) инжектит LoginService.issueTokensForUser. NestJS DI требует
+    // явного forwardRef для разрыва circular dependency.
+    @Inject(forwardRef(() => LoginService))
+    private readonly login: LoginService,
   ) {}
 
   /**
@@ -167,6 +178,107 @@ export class TwoFaService {
 
     this.logger.log({ userId }, 'auth.2fa.enabled');
     return { recoveryCodes: plaintextCodes };
+  }
+
+  /**
+   * 2FA verify при login (#133).
+   *
+   * Flow:
+   * 1. Получаем challenge из Redis по challengeId — incr attempts.
+   * 2. Если challenge не найден ИЛИ attempts > MAX → 401.
+   * 3. Определяем формат code: 6 цифр → TOTP, иначе → recovery.
+   * 4. TOTP: decrypt secret, verify через otplib.
+   * 5. Recovery: для каждой неиспользованной recovery-записи user'а — argon2.verify.
+   *    При успехе помечаем usedAt = now (race-safe через UPDATE WHERE used_at IS NULL).
+   * 6. Если verify пройдёт — cleanup challenge, выпускаем токены через
+   *    LoginService.issueTokensForUser (тот же путь что без 2FA).
+   *
+   * Generic error message — не раскрываем «неверный код» vs «исчерпан лимит» vs
+   * «challenge не найден» (anti-enumeration пробного UX).
+   */
+  async verifyAtLogin(challengeId: string, code: string): Promise<LoginTokenResponse> {
+    const consumed = await this.challenge.consumeAttempt(challengeId);
+    if (!consumed) {
+      throw new UnauthorizedException('Невалидный или истёкший код');
+    }
+
+    const { payload, attempt } = consumed;
+    this.logger.debug({ challengeId, attempt, userId: payload.userId }, '2fa.verify.attempt');
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        twoFaEnabled: true,
+        twoFaSecret: true,
+      },
+    });
+    if (!user || !user.twoFaEnabled || !user.twoFaSecret) {
+      // Edge case: между созданием challenge и verify — admin отключил 2FA.
+      // Безопасно возвращаем generic error.
+      this.logger.warn({ userId: payload.userId }, '2fa.verify.user-not-eligible');
+      throw new UnauthorizedException('Невалидный или истёкший код');
+    }
+
+    const isTotpFormat = /^\d{6}$/.test(code);
+    const verified = isTotpFormat
+      ? this.verifyTotp(code, user.twoFaSecret)
+      : await this.verifyRecoveryCode(code, user.id);
+
+    if (!verified) {
+      throw new UnauthorizedException('Невалидный или истёкший код');
+    }
+
+    await this.challenge.cleanup(challengeId);
+
+    this.logger.log(
+      { userId: user.id, method: isTotpFormat ? 'totp' : 'recovery' },
+      'auth.2fa.verified',
+    );
+
+    const ctx = {
+      ...(payload.ip !== undefined ? { ip: payload.ip } : {}),
+      ...(payload.userAgent !== undefined ? { userAgent: payload.userAgent } : {}),
+    };
+    return this.login.issueTokensForUser(
+      { id: user.id, email: user.email, role: user.role },
+      ctx,
+    );
+  }
+
+  private verifyTotp(code: string, encryptedSecret: string): boolean {
+    const secret = this.crypto.decrypt(encryptedSecret);
+    const result = verifySync({ secret, token: code });
+    return result.valid;
+  }
+
+  /**
+   * Линейный поиск по неиспользованным recovery codes (≤10 на user'а).
+   * Argon2.verify — медленный, но это OK при ≤10 элементах.
+   *
+   * Race-safety: помечаем used_at в UPDATE WHERE used_at IS NULL — если
+   * параллельный verify уже использовал тот же код, наш UPDATE вернёт count=0
+   * и мы откатываемся (return false).
+   */
+  private async verifyRecoveryCode(code: string, userId: string): Promise<boolean> {
+    const codes = await this.prisma.recoveryCode.findMany({
+      where: { userId, usedAt: null },
+      select: { id: true, codeHash: true },
+    });
+
+    for (const candidate of codes) {
+      const { valid } = await this.password.verify(candidate.codeHash, code);
+      if (!valid) continue;
+
+      const claimed = await this.prisma.recoveryCode.updateMany({
+        where: { id: candidate.id, usedAt: null },
+        data: { usedAt: new Date() },
+      });
+      return claimed.count > 0;
+    }
+    return false;
   }
 
   /**

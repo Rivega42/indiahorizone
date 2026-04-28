@@ -18,9 +18,11 @@ import {
   VerifyEnrollDto,
   type VerifyEnrollResponse,
 } from './dto/verify-enroll.dto';
-import { CurrentUser } from '../../../common/auth/decorators';
+import { VerifyTwoFaLoginDto } from './dto/verify-login.dto';
+import { CurrentUser, Public } from '../../../common/auth/decorators';
 
 import type { AuthenticatedUser } from '../../../common/auth/types';
+import type { LoginTokenResponse } from '../dto/login.dto';
 
 @Controller('auth/2fa')
 export class TwoFaController {
@@ -39,5 +41,16 @@ export class TwoFaController {
     @Body() dto: VerifyEnrollDto,
   ): Promise<VerifyEnrollResponse> {
     return this.twoFa.completeEnrollment(user.id, dto.code);
+  }
+
+  /**
+   * Public endpoint — identity proven by challengeId (выдан после успешного password-step).
+   * Auth-токены выпускаются ТОЛЬКО при успешном verify (TOTP или recovery code).
+   */
+  @Public()
+  @Post('verify')
+  @HttpCode(HttpStatus.OK)
+  async verifyLogin(@Body() dto: VerifyTwoFaLoginDto): Promise<LoginTokenResponse> {
+    return this.twoFa.verifyAtLogin(dto.challengeId, dto.code);
   }
 }
