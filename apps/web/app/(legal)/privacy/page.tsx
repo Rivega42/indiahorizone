@@ -10,14 +10,13 @@
  */
 import type { Metadata } from 'next';
 
+import { LEGAL_LAST_UPDATED, PRIVACY_VERSION } from '@/lib/legal/versions';
+
 export const metadata: Metadata = {
   title: 'Политика конфиденциальности',
   description: 'Как IndiaHorizone собирает, использует и защищает ваши персональные данные.',
   robots: { index: true, follow: true },
 };
-
-const PRIVACY_VERSION = '0.1.0';
-const LAST_UPDATED = '28 апреля 2026 г.';
 
 export default function PrivacyPage(): React.ReactElement {
   return (
@@ -27,7 +26,7 @@ export default function PrivacyPage(): React.ReactElement {
           Политика конфиденциальности
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Версия {PRIVACY_VERSION} (черновик) · обновлено {LAST_UPDATED}
+          Версия {PRIVACY_VERSION} (черновик) · обновлено {LEGAL_LAST_UPDATED}
         </p>
       </header>
 
