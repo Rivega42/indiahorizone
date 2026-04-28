@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Новый вход в IndiaHorizone</title>
+</head>
+<body style="margin:0; padding:0; background:#f7f4ee; font-family: 'Helvetica Neue', Arial, sans-serif; color:#222;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f7f4ee; padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background:#ffffff; border-radius:12px; padding:40px 32px; max-width:600px;">
+          <tr>
+            <td style="font-size:22px; font-weight:600; padding-bottom:16px;">
+              Новый вход — это вы?
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:15px; line-height:1.6; color:#444; padding-bottom:16px;">
+              Мы заметили вход в ваш аккаунт IndiaHorizone с непривычного устройства или сети.
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#fafafa; border-radius:8px; padding:16px 20px; font-size:14px; line-height:1.6; color:#444;">
+              <strong>IP-сеть:</strong> {{ipMasked}}<br>
+              <strong>Устройство:</strong> {{userAgent}}<br>
+              <strong>Время:</strong> {{loggedAt}}
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:15px; line-height:1.6; color:#444; padding-top:24px; padding-bottom:16px;">
+              <strong>Если это были вы</strong> — игнорируйте письмо.
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:15px; line-height:1.6; color:#444; padding-bottom:24px;">
+              <strong>Если это были не вы</strong> — кто-то получил доступ к вашему паролю.
+              Срочно смените пароль:
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:8px 0 24px 0;">
+              <a href="{{resetPasswordUrl}}"
+                 style="display:inline-block; background:#c0392b; color:#ffffff; text-decoration:none; padding:14px 28px; border-radius:8px; font-weight:600; font-size:16px;">
+                Сменить пароль
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:13px; line-height:1.5; color:#888; padding-top:16px; border-top:1px solid #eee;">
+              При смене пароля все активные сессии (на всех устройствах) будут завершены —
+              никто не сможет продолжать пользоваться украденным доступом.
+              <br><br>
+              Если у вас включена двухфакторная аутентификация (2FA) — атакующий
+              не сможет войти, даже зная пароль. Если 2FA не включена, рекомендуем
+              включить в настройках профиля.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
