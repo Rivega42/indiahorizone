@@ -1,5 +1,6 @@
 import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { CommonAuthModule } from './common/auth/auth.module';
 import { CryptoModule } from './common/crypto/crypto.module';
@@ -28,6 +29,7 @@ import { TripsModule } from './modules/trips/trips.module';
       isGlobal: true,
       cache: true,
     }),
+    ScheduleModule.forRoot(), // cron tasks (#160 trip auto-transitions)
     LoggerModule, // pino + correlation-id (#124) — должен быть выше остальных
     MetricsModule, // Prometheus metrics + /metrics endpoint (#125)
     CryptoModule, // global, нужен PrismaService в фазе 4 + ClientsService уже сейчас (#139)
