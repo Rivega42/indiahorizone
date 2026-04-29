@@ -88,15 +88,18 @@ Backend slices status:
 
 | Что | Статус | Issue |
 |---|---|---|
+| `/tours` index — каталог всех туров с card-grid | ✅ DONE | EPIC 12 |
 | `/tours/[slug]` route + ISR + generateStaticParams | ✅ DONE | #298 |
-| Hero + Facts + DayTimeline + Inclusions + Reviews + PriceBlock + FAQ + FooterLegal — все секции | ✅ DONE (inline в page.tsx) | #299–#306 |
+| Hero + Facts + DayTimeline + Inclusions + Reviews + PriceBlock + FAQ + FooterLegal — extracted в `components/tour/*.tsx` | ✅ DONE | #299–#306 + refactor |
 | LeadForm с consent чекбоксом ПДн | ✅ DONE | #304 |
 | Catalog API `GET /tours` + `GET /tours/:slug` | ✅ DONE | #296 |
 | SEO — Schema.org TouristTrip + FAQPage + Open Graph + Twitter + robots.txt + sitemap.xml + Yandex-verification | ✅ DONE | #308 |
 | `/privacy` + `/consent` + `/offer` legal страницы (DRAFT, требуют юр.review) | ✅ DRAFT | #307 |
 | Performance: next/image для hero+timeline, dynamic import LeadForm, AVIF/WebP | ✅ DONE | #309 (Lighthouse-замер ждёт deploy) |
+| Lighthouse CI workflow (mobile budgets) | ✅ DONE | #309 follow-up |
 | PWA manifest + Service Worker + iOS-friendly icons | ✅ DONE | #122 |
 | iOS PWA push prompt (usePushSupport hook + IosInstallInstructions + EnableNotificationsButton) | ✅ DONE | #356 |
+| `/profile` index + `/profile/notifications` (preferences UI + devices management) | ✅ DONE | #163 + #166 |
 | Auth UI (login/register) | ✅ DONE | #135 |
 | Дизайн D1-D7 для Tour Landing | ⏳ В работе (Claude Design) | #312–#318 |
 | Trip Dashboard frontend | ⏳ Не начато | #152–#161 |
