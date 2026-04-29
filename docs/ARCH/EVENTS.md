@@ -122,9 +122,7 @@ interface DomainEvent<T> {
 |---|---|---|---|
 | `trips.created` | POST /trips (manager/admin) | `{tripId, clientId, createdBy, region, startsAt, endsAt}` | ✅ #150 |
 | `trips.itinerary.updated` | POST /trips/:id/itinerary/publish | `{tripId, itineraryId, version, publishedAt, previousVersion, dayPlanIds[], diff: {addedDays, removedDays, changedDays}}` | ✅ #151 |
-| `trips.status.changed` | (TODO state-machine #160) | `{tripId, from, to}` | ⏳ #160 |
-| `trips.day.started` / `trips.day.ended` | Cron-scheduler (#160) | `{tripId, dayNumber}` | ⏳ #160 |
-| `trips.completed` / `trips.cancelled` | Status transitions | `{tripId, ...}` | ⏳ #160 |
+| `trips.status.changed` | PATCH /trips/:id/status (manual) + payment-listener (paid) + cron auto-transitions (in_progress/completed) | `{tripId, from, to, reason: 'manual'\|'time-started'\|'time-ended'\|'payment-received'\|'cancellation', actorId, occurredAt}` | ✅ #160 |
 | `trips.document.attached` | (TODO после media #174-178) | `{tripId, mediaId, docType}` | ⏳ |
 
 ### sos-svc
@@ -145,6 +143,7 @@ interface DomainEvent<T> {
 | `comm.message.failed` | NotifyService permanent fail | `{notificationId, channel, templateId, errorMessage, userId?}` | ✅ #162 |
 | `comm.message.delivered` | Webhook от provider'а (TODO) | `{notificationId}` | ⏳ |
 | `comm.chat.message_sent` | POST /chat/threads/:id/messages | `{threadId, messageId, fromUserId, hasAttachments}` (без body — privacy) | ✅ #169 |
+| `comm.push.subscribed` | POST /comm/push/subscribe | `{subscriptionId, userId, platform, reactivated}` (без endpoint/keys — privacy, endpoint per-device potentially PII) | ✅ #163 |
 
 ### media-svc
 
