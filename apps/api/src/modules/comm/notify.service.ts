@@ -38,6 +38,14 @@ export interface SendInput {
   data: Record<string, unknown>;
   /** Опционально: связать notification с user'ом (transactional context) */
   userId?: string;
+  /**
+   * Категория для проверки user.preferences.channels[email]. SOS обходит
+   * проверку (protected). Если не задан — preferences не проверяются (legacy).
+   *
+   * Welcome / password-reset / suspicious-login — это `system` (нельзя отключить).
+   * Marketing email — `marketing` (152-ФЗ ст. 18: opt-in, по умолчанию выключен).
+   */
+  category?: NotificationCategory;
 }
 
 /**
@@ -78,7 +86,7 @@ export class NotifyService {
     private readonly preferences: NotificationPreferencesService,
   ) {}
 
-  async send(input: SendInput): Promise<{ notificationId: string }> {
+  async send(input: SendInput): Promise<{ notificationId: string; skipped?: boolean }> {
     if (input.channel !== 'email') {
       throw new NotFoundException(
         `Channel "${input.channel}" в .send() не поддерживается. Для push используйте .sendPush(); для sms/telegram — отдельные методы (#164/#165)`,
@@ -86,6 +94,34 @@ export class NotifyService {
     }
     if (!this.templates.exists(input.templateId)) {
       throw new NotFoundException(`Template "${input.templateId}" не найден`);
+    }
+
+    // Preferences check (#166): respect user.preferences.channels[email] для category.
+    // SOS — protected. Если category не задан или userId не задан — preferences
+    // не проверяются (legacy callers / sender to non-user email).
+    if (input.userId !== undefined && input.category !== undefined) {
+      const allowed = await this.preferences.shouldNotify(input.userId, input.category, 'email');
+      if (!allowed) {
+        this.logger.log(
+          { userId: input.userId, category: input.category, templateId: input.templateId },
+          'comm.email.skipped.preferences',
+        );
+        // Создаём Notification record для трассировки.
+        const skipped = await this.prisma.notification.create({
+          data: {
+            channel: input.channel,
+            recipient: input.to,
+            templateId: input.templateId,
+            payload: input.data as Prisma.InputJsonValue,
+            status: 'failed',
+            failedAt: new Date(),
+            errorMessage: `blocked by user preferences (category=${input.category})`,
+            userId: input.userId,
+          },
+          select: { id: true },
+        });
+        return { notificationId: skipped.id, skipped: true };
+      }
     }
 
     const notification = await this.prisma.notification.create({

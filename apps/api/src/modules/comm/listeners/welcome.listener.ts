@@ -81,6 +81,9 @@ export class WelcomeEmailListener implements OnModuleInit, OnModuleDestroy {
           appUrl,
         },
         userId,
+        // Welcome email — обязательный onboarding (system category),
+        // не маркетинг. Не блокируется preferences.
+        category: 'system',
       });
     } catch (err) {
       // Re-throw — events-bus retry-цикл подхватит. После MAX_ATTEMPTS попыток
