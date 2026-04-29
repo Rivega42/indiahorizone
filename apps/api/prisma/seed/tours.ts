@@ -14,7 +14,7 @@
  *
  * Issue: #295 [12.2]
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { PrismaClient, type Prisma, type TourStatus } from '@prisma/client';
@@ -53,7 +53,16 @@ interface TourJson {
   days: TourDayJson[];
 }
 
-const TOUR_FILES = ['tours/kerala-2026-10.json'];
+/**
+ * Auto-discovery всех `*.json` в директории seed/tours/.
+ * Drop new tour file → run seed → готово, без изменения кода.
+ * См. apps/api/prisma/seed/tours/README.md.
+ */
+const TOURS_DIR = join(__dirname, 'tours');
+const TOUR_FILES = readdirSync(TOURS_DIR)
+  .filter((f) => f.endsWith('.json'))
+  .map((f) => `tours/${f}`)
+  .sort();
 
 async function seedTour(file: string): Promise<void> {
   const path = join(__dirname, file);

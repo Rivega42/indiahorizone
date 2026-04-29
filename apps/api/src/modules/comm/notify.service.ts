@@ -22,13 +22,14 @@
  */
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
+import { NotificationPreferencesService } from './preferences/preferences.service';
 import { EMAIL_PROVIDER, type EmailProvider } from './providers/email.provider';
 import { PushService } from './push/push.service';
 import { TemplateService } from './template.service';
 import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
-import type { NotificationChannel, Prisma } from '@prisma/client';
+import type { NotificationCategory, NotificationChannel, Prisma } from '@prisma/client';
 
 export interface SendInput {
   channel: NotificationChannel;
@@ -47,6 +48,10 @@ export interface SendInput {
  * `tag` — для группировки (один tag → одна notification, не стек). Удобно для
  * сценариев типа «обновился статус trip» — каждый trip имеет свой tag, новая
  * push заменяет старую вместо стека.
+ *
+ * `category` — для проверки user.preferences.channels[push]. SOS обходит
+ * проверку (protected). Если не задан — preferences не проверяются (only для
+ * legacy callers; новые callers ОБЯЗАНЫ указывать category).
  */
 export interface SendPushInput {
   userId: string;
@@ -54,6 +59,7 @@ export interface SendPushInput {
   body: string;
   url?: string;
   tag?: string;
+  category?: NotificationCategory;
 }
 
 @Injectable()
@@ -66,6 +72,7 @@ export class NotifyService {
     private readonly templates: TemplateService,
     @Inject(EMAIL_PROVIDER) private readonly emailProvider: EmailProvider,
     private readonly push: PushService,
+    private readonly preferences: NotificationPreferencesService,
   ) {}
 
   async send(input: SendInput): Promise<{ notificationId: string }> {
@@ -178,7 +185,42 @@ export class NotifyService {
     sent: number;
     failed: number;
     expired: number;
+    skipped: boolean;
   }> {
+    // Preferences check (#166): respect user.preferences.channels.push для категории.
+    // SOS — protected, всегда true. Для legacy callers без category — пропускаем
+    // проверку (skipped=false по дефолту, push идёт).
+    if (input.category) {
+      const allowed = await this.preferences.shouldNotify(input.userId, input.category, 'push');
+      if (!allowed) {
+        this.logger.log(
+          { userId: input.userId, category: input.category },
+          'comm.push.skipped.preferences',
+        );
+        // Создаём Notification для трассировки, но в статусе 'failed' с явным reason.
+        // Это даёт founder'ам аналитику «сколько отправок blocked'нуто preferences».
+        const skipped = await this.prisma.notification.create({
+          data: {
+            channel: 'push',
+            recipient: input.userId,
+            templateId: 'push:inline',
+            payload: {
+              title: input.title,
+              body: input.body,
+              ...(input.url !== undefined ? { url: input.url } : {}),
+              ...(input.tag !== undefined ? { tag: input.tag } : {}),
+            },
+            status: 'failed',
+            failedAt: new Date(),
+            errorMessage: `blocked by user preferences (category=${input.category})`,
+            userId: input.userId,
+          },
+          select: { id: true },
+        });
+        return { notificationId: skipped.id, sent: 0, failed: 0, expired: 0, skipped: true };
+      }
+    }
+
     const notification = await this.prisma.notification.create({
       data: {
         channel: 'push',
@@ -254,6 +296,6 @@ export class NotifyService {
       finalStatus === 'sent' ? 'comm.push.sent' : 'comm.push.no-devices-or-failed',
     );
 
-    return { notificationId: notification.id, ...result };
+    return { notificationId: notification.id, ...result, skipped: false };
   }
 }
