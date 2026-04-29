@@ -21,6 +21,17 @@ export interface PushDeliverPayload {
   url?: string;
   /** Для группировки в бровзере (один tag → одна notification, не стек). */
   tag?: string;
+  /**
+   * Web Push urgency hint (RFC 8030 §5.3):
+   * - `normal` (default) — обычная нотификация (поездка стартовала, чат)
+   * - `high` — критичная (SOS ack, отмена поездки) — push-сервер пытается доставить
+   *   быстрее даже на устройстве в режиме энергосбережения
+   *
+   * Apple Web Push на iOS особенно чувствителен — `high` обходит throttling, но
+   * злоупотребление может привести к downgrade'у нашего sender-rep'а у Apple.
+   * Использовать ТОЛЬКО для action-required (SOS, finance refund failure).
+   */
+  urgency?: 'normal' | 'high';
 }
 
 export interface PushSubscriptionTarget {

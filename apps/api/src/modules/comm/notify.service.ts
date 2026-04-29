@@ -52,6 +52,8 @@ export interface SendInput {
  * `category` — для проверки user.preferences.channels[push]. SOS обходит
  * проверку (protected). Если не задан — preferences не проверяются (only для
  * legacy callers; новые callers ОБЯЗАНЫ указывать category).
+ *
+ * `urgency` — `'normal'` (default) | `'high'` для action-required SOS.
  */
 export interface SendPushInput {
   userId: string;
@@ -60,6 +62,7 @@ export interface SendPushInput {
   url?: string;
   tag?: string;
   category?: NotificationCategory;
+  urgency?: 'normal' | 'high';
 }
 
 @Injectable()
@@ -244,6 +247,7 @@ export class NotifyService {
       body: input.body,
       ...(input.url !== undefined ? { url: input.url } : {}),
       ...(input.tag !== undefined ? { tag: input.tag } : {}),
+      ...(input.urgency !== undefined ? { urgency: input.urgency } : {}),
     });
 
     // Status: sent если хоть один device получил, failed если все провалились
