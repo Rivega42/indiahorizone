@@ -79,6 +79,8 @@ export class PasswordResetService {
         templateId: 'password-reset',
         data: { resetUrl },
         userId: user.id,
+        // Password reset = system-critical, нельзя отключить через preferences.
+        category: 'system',
       });
     } catch (err) {
       // Email-fail НЕ должен ломать UX (всё равно 204).

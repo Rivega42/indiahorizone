@@ -87,6 +87,8 @@ export class SuspiciousLoginListener implements OnModuleInit, OnModuleDestroy {
           resetPasswordUrl,
         },
         userId,
+        // Suspicious-login = security-critical, system category (не блокируется preferences).
+        category: 'system',
       });
     } catch (err) {
       // Re-throw — events-bus retry-цикл подхватит. Если SMTP временно недоступен,
