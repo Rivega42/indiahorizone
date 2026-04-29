@@ -1,7 +1,7 @@
 import { ChevronDown, Leaf, Mountain, Music, Sparkles, UtensilsCrossed, Waves } from 'lucide-react';
 import Image from 'next/image';
 
-import { SectionHead } from './_shared';
+import { pluralizeDays, SectionHead } from './_shared';
 
 import type { ActivityKind, Tour } from '@/lib/mock/tours';
 
@@ -22,19 +22,6 @@ const ACTIVITY_ICONS: Record<ActivityKind, React.ReactElement> = {
   adventure: <Mountain className="h-3.5 w-3.5" aria-hidden />,
   wellness: <Sparkles className="h-3.5 w-3.5" aria-hidden />,
 };
-
-/**
- * Корректное склонение существительного «день»:
- * 1 день, 2-4 дня, 5-20 дней, 21 день, ...
- */
-function pluralizeDays(n: number): string {
-  const lastTwo = n % 100;
-  if (lastTwo >= 11 && lastTwo <= 14) return `${n} дней`;
-  const last = n % 10;
-  if (last === 1) return `${n} день`;
-  if (last >= 2 && last <= 4) return `${n} дня`;
-  return `${n} дней`;
-}
 
 export function DayTimeline({ tour }: { tour: Tour }): React.ReactElement {
   return (

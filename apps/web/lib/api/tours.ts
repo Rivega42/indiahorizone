@@ -74,5 +74,52 @@ export async function listTourSlugs(): Promise<string[]> {
   return listMockSlugs();
 }
 
+/**
+ * Tour-card для index-страницы /tours. Подмножество полного Tour (без days/faq/...).
+ */
+export interface TourSummary {
+  slug: string;
+  title: string;
+  region: string;
+  durationDays: number;
+  season: string;
+  priceFromRub: number;
+  priceToRub?: number | null;
+  heroPosterUrl: string;
+}
+
+/**
+ * Список туров для /tours index page. Возвращает полные TourSummary для рендера карточек.
+ * При недоступности API — fallback на mock.
+ */
+export async function listTourSummaries(): Promise<TourSummary[]> {
+  const res = await fetchWithTimeout(`${API_URL}/tours`, 3000);
+  if (res?.ok) {
+    try {
+      const data = (await res.json()) as TourSummary[];
+      if (data.length > 0) return data;
+    } catch {
+      /* falls through to mock */
+    }
+  }
+  // Mock-fallback: вытаскиваем те же поля из локальных mock-туров
+  return listMockSlugs().map((slug) => {
+    const t = MOCK_TOURS_BY_SLUG[slug];
+    if (!t) {
+      throw new Error(`mock tour not found: ${slug}`);
+    }
+    return {
+      slug: t.slug,
+      title: t.title,
+      region: t.region,
+      durationDays: t.durationDays,
+      season: t.season,
+      priceFromRub: t.priceFromRub,
+      priceToRub: t.priceToRub ?? null,
+      heroPosterUrl: t.heroPosterUrl,
+    };
+  });
+}
+
 export type { Tour };
 export { KERALA_TOUR };

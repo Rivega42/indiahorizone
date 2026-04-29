@@ -53,12 +53,28 @@ const INTERFACES: Interface[] = [
     issue: 'EPIC 13 (предстоит)',
   },
   {
+    href: '/tours',
+    title: 'Каталог туров — все туры (Next.js, наш стек)',
+    status: 'ready',
+    description:
+      'Index-страница со всеми опубликованными турами. Карточки 1/2/3-col responsive, lazy-loaded next/image. ISR 1h.',
+    issue: '#293 (EPIC 12)',
+  },
+  {
     href: '/tours/tury-kerala-oktyabr-2026',
     title: 'Страница тура — Керала 10 дней (Next.js, наш стек)',
     status: 'in-progress',
     description:
       'Tour landing на Tailwind + shadcn: Hero, Facts, DayTimeline, Inclusions, PriceBlock+LeadForm, FAQ. Mock-данные. Будет переработана под дизайн [12.D2-D5] после утверждения.',
     issue: '#293 (EPIC 12)',
+  },
+  {
+    href: '/profile',
+    title: 'Личный кабинет — index (auth required)',
+    status: 'ready',
+    description:
+      'Index профиля с разделами. Сейчас 1: Уведомления (push/email/SMS/Telegram preferences + devices).',
+    issue: '#163 + #166',
   },
   {
     href: '/login',
