@@ -11,11 +11,26 @@ export function formatRub(value: number): string {
   return new Intl.NumberFormat('ru-RU').format(value);
 }
 
-export function formatPriceLabel(tour: Pick<Tour, 'priceFromRub' | 'priceToRub'>): string {
+export function formatPriceLabel(
+  tour: Pick<Tour, 'priceFromRub'> & { priceToRub?: number | null },
+): string {
   if (tour.priceToRub) {
     return `${formatRub(tour.priceFromRub)} — ${formatRub(tour.priceToRub)} ₽`;
   }
   return `от ${formatRub(tour.priceFromRub)} ₽`;
+}
+
+/**
+ * Корректное склонение существительного «день»:
+ * 1 день, 2-4 дня, 5-20 дней, 21 день, 22 дня, ...
+ */
+export function pluralizeDays(n: number): string {
+  const lastTwo = n % 100;
+  if (lastTwo >= 11 && lastTwo <= 14) return `${n} дней`;
+  const last = n % 10;
+  if (last === 1) return `${n} день`;
+  if (last >= 2 && last <= 4) return `${n} дня`;
+  return `${n} дней`;
 }
 
 interface SectionHeadProps {

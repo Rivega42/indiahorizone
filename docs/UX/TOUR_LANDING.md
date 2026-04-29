@@ -3,7 +3,11 @@
 > **Статус:** v1.0. Закрывает [#310](https://github.com/Rivega42/indiahorizone/issues/310).
 > **Owner:** product (Roman) + дизайн (Claude Design / external).
 > **Связано:** [`docs/ARCH/CATALOG.md`](../ARCH/CATALOG.md), [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
-> **Реализация:** `apps/web/app/tours/[slug]/page.tsx`. Дизайн-итерации: #312–#318.
+> **Реализация:**
+> - `apps/web/app/tours/page.tsx` — index-страница со всеми турами (карточки 1/2/3 col responsive)
+> - `apps/web/app/tours/[slug]/page.tsx` — landing-страница конкретного тура (этот документ)
+>
+> Дизайн-итерации: #312–#318.
 
 ## Назначение
 
