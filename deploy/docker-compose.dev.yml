@@ -1,9 +1,12 @@
 # Compose для dev на 2.56.241.126:3010
 # Issue: #320 [devops:vika]
 #
+# ВАЖНО: образ строится в GitHub Actions и пушится в GHCR.
+#        Локальный build отключён. pull_policy: always гарантирует свежий образ.
+#
 # Запуск (на сервере):
 #   cd /opt/indiahorizone
-#   docker compose -f docker-compose.dev.yml up -d --build
+#   docker compose -f docker-compose.dev.yml up -d --no-build
 #
 # Что НЕ входит в этот compose (специально):
 #   - apps/api (NestJS) — добавим когда [12.4] Lead закроется и Vika
@@ -13,10 +16,8 @@
 
 services:
   web:
-    build:
-      context: ./deploy
-      dockerfile: apps/web/Dockerfile
-    image: indiahorizone-web:dev
+    image: ghcr.io/rivega42/indiahorizone-web:dev
+    pull_policy: always
     container_name: indiahorizone-web-dev
     restart: unless-stopped
     ports:
