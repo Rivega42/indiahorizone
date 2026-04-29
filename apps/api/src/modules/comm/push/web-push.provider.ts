@@ -102,13 +102,13 @@ export class WebPushProvider implements PushProvider, OnModuleInit {
     });
 
     try {
-      // TTL 24h — push-сервис попытается доставить за это время если устройство
-      // оффлайн. Дольше нет смысла (контекст устаревает).
-      // urgency='normal' — для critical SOS будет 'high' через отдельный stream
-      // (events.comm.push.priority — TODO #163 follow-up).
+      // TTL: high-urgency = 1h (контекст SOS быстро устаревает), normal = 24h
+      const urgency = payload.urgency ?? 'normal';
+      const ttl = urgency === 'high' ? 60 * 60 : 24 * 60 * 60;
+
       await webpush.sendNotification(subscription, body, {
-        TTL: 24 * 60 * 60,
-        urgency: 'normal',
+        TTL: ttl,
+        urgency,
       });
       return { ok: true };
     } catch (err) {
