@@ -1,0 +1,106 @@
+name: Lighthouse mobile perf
+
+# Запускается:
+# - на schedule (раз в неделю на main) — отслеживание дрейфа perf
+# - вручную через workflow_dispatch с branch / URL — для ad-hoc проверок
+#
+# Поднимает Next.js production build локально в Job, гонит lighthouse-ci.
+# Бюджеты в .lighthouserc.json — pull request НЕ блокируется при regression
+# (warn level), только error на A11y < 0.95 и SEO < 0.95.
+#
+# Полные deploy-замеры (на 2.56.241.126 после deploy) — отдельный workflow
+# (devops:vika territory, нужен SSH-runner или scheduled hook).
+
+on:
+  schedule:
+    # 06:00 UTC = 09:00 MSK — после ночных deploy'ев
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch / SHA to test (default = main)'
+        required: false
+        default: 'main'
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9.12.0'
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || 'main' }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install web deps
+        run: pnpm install --frozen-lockfile --filter "@indiahorizone/web..."
+
+      - name: Build web
+        env:
+          NEXT_PUBLIC_API_URL: ''
+          NEXT_PUBLIC_SITE_URL: 'http://localhost:3010'
+          NEXT_PUBLIC_DISABLE_INDEXING: 'true'
+        run: pnpm --filter @indiahorizone/web build
+
+      - name: Start web (background)
+        env:
+          PORT: 3010
+          NEXT_PUBLIC_API_URL: ''
+        run: |
+          pnpm --filter @indiahorizone/web start &
+          echo $! > /tmp/web.pid
+          # Wait for server to be ready (max 60s)
+          for i in {1..60}; do
+            if curl -sf http://localhost:3010/ >/dev/null; then
+              echo "✓ web ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "❌ web failed to start within 60s"
+          exit 1
+
+      - name: Install Lighthouse CI
+        run: pnpm dlx --package=@lhci/cli@0.13.0 lhci --version
+
+      - name: Run Lighthouse
+        run: |
+          pnpm dlx --package=@lhci/cli@0.13.0 lhci autorun \
+            --config=.lighthouserc.json
+        continue-on-error: true # warn-level assertions не блокируют CI на этом этапе
+
+      - name: Stop web
+        if: always()
+        run: |
+          if [ -f /tmp/web.pid ]; then
+            kill "$(cat /tmp/web.pid)" || true
+          fi
+
+      - name: Upload reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 14
