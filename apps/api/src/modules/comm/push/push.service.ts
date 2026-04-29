@@ -119,6 +119,18 @@ export class PushService {
   }
 
   /**
+   * Soft-delete subscription по id. RBAC: только владелец может отписаться.
+   * Чужой id → 404 (не раскрываем существование чужих subscription'ов).
+   */
+  async unsubscribeById(userId: string, subscriptionId: string): Promise<{ removed: boolean }> {
+    const result = await this.prisma.pushSubscription.updateMany({
+      where: { id: subscriptionId, userId, deletedAt: null },
+      data: { deletedAt: new Date() },
+    });
+    return { removed: result.count > 0 };
+  }
+
+  /**
    * Активные subscription'ы user'а (для UI «ваши устройства»).
    */
   async listForUser(userId: string): Promise<PushSubscription[]> {
