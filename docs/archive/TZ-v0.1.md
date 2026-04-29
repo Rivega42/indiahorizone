@@ -1,3 +1,5 @@
+> ⚠️ АРХИВ. Документ устарел. Актуальная версия: [docs/TZ/README.md](../TZ/README.md)
+
 # Техническое задание — IndiaHorizone Platform
 
 > Tech-enabled India concierge для русскоязычных клиентов
