@@ -36,7 +36,7 @@
     "@nestjs/schedule": "^6.1.3",
     "@nestjs/terminus": "^10.2.3",
     "@nestjs/throttler": "^6.5.0",
-    "@nestjs/websockets": "^10",
+    "@nestjs/websockets": "^11",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/auto-instrumentations-node": "^0.73.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.215.0",
