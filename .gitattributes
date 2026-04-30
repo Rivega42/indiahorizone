@@ -1,0 +1,38 @@
+# Auto-detect text files и нормализуй line endings к LF (даже если кто-то клонирует на Windows)
+* text=auto eol=lf
+
+# Бинарники — не diff'им и не изменяем
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.mp4 binary
+*.webm binary
+*.mov binary
+*.mp3 binary
+*.wav binary
+
+# pnpm-lock.yaml — линкуется как text, но diff не нужен (только проверка merge-conflict'ов)
+pnpm-lock.yaml -diff
+
+# Generated files — мерджи не нужны
+*.tsbuildinfo -text
+.next/** -text -diff
+
+# Линтить как обычный markdown — переводы строк LF
+*.md text eol=lf
+
+# Shell-скрипты — LF обязательно (иначе bash на Linux/macOS сломается)
+*.sh text eol=lf
