@@ -1,58 +1,58 @@
-"компонент: web":
+'компонент: web':
   - changed-files:
       - any-glob-to-any-file:
-          - "apps/web/**"
-          - "packages/ui/**"
-          - "src/web/**"
+          - 'apps/web/**'
+          - 'packages/ui/**'
+          - 'src/web/**'
 
-"компонент: mobile":
+'компонент: mobile':
   - changed-files:
       - any-glob-to-any-file:
-          - "apps/mobile/**"
-          - "ios/**"
-          - "android/**"
+          - 'apps/mobile/**'
+          - 'ios/**'
+          - 'android/**'
 
-"компонент: api":
+'компонент: api':
   - changed-files:
       - any-glob-to-any-file:
-          - "apps/api/**"
-          - "src/api/**"
-          - "src/server/**"
+          - 'apps/api/**'
+          - 'src/api/**'
+          - 'src/server/**'
 
-"компонент: db":
+'компонент: db':
   - changed-files:
       - any-glob-to-any-file:
-          - "**/migrations/**"
-          - "**/prisma/**"
-          - "**/schema.prisma"
-          - "**/alembic/**"
+          - '**/migrations/**'
+          - '**/prisma/**'
+          - '**/schema.prisma'
+          - '**/alembic/**'
 
-"компонент: devops":
+'компонент: devops':
   - changed-files:
       - any-glob-to-any-file:
-          - ".github/**"
-          - "infra/**"
-          - "Dockerfile*"
-          - "docker-compose*.yml"
-          - ".pre-commit-config.yaml"
+          - '.github/**'
+          - 'infra/**'
+          - 'Dockerfile*'
+          - 'docker-compose*.yml'
+          - '.pre-commit-config.yaml'
 
-"компонент: ai":
+'компонент: ai':
   - changed-files:
       - any-glob-to-any-file:
-          - "packages/ai/**"
-          - "docs/prompts/**"
-          - "docs/ai/**"
+          - 'packages/ai/**'
+          - 'docs/prompts/**'
+          - 'docs/ai/**'
 
-"тип: документация":
+'тип: документация':
   - changed-files:
       - any-glob-to-any-file:
-          - "**/*.md"
-          - "docs/**"
+          - '**/*.md'
+          - 'docs/**'
 
-"тип: тесты":
+'тип: тесты':
   - changed-files:
       - any-glob-to-any-file:
-          - "**/*.test.*"
-          - "**/*.spec.*"
-          - "tests/**"
-          - "__tests__/**"
+          - '**/*.test.*'
+          - '**/*.spec.*'
+          - 'tests/**'
+          - '__tests__/**'

@@ -1,17 +1,17 @@
 name: ✅ Задача
 description: Обычная рабочая задача
-title: "[TASK] "
-labels: ["статус: бэклог"]
+title: '[TASK] '
+labels: ['статус: бэклог']
 body:
   - type: dropdown
     id: type
     attributes:
       label: Тип
       options:
-        - "тип: рефакторинг"
-        - "тип: документация"
-        - "тип: тех-долг"
-        - "тип: инфра"
+        - 'тип: рефакторинг'
+        - 'тип: документация'
+        - 'тип: тех-долг'
+        - 'тип: инфра'
     validations:
       required: true
   - type: dropdown
@@ -29,14 +29,14 @@ body:
     id: priority
     attributes:
       label: Приоритет
-      options: ["P0", "P1", "P2", "P3"]
+      options: ['P0', 'P1', 'P2', 'P3']
     validations:
       required: true
   - type: dropdown
     id: size
     attributes:
       label: Размер
-      options: ["XS", "S", "M", "L", "XL"]
+      options: ['XS', 'S', 'M', 'L', 'XL']
     validations:
       required: true
   - type: dropdown

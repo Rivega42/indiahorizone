@@ -1,7 +1,7 @@
 name: 🤖 DevOps задача для Вики
 description: Серверные действия, инфраструктура, GitHub admin
-title: "[devops:vika] "
-labels: ["тип: инфра", "для: вики"]
+title: '[devops:vika] '
+labels: ['тип: инфра', 'для: вики']
 body:
   - type: textarea
     id: goal
@@ -27,7 +27,7 @@ body:
     id: priority
     attributes:
       label: Приоритет
-      options: ["P0", "P1", "P2", "P3"]
+      options: ['P0', 'P1', 'P2', 'P3']
     validations:
       required: true
   - type: textarea

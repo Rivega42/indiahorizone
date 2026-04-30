@@ -1,7 +1,7 @@
 name: 🎯 Эпик
 description: Большой блок работы (>1 неделя, несколько issues)
-title: "[EPIC ?] "
-labels: ["тип: эпик", "статус: discovery"]
+title: '[EPIC ?] '
+labels: ['тип: эпик', 'статус: discovery']
 body:
   - type: markdown
     attributes:
@@ -11,7 +11,7 @@ body:
     id: priority
     attributes:
       label: Приоритет
-      options: ["P0", "P1", "P2", "P3"]
+      options: ['P0', 'P1', 'P2', 'P3']
     validations:
       required: true
   - type: dropdown

@@ -19,6 +19,9 @@ export default tseslint.config(
       '**/public/**',
       // AI-generated prototypes from Claude Design — не для lint'а, только для визуального референса
       'docs/UX/prototypes/from-claude-design/**',
+      // Automation скрипты — ESM-модули для GitHub Actions, не часть TS-проекта
+      // (запускаются через actions/github-script@v7 динамическим импортом).
+      'scripts/**/*.mjs',
     ],
   },
 
