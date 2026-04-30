@@ -95,33 +95,57 @@
 
 **Уязвимости в зависимостях:** не сканировано в этой сессии. Dependabot отсутствует — отдельный gap.
 
-## План работ (приоритеты)
+## План работ (приоритеты) — итоги после ШАГОВ 1-10
 
-### P0 (блокеры безопасности)
-- ✅ нет открытых P0-блокеров
+| Пункт | Статус |
+|---|---|
+| **P0 блокеры безопасности** | ✅ нет открытых |
+| `STATE.md` | ✅ создан |
+| `DECISIONS.md` | ✅ создан (10 ADR) |
+| `SECURITY.md` | ✅ создан |
+| `CHANGELOG.md` | ✅ создан + release-please workflow для будущей автогенерации |
+| `ROADMAP.md` (root) | ✅ создан (фасад) |
+| `BACKLOG.md` (root) | ✅ создан (фасад) |
+| `.gitattributes` | ✅ создан (LF normalization) |
+| `docs/ai/` | ✅ создан (CLAUDE_CODE_RULES, VIKA_RULES, DEVOPS_RULES, CLAUDE_DESIGN_RULES, EXTERNAL_TASKS, AUTOMATION) |
+| `docs/context/` | ✅ создан (PRODUCT_CONTEXT, DOMAIN) |
+| `docs/GLOSSARY.md` | ✅ создан |
+| `docs/prompts/` | ✅ создан (placeholder директория) |
+| `docs/adr/` | ✅ создана (использовать для длинных ADR; короткие — в `DECISIONS.md`) |
+| `docs/STRUCTURE.md` | ✅ создан (autogen) |
+| `docs/REPO_SETUP_PROMPT.md` | ✅ копия от kit'а |
+| `docs/repo-setup-vika-tasks.md` | ✅ список задач для Vика после merge'а |
+| `scripts/setup-labels.sh` + `setup-project.sh` | ✅ скопированы (Vика запустит) |
+| `scripts/dashboard-fetch.mjs` | ✅ скопирован |
+| `scripts/automation/*` (auto-labels, rollup, epic-sync, deps, validate, digest, notify + lib/) | ✅ скопированы |
+| 4 новых ISSUE_TEMPLATE (epic, task, tech_debt, vika_devops) | ✅ скопированы (3 существующих — bug/feature/config — сохранены) |
+| `.github/dependabot.yml` | ✅ создан (npm + docker + actions, без pip) |
+| `.github/labeler.yml` | ✅ скопирован |
+| `.github/markdown-link-check.json` | ✅ скопирован |
+| **11 новых workflows** (auto-labels, sub-issue-rollup, epic-board-sync, dependency-resolver, validate-issue, weekly-digest, stale-cleanup, notifications, dashboard-sync, release-please, path-size-labeler) | ✅ все скопированы |
+| `tools/dashboard/` | 🟡 placeholder README создан, React-app — отдельным PR |
+| `_archive/` директория | ✅ создана + zip перемещён в `_archive/2026-04-29/` |
+| **PR template** | ⏭ existing сохранён (уважаем) |
+| `ci.yml` workflow | ⏭ existing сохранён (уважаем; не дублируем kit'овый ci-pr.yml) |
+| `prisma-check.yml` workflow | ⏭ existing сохранён |
+| `lighthouse.yml` workflow | ⏭ existing сохранён (создан в #384) |
+| `deploy-dev.yml` workflow | ⏭ existing сохранён |
+| `deploy-staging.yml` / `deploy-prod.yml` | ⏭ skip — нет окружений |
+| `e2e.yml` | ⏭ skip — нет Playwright тестов (TODO #137) |
+| **Branch protection** для main | 🔄 issue для Вики (см. `docs/repo-setup-vika-tasks.md`) |
+| **GitHub Project v2 + кастомные поля** | 🔄 issue для Вики (Project уже есть, проверить fields) |
+| **PROJECT_TOKEN rotation** | 🔄 issue для Вики (текущий expired) |
+| **Применить лейблы** | 🔄 issue для Вики (`bash scripts/setup-labels.sh`) |
+| **GitHub Security Features** (Dependabot alerts, Secret scanning, CodeQL) | 🔄 issue для Вики |
+| **gitleaks scan** на git history | 🔄 issue для Вики (нет binary в окружении Claude) |
+| **GitHub Pages для dashboard** | 🔄 отложено до создания React-app в `tools/dashboard/` |
+| **Telegram secrets** для weekly-digest + notifications | 🔄 issue для Вики (опционально) |
 
-### P1 (базовая структура и документация — ШАГИ 2, 4, 6)
-- Создать `STATE.md`, `DECISIONS.md`, `SECURITY.md`
-- Создать `docs/ai/` (CLAUDE_CODE_RULES, VIKA_RULES, DEVOPS_RULES, EXTERNAL_TASKS, AUTOMATION)
-- Дополнить ISSUE_TEMPLATE: epic, task, tech_debt, vika_devops
-- Скопировать `scripts/automation/*` + `lib/*` из kit
-
-### P2 (CI/CD + автоматизация — ШАГИ 7-8)
-- Workflows: `auto-labels`, `sub-issue-rollup`, `epic-board-sync`, `dependency-resolver`, `validate-issue`, `weekly-digest`, `stale-cleanup`, `notifications`
-- `.github/dependabot.yml`, `labeler.yml`
-- `CHANGELOG.md` через release-please (workflow + первая ручная versioning)
-- `ROADMAP.md` + `BACKLOG.md` (root) — фасад с ссылками на `docs/TZ/MVP_PHASE3.md` и `docs/BACKLOG/M5/`
-
-### P3 (улучшения качества — ШАГИ 9-10)
-- `tools/dashboard/` (опционально)
-- `.gitattributes`, `docs/GLOSSARY.md`, `docs/prompts/`
-- gitleaks-scan через issue для Вики
-- Финал: `docs/STRUCTURE.md` (autogen tree), `_archive/` директория
-
-### Skip / зафиксировать пропуск
-- `deploy-staging.yml` / `deploy-prod.yml` — нет staging/prod окружений (только dev на 2.56.241.126). Отметить в `AUDIT.md` ✓.
-- `e2e.yml` — Playwright e2e tests не написаны (TODO в #137). Создать workflow shell, активировать когда тесты появятся.
-- `release-please.yml` — пока monorepo internal-only (Proprietary), version-bump через дату коммитов. Добавить когда понадобится формальный SemVer.
+### Легенда
+- ✅ выполнено в `chore/repo-setup` PR
+- 🟡 placeholder (отдельный PR в будущем)
+- 🔄 issue для Vика после merge
+- ⏭ skip / неприменимо (зафиксировано)
 
 ## Открытые вопросы для founders
 

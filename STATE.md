@@ -8,7 +8,7 @@
 
 ## В работе сейчас
 
-- `chore/repo-setup` (этот PR) — применяем `repo-setup-kit` для автоматизации Project board, лейблов, sub-issue rollup, weekly digest, dependency resolver.
+- ✅ `chore/repo-setup` PR подготовлен и готов к merge. Применили `repo-setup-kit`: STATE.md, DECISIONS.md, SECURITY.md, CHANGELOG.md, ROADMAP.md (root facade), BACKLOG.md (root facade), AUDIT.md, `.gitattributes`, `docs/ai/` (CLAUDE_CODE_RULES, VIKA_RULES, DEVOPS_RULES, CLAUDE_DESIGN_RULES, EXTERNAL_TASKS, AUTOMATION), `docs/context/` (PRODUCT_CONTEXT, DOMAIN), `docs/GLOSSARY.md`, `docs/STRUCTURE.md`, `docs/repo-setup-vika-tasks.md`, 4 новых ISSUE_TEMPLATE (epic/task/tech_debt/vika_devops), `.github/dependabot.yml + labeler.yml + markdown-link-check.json`, **11 новых workflow'ов** (auto-labels, sub-issue-rollup, epic-board-sync, dependency-resolver, validate-issue, weekly-digest, stale-cleanup, notifications, dashboard-sync, release-please, path-size-labeler), **scripts/automation/** (auto-labels, rollup, epic-sync, deps, validate, digest, notify + lib/graphql + lib/parse), `scripts/setup-labels.sh`, `scripts/setup-project.sh`, `scripts/dashboard-fetch.mjs`, `tools/dashboard/README.md` placeholder.
 
 ## Заблокировано (внешние зависимости)
 
