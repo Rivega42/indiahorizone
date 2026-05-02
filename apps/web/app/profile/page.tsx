@@ -1,17 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
+import { getMe, type ClientMe } from '@/lib/api/clients';
 import { useCurrentUser } from '@/lib/auth/store';
 
 /**
- * /profile — index личного кабинета.
+ * /profile — index личного кабинета (#A-01).
  *
- * Сейчас 1 раздел: Уведомления (#163, #166). Будут добавляться:
- * - Devices (отдельная страница если станет много опций)
- * - Security (2FA, sessions, password)
- * - Trips (history + active)
- * - Documents (паспорт, виза)
+ * Подтягивает профиль через GET /clients/me и показывает имя в шапке.
+ * При 404 (профиль ещё не provisioned listener'ом auth.user.registered) —
+ * fallback на email.
  *
  * Auth required.
  */
@@ -25,18 +25,55 @@ interface ProfileSection {
 
 const SECTIONS: ProfileSection[] = [
   {
+    href: '/profile/trips',
+    title: 'Мои поездки',
+    description: 'Активные и прошлые туры, программа, документы',
+  },
+  {
     href: '/profile/notifications',
     title: 'Уведомления',
-    description: 'Push, email, SMS, Telegram. Что и куда вам отправлять.',
+    description: 'Push, email, SMS, Telegram. Что и куда вам отправлять',
   },
-  // TODO когда будут готовы:
-  // { href: '/profile/security', title: 'Безопасность', description: 'Пароль, 2FA, активные сессии', badge: 'Скоро' },
-  // { href: '/profile/trips', title: 'Мои поездки', description: 'Активные и прошлые туры' },
-  // { href: '/profile/documents', title: 'Документы', description: 'Паспорт, виза, медполис' },
+  {
+    href: '/profile/consents',
+    title: 'Согласия',
+    description: 'Фото/видео, геолокация, экстренные контакты, маркетинг',
+  },
+  {
+    href: '/profile/emergency',
+    title: 'Экстренные контакты',
+    description: 'Кому звонить при ЧП во время поездки',
+  },
 ];
+
+function buildGreeting(me: ClientMe | null, fallbackEmail: string): string {
+  const firstName = me?.profile?.firstName?.trim();
+  if (firstName) return `Здравствуйте, ${firstName}`;
+  return `Здравствуйте, ${fallbackEmail}`;
+}
 
 export default function ProfileIndexPage(): React.ReactElement {
   const user = useCurrentUser();
+  const [me, setMe] = useState<ClientMe | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    getMe()
+      .then((data) => {
+        if (!cancelled) setMe(data);
+      })
+      .catch(() => {
+        // 404 (profile not yet provisioned) или сетевая — показываем email-fallback
+      })
+      .finally(() => {
+        if (!cancelled) setLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   if (user === null) {
     return (
@@ -59,7 +96,7 @@ export default function ProfileIndexPage(): React.ReactElement {
           Личный кабинет
         </p>
         <h1 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
-          Здравствуйте, {user.email}
+          {loaded ? buildGreeting(me, user.email) : 'Загрузка…'}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">Управление вашим профилем и поездками.</p>
       </header>
