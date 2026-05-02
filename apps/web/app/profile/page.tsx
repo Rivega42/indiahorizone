@@ -30,6 +30,16 @@ const SECTIONS: ProfileSection[] = [
     description: 'Активные и прошлые туры, программа, документы',
   },
   {
+    href: '/profile/personal',
+    title: 'Личные данные',
+    description: 'ФИО, дата рождения, телефон, гражданство',
+  },
+  {
+    href: '/profile/chat',
+    title: 'Сообщения',
+    description: 'Чат с concierge и гидом',
+  },
+  {
     href: '/profile/notifications',
     title: 'Уведомления',
     description: 'Push, email, SMS, Telegram. Что и куда вам отправлять',

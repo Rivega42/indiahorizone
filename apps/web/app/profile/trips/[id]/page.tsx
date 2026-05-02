@@ -233,6 +233,14 @@ export default function TripDetailPage(): React.ReactElement {
             <p className="mt-2 text-sm text-muted-foreground">
               {formatDateRange(trip.startsAt, trip.endsAt)}
             </p>
+            {trip.status === 'in_progress' || trip.status === 'confirmed' ? (
+              <Link
+                href={`/profile/trips/${tripId}/dashboard`}
+                className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
+                На главный экран поездки →
+              </Link>
+            ) : null}
           </>
         ) : null}
       </header>
