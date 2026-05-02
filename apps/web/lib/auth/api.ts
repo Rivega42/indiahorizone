@@ -64,4 +64,24 @@ export const authApi = {
     const { data } = await apiClient.post<{ revokedCount: number }>('/auth/logout-all');
     return data;
   },
+
+  /**
+   * Запрос ссылки сброса пароля (#A-12).
+   *
+   * Anti-enumeration: всегда 204, независимо от существования email.
+   * При запросе несуществующего email — никакое сообщение не отправляется.
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    await apiClient.post('/auth/password/reset-request', { email });
+  },
+
+  /**
+   * Подтверждение нового пароля по токену из email (#A-12).
+   *
+   * 204 при успехе. 401 при невалидном/истёкшем токене (1h TTL).
+   * 400 при слабом пароле (zxcvbn-проверка на бэке).
+   */
+  async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
+    await apiClient.post('/auth/password/reset', { token, newPassword });
+  },
 };
