@@ -36,6 +36,15 @@ export interface RefreshResponse {
   refreshToken: string;
 }
 
+export interface SessionItem {
+  id: string;
+  deviceLabel: string;
+  ip: string | null;
+  createdAt: string;
+  expiresAt: string;
+  current: boolean;
+}
+
 /**
  * SDK-клиенты для auth-svc.
  * Соответствуют контракту backend (apps/api/src/modules/auth/auth.controller.ts).
@@ -83,5 +92,27 @@ export const authApi = {
    */
   async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
     await apiClient.post('/auth/password/reset', { token, newPassword });
+  },
+
+  /**
+   * Список активных сессий (#A-05).
+   *
+   * Возвращает все сессии с revokedAt=null и expiresAt > now,
+   * с пометкой `current: true` для текущей сессии (по sessionId из JWT).
+   */
+  async listSessions(): Promise<SessionItem[]> {
+    const { data } = await apiClient.get<{ items: SessionItem[] }>('/auth/sessions');
+    return data.items;
+  },
+
+  /**
+   * Завершить конкретную сессию (#A-05).
+   *
+   * 204 при успехе. 403 если пытаются завершить текущую (для этого
+   * есть POST /auth/logout). 404 если сессия не найдена / не принадлежит
+   * пользователю / уже revoked.
+   */
+  async revokeSession(sessionId: string): Promise<void> {
+    await apiClient.delete(`/auth/sessions/${sessionId}`);
   },
 };

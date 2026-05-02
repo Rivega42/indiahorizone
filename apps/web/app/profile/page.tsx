@@ -54,6 +54,11 @@ const SECTIONS: ProfileSection[] = [
     title: 'Экстренные контакты',
     description: 'Кому звонить при ЧП во время поездки',
   },
+  {
+    href: '/profile/security/sessions',
+    title: 'Активные сессии',
+    description: 'Устройства, на которых выполнен вход. Завершите подозрительные.',
+  },
 ];
 
 function buildGreeting(me: ClientMe | null, fallbackEmail: string): string {
