@@ -12,8 +12,8 @@
     "type-check": "tsc -b"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.59.16",
-    "axios": "^1.7.7",
+    "@tanstack/react-query": "^5.100.9",
+    "axios": "^1.16.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.453.0",
@@ -23,12 +23,12 @@
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
-    "@tanstack/react-query-devtools": "^5.59.16",
+    "@tanstack/react-query-devtools": "^5.100.9",
     "@types/node": "^20.16.13",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.13",
     "tailwindcss": "^3.4.14"
   }
 }
