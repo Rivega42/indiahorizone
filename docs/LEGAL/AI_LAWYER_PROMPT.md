@@ -100,39 +100,104 @@ purpose: AI lawyer консультация — сравнение с двумя
 
 ---
 
-## 2. Файлы в Project Knowledge
+## 2. Документы для контекста — два способа подачи
 
-> Загрузить в раздел **«Project knowledge»** (drag-and-drop). Все пути от корня репозитория `Rivega42/indiahorizone`. Файлы доступны и через GitHub Raw, и через локальную копию репозитория.
+Репозиторий `Rivega42/indiahorizone` публичный, поэтому документы можно
+давать Claude **двумя способами**: загружать как файлы в Project Knowledge
+**или** давать прямые ссылки на GitHub Raw — Claude их подтянет через
+встроенный web-tool. Каждый способ имеет свои компромиссы:
 
-**Обязательные (без них AI отвечает в вакууме):**
+| Способ | Плюсы | Минусы |
+|---|---|---|
+| **Project Knowledge** (drag-and-drop .md) | Всегда в контексте, не зависит от сети, индексируется для семантического поиска | Лимит на объём; обновления требуют перезагрузки |
+| **Raw URLs** в промпте | Всегда свежая версия из репо, без дублирования | Требует web-tool; Claude может «не открыть» ссылку при rate-limit или отдать частичный fetch |
 
-1. `docs/LEGAL/LAWYER_QUESTIONS.md` — сами вопросы.
-2. `docs/LEGAL/TOUR_OPERATOR.md` — текущая гипотеза по статусу 132-ФЗ.
-3. `docs/LEGAL/PDN.md` — карта обработки ПДн (внутренний документ).
-4. `docs/LEGAL/PRIVACY.md` — публичная политика конфиденциальности (черновик).
-5. `docs/LEGAL/CONSENT.md` — рамочное согласие.
-6. `docs/LEGAL/CONSENTS/PDN.md` — детальное согласие на ПДн.
-7. `docs/LEGAL/CONSENTS/PHOTO_VIDEO.md` — granular consent на фото/видео (4 уровня).
-8. `docs/LEGAL/CONSENTS/GEO.md` — granular consent на гео (4 уровня).
-9. `docs/LEGAL/CONSENTS/EMERGENCY_CONTACTS.md` — экстренные контакты + согласие.
-10. `docs/LEGAL/CONTRACTS/CLIENT_OFFER.md` — каркас оферты клиенту.
-11. `docs/LEGAL/CONTRACTS/GUIDE_CONTRACT.md` — каркас договора с гидом в IN.
-12. `docs/FINANCE/CONTRACT_INTERCO.md` — каркас inter-co контракта РФ↔IN.
-13. `docs/FINANCE/PAYMENTS/SCHEME.md` — схема платежей end-to-end.
-14. `docs/FINANCE/PAYMENTS/CURRENCY_CONTROL.md` — валютный контроль 173-ФЗ.
-15. `docs/FINANCE/PAYMENTS/AML.md` — KYC по 115-ФЗ.
-16. `docs/FINANCE/REFUNDS.md` — политика возвратов и сетка штрафов.
-17. `docs/BUSINESS_MODEL.md` — что продаём, граница ответственности.
+> **Рекомендуемый гибрид:** **5–7 ключевых файлов — в Project Knowledge**
+> (backbone, всегда виден). **Остальное — ссылками в промпте** (Claude
+> подтягивает по необходимости). Так не упираемся в лимит knowledge и не
+> рискуем «забытыми» документами.
 
-**Желательные (для контекста, не критичны):**
+### 2.1. В Project Knowledge — обязательно загрузить (5 файлов)
 
-18. `docs/BUSINESS_MODEL/UNIT_ECONOMICS.md` — размер чека и маржа.
-19. `docs/SOS/CONCEPT.md` — обещание SOS клиенту.
-20. `docs/SOS/REGULATION.md` — SLA реакции (60 сек / 3 мин).
-21. `CLAUDE.md` (корень репо) — общая концепция продукта и правила работы.
+> Драг-н-дроп каждого файла в раздел «Project knowledge» при создании
+> проекта. Это backbone, который Claude видит всегда без сетевых запросов.
 
-> **Совет:** если Claude Projects ограничивает суммарный объём knowledge —
-> грузить пп. 1–17 как минимум. Остальное можно дать ad-hoc в чате.
+1. `docs/LEGAL/LAWYER_QUESTIONS.md` — сами вопросы (73 шт.)
+2. `docs/LEGAL/TOUR_OPERATOR.md` — гипотеза по статусу 132-ФЗ
+3. `docs/LEGAL/CONTRACTS/CLIENT_OFFER.md` — каркас оферты
+4. `docs/LEGAL/PDN.md` — карта обработки ПДн
+5. `docs/FINANCE/CONTRACT_INTERCO.md` — inter-co контракт РФ↔IN
+
+### 2.2. Дополнительные документы — давать ссылками в промпте
+
+> Скопировать список ниже целиком в промпт (раздел «Дополнительный
+> контекст»). Claude откроет ссылки через web-tool по мере надобности.
+
+**Согласия (Блок C — 152-ФЗ):**
+
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/PRIVACY.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENT.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/PDN.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/PHOTO_VIDEO.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/GEO.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/EMERGENCY_CONTACTS.md
+
+**Договоры:**
+
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONTRACTS/GUIDE_CONTRACT.md
+
+**Финансы (Блок D — валютка/AML):**
+
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/PAYMENTS/SCHEME.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/PAYMENTS/CURRENCY_CONTROL.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/PAYMENTS/AML.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/REFUNDS.md
+
+**Бизнес-контекст:**
+
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/BUSINESS_MODEL.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/BUSINESS_MODEL/UNIT_ECONOMICS.md
+
+**SOS (Блок F):**
+
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/SOS/CONCEPT.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/SOS/REGULATION.md
+
+**Общая концепция продукта:**
+
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/CLAUDE.md
+
+> **Внимание:** `LAWYER_QUESTIONS.md` и `AI_LAWYER_PROMPT.md` пока живут
+> на ветке `docs/lawyer-questions` (не в main). Их актуальные URL:
+>
+> - https://raw.githubusercontent.com/Rivega42/indiahorizone/docs/lawyer-questions/docs/LEGAL/LAWYER_QUESTIONS.md
+> - https://raw.githubusercontent.com/Rivega42/indiahorizone/docs/lawyer-questions/docs/LEGAL/AI_LAWYER_PROMPT.md
+>
+> После merge в main — заменить на `/main/` в URL.
+
+### 2.3. Альтернатива: всё через MCP GitHub server (для продвинутых)
+
+Если используете Claude Desktop с настроенным MCP:
+
+```bash
+# В config MCP-сервера github
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_..." }
+    }
+  }
+}
+```
+
+Затем в промпте: «Прочитай все файлы из `Rivega42/indiahorizone` в
+папках `docs/LEGAL/`, `docs/FINANCE/`, `docs/BUSINESS_MODEL/` через
+GitHub MCP». Claude сам обойдёт репо без ручных URL.
+
+> **Когда оправдано:** если планируете несколько итераций консультации
+> с подтягиванием новых файлов «на лету». Для разовой сессии — overkill.
 
 ---
 
@@ -150,19 +215,57 @@ purpose: AI lawyer консультация — сравнение с двумя
 + IH IN PVT LTD. Перед встречами с двумя приглашёнными юристами хочу
 получить вашу независимую экспертизу по полному списку вопросов.
 
-В Project knowledge приложены:
-• docs/LEGAL/LAWYER_QUESTIONS.md — 73 вопроса в 8 блоках (A–H).
-• Все наши draft-документы: оферта, согласия, inter-co контракт,
-  политики, схема платежей, бизнес-модель.
+КОНТЕКСТ — DOCUMENTED.
 
-Задача:
+В Project knowledge у вас уже есть основные документы:
+• docs/LEGAL/LAWYER_QUESTIONS.md — 73 вопроса в 8 блоках (A–H)
+• docs/LEGAL/TOUR_OPERATOR.md — гипотеза по 132-ФЗ
+• docs/LEGAL/CONTRACTS/CLIENT_OFFER.md — каркас оферты
+• docs/LEGAL/PDN.md — карта обработки ПДн
+• docs/FINANCE/CONTRACT_INTERCO.md — inter-co контракт РФ↔IN
+
+ДОПОЛНИТЕЛЬНЫЙ КОНТЕКСТ — открывать по необходимости.
+
+При работе над конкретным блоком — открывайте соответствующие файлы
+по прямым ссылкам ниже (через ваш web-tool). Не нужно читать всё разом
+— только когда вопрос требует уточнения.
+
+Согласия (Блок C — 152-ФЗ):
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/PRIVACY.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENT.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/PDN.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/PHOTO_VIDEO.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/GEO.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONSENTS/EMERGENCY_CONTACTS.md
+
+Договоры (Блок E):
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/LEGAL/CONTRACTS/GUIDE_CONTRACT.md
+
+Финансы (Блок D — валютный контроль / AML / возвраты):
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/PAYMENTS/SCHEME.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/PAYMENTS/CURRENCY_CONTROL.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/PAYMENTS/AML.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/FINANCE/REFUNDS.md
+
+Бизнес-контекст:
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/BUSINESS_MODEL.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/BUSINESS_MODEL/UNIT_ECONOMICS.md
+
+SOS (Блок F):
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/SOS/CONCEPT.md
+- https://raw.githubusercontent.com/Rivega42/indiahorizone/main/docs/SOS/REGULATION.md
+
+ЗАДАЧА.
+
 1. Пройдитесь по всем 73 вопросам в порядке Блоков A → H.
 2. По каждому — ответ строго по шаблону из ваших custom instructions
    (короткий ответ + правовое основание + уровень риска + что делать +
    когда нужен профильный specialist).
-3. В конце каждого блока — резюме «топ-3 действия с самым высоким
+3. Если для ответа нужен документ из «Дополнительного контекста» —
+   откройте его перед ответом и сошлитесь на конкретный пункт.
+4. В конце каждого блока — резюме «топ-3 действия с самым высоким
    приоритетом по этому блоку».
-4. После Блока H — общий вывод:
+5. После Блока H — общий вывод:
    • Готовы ли мы к публичному запуску в текущей конструкции? (да /
      нет / с условиями).
    • Список топ-5 действий, которые нужно сделать ДО первого платного
