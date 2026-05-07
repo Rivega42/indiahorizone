@@ -1,4 +1,5 @@
--- B-04 Client quiz/анкета (#421, sub-issue #513).
+-- B-04 Client quiz/анкета (#421, sub-issue #513). v3.
+-- Verified locally: prisma migrate diff --exit-code returns 0 (no drift).
 --
 -- Расширяем `client_profiles` структурированными полями quiz'а — для
 -- быстрых CRM-фильтров (вегетарианцы, с детьми, новички в Индии) и подбора
