@@ -180,6 +180,65 @@ export class TwoFaService {
   }
 
   /**
+   * Отключить 2FA (issue #438).
+   *
+   * Требует доказательство владения вторым фактором — TOTP-код ИЛИ recovery-код.
+   * Без этого admin/concierge с украденным session-cookie мог бы отключить 2FA
+   * атакующего и обойти второй фактор.
+   *
+   * При успехе:
+   * - twoFaEnabled = false
+   * - twoFaSecret = null
+   * - все recovery codes удаляются (deleteMany)
+   * - публикуется auth.2fa.disabled через outbox
+   *
+   * Recovery-код, использованный для disable, считается потраченным —
+   * но т.к. мы и так удаляем все коды, отдельная пометка usedAt не нужна.
+   *
+   * @throws NotFoundException если user не найден
+   * @throws BadRequestException если 2FA не активирован
+   * @throws UnauthorizedException если код невалидный
+   */
+  async disable(userId: string, code: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, twoFaEnabled: true, twoFaSecret: true },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!user.twoFaEnabled || !user.twoFaSecret) {
+      throw new BadRequestException('2FA не активирован');
+    }
+
+    const isTotpFormat = /^\d{6}$/.test(code);
+    const verified = isTotpFormat
+      ? this.verifyTotp(code, user.twoFaSecret)
+      : await this.verifyRecoveryCode(code, userId);
+
+    if (!verified) {
+      this.logger.warn({ userId }, 'auth.2fa.disable.invalid-code');
+      throw new UnauthorizedException('Неверный код');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: userId },
+        data: { twoFaEnabled: false, twoFaSecret: null },
+      });
+      await tx.recoveryCode.deleteMany({ where: { userId } });
+      await this.outbox.add(tx, {
+        type: 'auth.2fa.disabled',
+        schemaVersion: 1,
+        actor: { type: 'user', id: userId },
+        payload: { userId, method: isTotpFormat ? 'totp' : 'recovery' },
+      });
+    });
+
+    this.logger.log({ userId, method: isTotpFormat ? 'totp' : 'recovery' }, 'auth.2fa.disabled');
+  }
+
+  /**
    * 2FA verify при login (#133).
    *
    * Flow:
