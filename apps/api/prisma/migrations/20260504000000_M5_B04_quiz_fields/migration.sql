@@ -24,12 +24,15 @@ CREATE TYPE "pace_level" AS ENUM ('slow', 'medium', 'fast');
 CREATE TYPE "india_experience" AS ENUM ('never', 'been_once', 'multiple');
 
 -- 3. Колонки в client_profiles
+-- Prisma 5.22 для `String[] @default([])` генерит `TEXT[] DEFAULT ARRAY[]::TEXT[]`
+-- БЕЗ NOT NULL (в отличие от старых миграций). Это поведение совпадает с pg-семантикой
+-- массивов: empty array != NULL. Применяем здесь тот же стиль чтобы избежать drift.
 ALTER TABLE "client_profiles"
-  ADD COLUMN "diet_preferences" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  ADD COLUMN "diet_preferences" TEXT[] DEFAULT ARRAY[]::TEXT[],
   ADD COLUMN "allergies" TEXT,
   ADD COLUMN "pace_level" "pace_level",
   ADD COLUMN "has_children" BOOLEAN,
-  ADD COLUMN "children_ages" INTEGER[] NOT NULL DEFAULT ARRAY[]::INTEGER[],
+  ADD COLUMN "children_ages" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
   ADD COLUMN "india_experience" "india_experience",
   ADD COLUMN "quiz_completed_at" TIMESTAMP(3);
 
