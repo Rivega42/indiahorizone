@@ -24,18 +24,19 @@ CREATE TYPE "pace_level" AS ENUM ('slow', 'medium', 'fast');
 -- 2. Enum IndiaExperience — опыт клиента с Индией
 CREATE TYPE "india_experience" AS ENUM ('never', 'been_once', 'multiple');
 
--- 3. Колонки в client_profiles
+-- 3. Колонки в client_profiles. Точное соответствие выводу
+-- `prisma migrate dev --create-only` — иначе Schema ↔ Migrations check
+-- падает на CI (даже если синтаксис эквивалентный). Алфавитный порядок
+-- ALTER TABLE и форматирование — Prisma's authoritative.
 -- Prisma 5.22 для `String[] @default([])` генерит `TEXT[] DEFAULT ARRAY[]::TEXT[]`
--- БЕЗ NOT NULL (в отличие от старых миграций). Это поведение совпадает с pg-семантикой
--- массивов: empty array != NULL. Применяем здесь тот же стиль чтобы избежать drift.
-ALTER TABLE "client_profiles"
-  ADD COLUMN "diet_preferences" TEXT[] DEFAULT ARRAY[]::TEXT[],
-  ADD COLUMN "allergies" TEXT,
-  ADD COLUMN "pace_level" "pace_level",
-  ADD COLUMN "has_children" BOOLEAN,
-  ADD COLUMN "children_ages" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
-  ADD COLUMN "india_experience" "india_experience",
-  ADD COLUMN "quiz_completed_at" TIMESTAMP(3);
+-- БЕЗ NOT NULL — empty array != NULL по pg-семантике.
+ALTER TABLE "client_profiles" ADD COLUMN     "allergies" TEXT,
+ADD COLUMN     "children_ages" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
+ADD COLUMN     "diet_preferences" TEXT[] DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN     "has_children" BOOLEAN,
+ADD COLUMN     "india_experience" "india_experience",
+ADD COLUMN     "pace_level" "pace_level",
+ADD COLUMN     "quiz_completed_at" TIMESTAMP(3);
 
 -- Partial индексы для CRM-фильтров (quiz_completed_at DESC, india_experience)
 -- НЕ добавляем здесь — они не объявлены в schema.prisma → drift detection
