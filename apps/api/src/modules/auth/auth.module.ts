@@ -11,6 +11,8 @@ import { LogoutService } from './services/logout.service';
 import { PasswordService } from './services/password.service';
 import { RefreshService } from './services/refresh.service';
 import { SuspiciousLoginDetector } from './services/suspicious-login.detector';
+import { SessionsController } from './sessions/sessions.controller';
+import { SessionsService } from './sessions/sessions.service';
 import { TwoFaChallengeService } from './two-fa/two-fa-challenge.service';
 import { TwoFaController } from './two-fa/two-fa.controller';
 import { TwoFaService } from './two-fa/two-fa.service';
@@ -33,7 +35,7 @@ import { TwoFaService } from './two-fa/two-fa.service';
     // Глобальный module не требуется — JwtTokenService сам читает env через ConfigService.
     JwtModule.register({}),
   ],
-  controllers: [AuthController, TwoFaController, PasswordResetController],
+  controllers: [AuthController, TwoFaController, PasswordResetController, SessionsController],
   providers: [
     AuthService,
     LoginService,
@@ -44,6 +46,7 @@ import { TwoFaService } from './two-fa/two-fa.service';
     TwoFaService,
     TwoFaChallengeService,
     PasswordResetService,
+    SessionsService,
     SuspiciousLoginDetector,
   ],
   exports: [
@@ -56,6 +59,7 @@ import { TwoFaService } from './two-fa/two-fa.service';
     TwoFaService,
     TwoFaChallengeService,
     PasswordResetService,
+    SessionsService,
     SuspiciousLoginDetector,
   ],
 })
