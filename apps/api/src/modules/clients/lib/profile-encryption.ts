@@ -23,6 +23,9 @@ const ENCRYPTED_FIELDS: readonly (keyof ClientProfile)[] = [
   'lastName',
   'dateOfBirth',
   'phone',
+  // allergies (#B-04) — потенциально медданные. Хранятся зашифрованно
+  // как и остальные ПДн.
+  'allergies',
 ] as const;
 
 export type EncryptableProfileInput = Partial<{
@@ -36,6 +39,8 @@ export type EncryptableProfileInput = Partial<{
    */
   dateOfBirth: string | null;
   phone: string | null;
+  /** Свободный текст про аллергии (#B-04). Шифруется как медданные. */
+  allergies: string | null;
 }>;
 
 /**
@@ -43,7 +48,7 @@ export type EncryptableProfileInput = Partial<{
  * остальные поля (citizenship/clientId/etc.) сохраняются как были.
  */
 type EncryptedProfile<T> = {
-  [K in keyof T]: K extends 'firstName' | 'lastName' | 'dateOfBirth' | 'phone'
+  [K in keyof T]: K extends 'firstName' | 'lastName' | 'dateOfBirth' | 'phone' | 'allergies'
     ? string | (T[K] extends null | undefined ? Extract<T[K], null | undefined> : never)
     : T[K];
 };

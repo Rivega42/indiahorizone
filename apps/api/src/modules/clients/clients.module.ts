@@ -14,12 +14,13 @@ import { ConsentsService } from './consents/consents.service';
 import { EmergencyContactsController } from './emergency-contacts/emergency-contacts.controller';
 import { EmergencyContactsService } from './emergency-contacts/emergency-contacts.service';
 import { ClientsListener } from './listeners/clients.listener';
+import { QuizController } from './quiz.controller';
 import { EventsBusModule } from '../../common/events-bus/events-bus.module';
 import { PrismaModule } from '../../common/prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule, EventsBusModule],
-  controllers: [ClientsController, ConsentsController, EmergencyContactsController],
+  controllers: [ClientsController, ConsentsController, EmergencyContactsController, QuizController],
   providers: [ClientsService, ClientsListener, ConsentsService, EmergencyContactsService],
   exports: [ClientsService, ConsentsService, EmergencyContactsService],
 })
