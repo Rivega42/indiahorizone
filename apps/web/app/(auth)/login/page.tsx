@@ -11,6 +11,7 @@ import { Field } from '../../../components/ui/field';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { getErrorMessage } from '../../../lib/api/client';
+import { isLoginChallenge } from '../../../lib/auth/api';
 import { useLogin } from '../../../lib/auth/hooks';
 
 /**
@@ -40,7 +41,13 @@ export default function LoginPage(): React.ReactElement {
     login.mutate(
       { email: email.trim().toLowerCase(), password },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
+          if (isLoginChallenge(result)) {
+            // 2FA активирован — challengeId хранится в sessionStorage до verify (#A-04).
+            sessionStorage.setItem('ih.2fa.challengeId', result.challengeId);
+            router.push('/login/2fa');
+            return;
+          }
           router.push('/trips');
         },
       },

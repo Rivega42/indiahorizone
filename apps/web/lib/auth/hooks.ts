@@ -4,8 +4,9 @@ import { useMutation } from '@tanstack/react-query';
 
 import {
   authApi,
+  isLoginChallenge,
   type LoginPayload,
-  type LoginResponse,
+  type LoginResult,
   type RegisterPayload,
   type RegisterResponse,
 } from './api';
@@ -13,12 +14,21 @@ import { authStore } from './store';
 
 /**
  * useLogin — мутация POST /auth/login.
- * onSuccess: пишет токены и user в authStore. После — caller роутит на /trips.
+ *
+ * onSuccess: если ответ — challenge (2FA активирован у пользователя),
+ * НЕ пишет токены (их нет). Caller получает `result.challengeId` через
+ * mutation.data и редиректит на /login/2fa.
+ *
+ * Если ответ — обычный LoginResponse с токенами, пишет в authStore.
  */
-export function useLogin(): ReturnType<typeof useMutation<LoginResponse, unknown, LoginPayload>> {
-  return useMutation<LoginResponse, unknown, LoginPayload>({
+export function useLogin(): ReturnType<typeof useMutation<LoginResult, unknown, LoginPayload>> {
+  return useMutation<LoginResult, unknown, LoginPayload>({
     mutationFn: (payload) => authApi.login(payload),
     onSuccess: (data) => {
+      if (isLoginChallenge(data)) {
+        // 2FA challenge — токенов ещё нет, caller-страница покажет /login/2fa.
+        return;
+      }
       authStore.setSession({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,

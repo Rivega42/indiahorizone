@@ -59,6 +59,11 @@ const SECTIONS: ProfileSection[] = [
     title: 'Активные сессии',
     description: 'Устройства, на которых выполнен вход. Завершите подозрительные.',
   },
+  {
+    href: '/profile/security/2fa',
+    title: 'Двухфакторная аутентификация',
+    description: 'Защитите аккаунт кодом из приложения-аутентификатора.',
+  },
 ];
 
 function buildGreeting(me: ClientMe | null, fallbackEmail: string): string {

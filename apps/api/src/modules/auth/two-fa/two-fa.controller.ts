@@ -12,6 +12,7 @@
  */
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 
+import { DisableTwoFaDto } from './dto/disable.dto';
 import {
   type EnrollResponse,
   VerifyEnrollDto,
@@ -52,5 +53,18 @@ export class TwoFaController {
   @HttpCode(HttpStatus.OK)
   async verifyLogin(@Body() dto: VerifyTwoFaLoginDto): Promise<LoginTokenResponse> {
     return this.twoFa.verifyAtLogin(dto.challengeId, dto.code);
+  }
+
+  /**
+   * Отключить 2FA. Требует TOTP-код или recovery-код для подтверждения владения
+   * вторым фактором (защита от session-hijack scenario).
+   */
+  @Post('disable')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async disable(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: DisableTwoFaDto,
+  ): Promise<void> {
+    await this.twoFa.disable(user.id, dto.code);
   }
 }
