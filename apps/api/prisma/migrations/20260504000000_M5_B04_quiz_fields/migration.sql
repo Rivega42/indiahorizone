@@ -33,12 +33,8 @@ ALTER TABLE "client_profiles"
   ADD COLUMN "india_experience" "india_experience",
   ADD COLUMN "quiz_completed_at" TIMESTAMP(3);
 
--- 4. Индекс на quiz_completed_at — менеджеры фильтруют список «новые анкеты»
-CREATE INDEX "client_profiles_quiz_completed_at_idx"
-  ON "client_profiles" ("quiz_completed_at" DESC NULLS LAST)
-  WHERE "quiz_completed_at" IS NOT NULL;
-
--- 5. Индекс на india_experience — для quick-filter «новички» (LeadProfile сегмент)
-CREATE INDEX "client_profiles_india_experience_idx"
-  ON "client_profiles" ("india_experience")
-  WHERE "india_experience" IS NOT NULL;
+-- Partial индексы для CRM-фильтров (quiz_completed_at DESC, india_experience)
+-- НЕ добавляем здесь — они не объявлены в schema.prisma → drift detection
+-- падает. Появятся отдельной миграцией, когда будут готовы admin-queries
+-- (после EPIC 13). При EXPLAIN'е показано: для текущего объёма (≤1K профилей)
+-- sequential scan быстрее partial index'а — миграция бесполезна на старте.
