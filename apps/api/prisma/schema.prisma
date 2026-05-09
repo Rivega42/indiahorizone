@@ -372,14 +372,57 @@ model ClientProfile {
   phone          String?
   /// Telegram username без @, публичный handle. НЕ шифруется.
   telegramHandle String?  @map("telegram_handle")
-  /// Свободный JSONB: языки, диеты, специальные требования.
-  /// Пример: { "languages": ["ru", "en"], "diet": "vegetarian" }
+  /// Свободный JSONB: языки, специальные требования (низкоприоритетные ответы quiz'а
+  /// или специфичные пожелания, не подходящие под структурированные поля).
+  /// Пример: { "languages": ["ru", "en"], "dailyBudgetUsd": 150 }
   preferences    Json?    @default("{}")
+
+  /// Quiz / анкета (#B-04, sub #513). Структурированные поля для CRM-фильтров и
+  /// подбора маршрутов. Отдельные колонки (а не JSON) — потому что менеджеру нужны
+  /// быстрые фильтры «вегетарианцы», «с детьми», «никогда не были в Индии».
+
+  /// Диетические предпочтения: 'vegetarian' | 'vegan' | 'halal' | 'kosher' |
+  /// 'no_pork' | 'no_beef' | 'no_restrictions'. Хранятся как массив для
+  /// возможности множественного выбора (например, halal+no_pork).
+  dietPreferences String[] @default([]) @map("diet_preferences")
+  /// Свободный текст про аллергии. Шифруется (#139) — может содержать
+  /// медицинскую информацию (квази-чувствительные ПДн).
+  allergies       String?  @map("allergies")
+  /// Темп поездки.
+  paceLevel       PaceLevel? @map("pace_level")
+  /// Едет ли с детьми. null = пользователь не отвечал.
+  hasChildren     Boolean? @map("has_children")
+  /// Возраста детей, если hasChildren=true. Для подбора активностей.
+  childrenAges    Int[]    @default([]) @map("children_ages")
+  /// Опыт поездок в Индию.
+  indiaExperience IndiaExperience? @map("india_experience")
+  /// Когда заполнен финал quiz'а (POST). null = только draft (PATCH'и).
+  /// Используется для триггера manager-handoff и для UI-индикатора «анкета готова».
+  quizCompletedAt DateTime? @map("quiz_completed_at")
+
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("client_profiles")
+}
+
+/// Темп поездки (quiz-ответ для подбора маршрута).
+enum PaceLevel {
+  slow   /// 1-2 локации в день, много отдыха
+  medium /// 2-3 локации, сбалансированно
+  fast   /// 3-4+ локации, активно
+
+  @@map("pace_level")
+}
+
+/// Опыт клиента с Индией.
+enum IndiaExperience {
+  never        /// Никогда не были
+  been_once    /// Были один раз
+  multiple     /// Были несколько раз
+
+  @@map("india_experience")
 }
 
 /// Сессия пользователя (refresh-token instance). Один user может иметь

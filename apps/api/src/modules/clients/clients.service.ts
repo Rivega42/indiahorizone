@@ -20,6 +20,7 @@ import { CryptoService } from '../../common/crypto/crypto.service';
 import { OutboxService } from '../../common/outbox/outbox.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
+import type { QuizResponse } from './dto/quiz.dto';
 import type { Client, ClientProfile, Prisma } from '@prisma/client';
 
 /**
@@ -174,4 +175,141 @@ export class ClientsService {
 
     return decryptProfile(updated, this.crypto);
   }
+
+  /**
+   * Получить текущее состояние quiz'а (#B-04).
+   *
+   * Возвращает структурированные quiz-поля из ClientProfile + completedAt.
+   * `allergies` расшифровываются через decryptProfile (это медданные).
+   *
+   * @returns null если профиль ещё не создан (listener auth.user.registered
+   *   не отработал); caller вернёт 404.
+   */
+  async getQuiz(userId: string): Promise<QuizResponse | null> {
+    const client = await this.prisma.client.findUnique({
+      where: { userId },
+      select: { profile: true },
+    });
+    if (!client?.profile) {
+      return null;
+    }
+    const decrypted = decryptProfile({ ...client.profile }, this.crypto);
+    return {
+      dietPreferences: decrypted.dietPreferences,
+      allergies: decrypted.allergies,
+      paceLevel: decrypted.paceLevel,
+      hasChildren: decrypted.hasChildren,
+      childrenAges: decrypted.childrenAges,
+      indiaExperience: decrypted.indiaExperience,
+      completedAt: decrypted.quizCompletedAt?.toISOString() ?? null,
+    };
+  }
+
+  /**
+   * PATCH /clients/me/quiz — autosave частично заполненного quiz'а (#B-04).
+   *
+   * Не ставит completedAt и не публикует event — это draft. Финальный submit
+   * через `submitQuiz()`.
+   */
+  async patchQuiz(userId: string, patch: QuizPatch): Promise<QuizResponse> {
+    return this.applyQuizPatch(userId, patch, false);
+  }
+
+  /**
+   * POST /clients/me/quiz — финальная отправка (#B-04).
+   *
+   * Помимо записи полей: ставит quizCompletedAt = now, публикует
+   * `client.quiz.completed` через outbox для downstream listeners
+   * (manager-handoff, NPS-baseline).
+   *
+   * Идемпотентность: повторный submit перезаписывает значения и обновляет
+   * completedAt — событие публикуется каждый раз. Менеджер обрабатывает
+   * дубли через correlation в CRM (вне scope этого сервиса).
+   */
+  async submitQuiz(userId: string, patch: QuizPatch): Promise<QuizResponse> {
+    return this.applyQuizPatch(userId, patch, true);
+  }
+
+  private async applyQuizPatch(
+    userId: string,
+    patch: QuizPatch,
+    finalize: boolean,
+  ): Promise<QuizResponse> {
+    const client = await this.prisma.client.findUnique({
+      where: { userId },
+      select: { id: true, profile: { select: { id: true } } },
+    });
+    if (!client) {
+      throw new NotFoundException(`Client not found for userId=${userId}`);
+    }
+
+    const { allergies, ...rest } = patch;
+    const encryptedAllergies =
+      allergies === undefined
+        ? {}
+        : { allergies: allergies === null ? null : this.crypto.encrypt(allergies) };
+
+    const data: Prisma.ClientProfileUpdateInput = {
+      ...rest,
+      ...encryptedAllergies,
+      ...(finalize ? { quizCompletedAt: new Date() } : {}),
+    };
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = client.profile
+        ? await tx.clientProfile.update({
+            where: { id: client.profile.id },
+            data,
+          })
+        : await tx.clientProfile.create({
+            data: {
+              clientId: client.id,
+              ...rest,
+              ...encryptedAllergies,
+              ...(finalize ? { quizCompletedAt: new Date() } : {}),
+            },
+          });
+
+      if (finalize) {
+        await this.outbox.add(tx, {
+          type: 'client.quiz.completed',
+          schemaVersion: 1,
+          actor: { type: 'user', id: userId },
+          payload: {
+            userId,
+            clientId: client.id,
+            indiaExperience: result.indiaExperience,
+            hasChildren: result.hasChildren,
+            paceLevel: result.paceLevel,
+          },
+        });
+      }
+
+      return result;
+    });
+
+    const decrypted = decryptProfile({ ...updated }, this.crypto);
+    return {
+      dietPreferences: decrypted.dietPreferences,
+      allergies: decrypted.allergies,
+      paceLevel: decrypted.paceLevel,
+      hasChildren: decrypted.hasChildren,
+      childrenAges: decrypted.childrenAges,
+      indiaExperience: decrypted.indiaExperience,
+      completedAt: decrypted.quizCompletedAt?.toISOString() ?? null,
+    };
+  }
+}
+
+/**
+ * Тип для применения quiz patch'а в ClientsService. Соответствует QuizPatchDto,
+ * но без декораторов class-validator — это уже валидированный input.
+ */
+export interface QuizPatch {
+  dietPreferences?: string[];
+  allergies?: string | null;
+  paceLevel?: 'slow' | 'medium' | 'fast' | null;
+  hasChildren?: boolean | null;
+  childrenAges?: number[];
+  indiaExperience?: 'never' | 'been_once' | 'multiple' | null;
 }

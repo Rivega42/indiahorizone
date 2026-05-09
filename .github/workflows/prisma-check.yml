@@ -108,6 +108,8 @@ jobs:
 
       # Дополнительно: валидация синтаксиса schema.prisma (1 секунда, ловит опечатки)
       - name: Validate schema syntax
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test?schema=public
         working-directory: apps/api
         run: |
           echo "Validating schema.prisma syntax..."
